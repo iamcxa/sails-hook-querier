@@ -1,0 +1,48 @@
+{
+  "name": "sails-hook-querier",
+  "version": "0.1.0",
+  "description": "Hook to add powerful customize sequelize querier for sails application",
+  "main": "index.js",
+  "private": true,
+  "author": {
+    "name": "Kent Chen",
+    "email": "iamcxa@gmail.com",
+    "url": "http://iamcxa.me/"
+  },
+  "keywords": [
+    "sails",
+    "sails.js",
+    "sails-hook",
+    "sequelize"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iamcxa/sails-hook-querier"
+  },
+  "devDependencies": {
+    "@sailshq/eslint": "^4.19.3",
+    "chai-datetime": "^1.5.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^5.2.0",
+    "chai": "^4.2.0",
+    "sails": "~1.0.2",
+    "sails-hook-sequelize": "https://github.com/trunk-studio/sails-hook-sequelize",
+    "sequelize": "^4.39.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "sails-util-micro-apps": "git+https://github.com/MoreAppio/sails-util-micro-apps.git"
+  },
+  "engines": {
+    "node": "^8.9.1"
+  },
+  "scripts": {
+    "doc": "",
+    "jsdoc": "jsdoc api/services/**.js --recurse --destination ./doc --readme README.md --access all"
+  },
+  "sails": {
+    "isHook": true
+  }
+}
