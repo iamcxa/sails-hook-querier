@@ -1,31 +1,31 @@
-var hookName = 'querier';
-var config = require(`./config/${hookName}`);
-
 module.exports = function (sails) {
-    var loader = require('sails-util-micro-apps')(sails);
-    var config = sails.config[hookName] || config;
-    var isEnable = config.enable;
-    return {
-      configure() {
-        if (isEnable) {
-          loader.configure({
-            policies: `${__dirname}/api/policies`, // Path to your hook's policies
-            config: `${__dirname}/config`, // Path to your hook's config
-            assets: `${__dirname}/assets`,
-            views: `${__dirname}/views`,
-          });
-        }
-      },
-      initialize(next) {
-        if (isEnable) {
-          loader.inject({
-            responses: `${__dirname}/api/responses`,
-            models: `${__dirname}/api/models`, // Path to your hook's models
-            helpers: `${__dirname}/api/helpers`, // Path to your hook's helpers
-            services: `${__dirname}/api/services`, // Path to your hook's services
-            controllers: `${__dirname}/api/controllers`, // Path to your hook's controllers
-          }, err => next(err));
-        }
-      },
-    };
+  var hookName = 'querier';
+  var loader = require('sails-util-micro-apps')(sails);
+  var hookConfig = require(`./config/${hookName}`);
+  var config = sails.config[hookName] || hookConfig[hookName];
+  var isEnable = config.enable;
+  return {
+    configure() {
+      if (isEnable) {
+        loader.configure({
+          policies: `${__dirname}/api/policies`,
+          config: `${__dirname}/config`,
+          assets: `${__dirname}/assets`,
+          views: `${__dirname}/views`,
+        });
+      }
+    },
+    initialize(next) {
+      sails.log.debug(`[!][sails-hook-${hookName}] Enable Status: ${isEnable}`);
+      if (isEnable) {
+        loader.inject({
+          models: `${__dirname}/api/models`,
+          helpers: `${__dirname}/api/helpers`,
+          services: `${__dirname}/api/services`,
+          responses: `${__dirname}/api/responses`,
+          controllers: `${__dirname}/api/controllers`,
+        }, err => next(err));
+      } else next();
+    },
+  };
 };

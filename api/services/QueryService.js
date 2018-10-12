@@ -190,6 +190,7 @@ module.exports = {
     required = [],
     readonly = [],
     extra = null,
+    view = false,
   }) {
     let result = {};
     try {
@@ -213,7 +214,7 @@ module.exports = {
         result = data;
       }
       // 檢查並輸出前端要顯示的欄位與類型
-      if (fields) {
+      if (view && fields) {
         // eslint-disable-next-line no-underscore-dangle
         result._fields = fields.map((field) => {
           // 如果已經有 required 與 readonly 欄位則不修改
@@ -775,6 +776,7 @@ module.exports = {
         readonly,
         data: data.toJSON(),
         extra,
+        view,
       });
     } catch (e) {
       sails.log.error(e);
@@ -955,10 +957,11 @@ module.exports = {
           : e))
         .map(field => ({
           ...field,
-          label: sails.__({
-            phrase: getPhrase(field.name),
-            locale: langCode || 'zh-TW',
-          }),
+          label: sails.__(getPhrase(field.name)),
+          // label: sails.__({
+          //   phrase: getPhrase(field.name),
+          //   locale: langCode || 'zh-TW',
+          // }),
           required: autoRequired
             .some(r => r === field.name),
           readonly: autoReadonly
@@ -1468,6 +1471,7 @@ module.exports = {
         format,
         formatCb,
         data: e ? e.toJSON() : null,
+        view,
       }));
       const total = typeof data.count === 'number'
         ? data.count : data.count.length;
@@ -1598,11 +1602,12 @@ module.exports = {
         ? `model.${_.upperFirst(name)}` : `model.${_.upperFirst(modelName)}.${name}`);
 
       const headers = columns.map(col => ({
-        label: sails.__({
-          phrase:
-            this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),
-          locale: langCode,
-        }),
+        label: sails.__(his.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col)),
+        // label: sails.__({
+        //   phrase:
+        //     this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),
+        //   locale: langCode,
+        // }),
         key: `${_.upperFirst(modelName)}.${col}`,
       }));
       // 取出可搜尋欄位
@@ -1610,11 +1615,15 @@ module.exports = {
         date: true,
         integer: true,
       }).map(e => ({
-        label: sails.__({
-          phrase: this.isCommonField(e.key)
-            ? `model${e.key.replace(modelName, '')}` : `model.${e.key}`,
-          locale: langCode,
-        }),
+        label: sails.__((
+          this.isCommonField(e.key)
+            ? `model${e.key.replace(modelName, '')}`
+            : `model.${e.key}`)),
+        // label: sails.__({
+        //   phrase: this.isCommonField(e.key)
+        //     ? `model${e.key.replace(modelName, '')}` : `model.${e.key}`,
+        //   locale: langCode,
+        // }),
         key: e.key,
         type: e.type,
       }));
