@@ -27,7 +27,9 @@
     "mocha": "^5.2.0",
     "chai": "^4.2.0",
     "sails": "~1.0.2",
-    "sails-hook-sequelize": "https://github.com/trunk-studio/sails-hook-sequelize",
+    "sails-hook-sequelize": "git+https://github.com/MoreAppio/sails-hook-sequelize.git",
+    "jsdoc": "^3.5.5",
+    "jsdoc-strip-async-await": "^0.1.0",
     "sequelize": "^4.39.0"
   },
   "dependencies": {
@@ -39,7 +41,7 @@
   },
   "scripts": {
     "doc": "",
-    "jsdoc": "jsdoc api/services/**.js --recurse --destination ./doc --readme README.md --access all"
+    "jsdoc": "jsdoc api/services/*.js --destination ./docs --readme README.md --access all --configure ./jsdoc.conf.json"
   },
   "sails": {
     "isHook": true

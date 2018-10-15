@@ -5,6 +5,18 @@ module.exports = function (sails) {
   var config = sails.config[hookName] || hookConfig[hookName];
   var isEnable = config.enable;
   return {
+    bootstrap() {
+      try {
+        // TODO: 修正 Sequelize pre query 去掉 fullGroupBy
+        // console.log('SequelizeConnections=>', SequelizeConnections.mysql);
+        // console.log('Sequelize=>', Sequelize);
+        // const equelize = require('sequelize');
+        sails.log.warn('[!] FIXME: 需要依據 connection 自動移除 ONLY_FULL_GROUP_BY。');
+        SequelizeConnections.mysql.query("SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
+      } catch (e) {
+        throw e;
+      }
+    },
     configure() {
       if (isEnable) {
         loader.configure({
