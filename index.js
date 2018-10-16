@@ -30,7 +30,7 @@ module.exports = function (sails) {
     initialize(next) {
       sails.log.debug(`[!][sails-hook-${hookName}] Enable Status: ${isEnable}`);
       if (isEnable) {
-        loader.inject({
+        loader.injectAll({
           models: `${__dirname}/api/models`,
           helpers: `${__dirname}/api/helpers`,
           services: `${__dirname}/api/services`,

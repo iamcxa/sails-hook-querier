@@ -1,5 +1,5 @@
 {
-  "name": "sails-hook-querier",
+  "name": "sails-hook-sequelize-querier",
   "version": "0.1.1",
   "description": "Hook to add powerful customize sequelize querier for sails application",
   "main": "index.js",
@@ -27,19 +27,22 @@
     "mocha": "^5.2.0",
     "chai": "^4.2.0",
     "sails": "~1.0.2",
-    "sails-hook-sequelize": "git+https://github.com/MoreAppio/sails-hook-sequelize.git",
     "jsdoc": "^3.5.5",
-    "jsdoc-strip-async-await": "^0.1.0",
-    "sequelize": "^4.39.0"
+    "jsdoc-strip-async-await": "^0.1.0"
   },
   "dependencies": {
     "lodash": "^4.17.11",
-    "sails-util-micro-apps": "git+https://github.com/MoreAppio/sails-util-micro-apps.git"
+    "sails-hook-sequelize": "git+https://github.com/MoreAppio/sails-hook-sequelize.git",
+    "sails-util-micro-apps": "git+https://github.com/MoreAppio/sails-util-micro-apps.git",
+    "sequelize": "^4.39.0"
   },
   "engines": {
     "node": "^8.9.1"
   },
   "scripts": {
+    "lint": "./node_modules/.bin/eslint --max-warnings=0 --report-unused-disable-directives './' && echo '✔  Your .js files look good.'",
+    "lint-fix": "./node_modules/.bin/eslint --max-warnings=0 --report-unused-disable-directives --fix './' && echo '✔  Your .js files look good.'",
+    "prepublishOnly": "",
     "doc": "",
     "jsdoc": "jsdoc api/services/*.js --destination ./docs --readme README.md --access all --configure ./jsdoc.conf.json"
   },

@@ -13,18 +13,7 @@
   },
 
   "parserOptions": {
-    "ecmaVersion": 8,
-    "ecmaFeatures": {
-      "experimentalObjectRestSpread": true
-    }
-  },
-
-  "globals": {
-    "Promise": true,
-    "sails": true,
-    "_": true,
-    "async": true,
-    "QueryService": true
+    "ecmaVersion": 8
   },
 
 	"rules": {

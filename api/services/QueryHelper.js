@@ -282,15 +282,15 @@ module.exports = {
     toJSON = null,
   } = {}) {
     try {
-      const inputHasNull = ValidatorHelper.checkNull({
+      const inputHasNull = ValidatorHelper.checkNull([
         modelName,
         input,
-      });
+      ]);
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(inputHasNull));
       }
       const model = sails.models[modelName.toLowerCase()];
-      if (!model) {
+      if (!model || !model.name) {
         throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS(model));
       }
       if (langCode) {
@@ -339,13 +339,11 @@ module.exports = {
       // });
       // console.log(errors);
       // return await cretaeBuild.save();
-      const createdItem = await model.create(data, {
-        include: !_.isEmpty(include) ? include : null,
-      });
+      const createdItem = await model.create(data, { include });
       if (!createdItem) {
         throw Error('QueryService.Create.Failed.Null.Created.Item');
       }
-      return toJSON ? createdItem.toJSON() : createdItem;
+      return toJSON ? createdItem.get({ plain: true }) : createdItem;
     } catch (e) {
       sails.log.error(e);
       throw e;
@@ -397,11 +395,11 @@ module.exports = {
     updateCb = null,
   } = {}) {
     try {
-      const inputHasNull = ValidatorHelper.checkNull({
+      const inputHasNull = ValidatorHelper.checkNull([
         modelName,
         input,
         where,
-      });
+      ]);
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(inputHasNull));
       }
@@ -491,10 +489,10 @@ module.exports = {
     ids = [],
   }) {
     try {
-      const inputHasNull = ValidatorHelper.checkNull({
+      const inputHasNull = ValidatorHelper.checkNull([
         modelName,
         ids,
-      });
+      ]);
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(inputHasNull));
       }
@@ -546,7 +544,7 @@ module.exports = {
           where: { id },
           force,
         });
-        results.push(result);
+        results.push({ success: Boolean(result), id, });
       }
       // console.log('results=>', results);
       return results;
@@ -642,9 +640,9 @@ module.exports = {
   } = {}) {
     const extra = {};
     try {
-      const inputHasNull = ValidatorHelper.checkNull({
+      const inputHasNull = ValidatorHelper.checkNull([
         modelName,
-      });
+      ]);
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(inputHasNull));
       }
@@ -930,7 +928,7 @@ module.exports = {
             if (length) {
               field.limit = length - 1;
             }
-            field.type = modelAttr.type.MESSAGE.toLowerCase();
+            field.type = modelAttr.type.key.toLowerCase();
             break;
           }
         }
@@ -1159,7 +1157,7 @@ module.exports = {
     perPage = 10,
     paging = true,
     sort = 'DESC',
-    by = 'createdAt',
+    sortBy = 'createdAt',
     order = null,
     group = null,
     collate = null,
@@ -1167,7 +1165,7 @@ module.exports = {
     condition = '$and',
   }) {
     try {
-      let mOrder = order || [[Sequelize.col(by), sort]];
+      let mOrder = order || [[Sequelize.col(sortBy), sort]];
       let intPage = Number(curPage);
       let intLimit = Number(perPage);
       if (_.isNaN(intPage)) intPage = 1;
@@ -1236,12 +1234,13 @@ module.exports = {
       }
 
       // 如果有指定配對的搜尋欄位
-      if (!_.isEmpty(filter.fields)) {
+      const fields = filter.fields ? JSON.parse(decodeURIComponent(fields)) : [];
+      if (!_.isEmpty(fields)) {
         if (!query.where.$and) {
           query.where.$and = [];
         }
         if (query.where.$and instanceof Array) {
-          filter.fields.forEach((e) => {
+          fields.forEach((e) => {
             // 轉型
             let value = isNumeric(e.value) ? parseInt(e.value, 10) : e.value;
             value = _.isDate(value) ? new Date(value) : value;
@@ -1394,7 +1393,7 @@ module.exports = {
     curPage = 1,
     perPage = 10,
     sort = 'DESC',
-    by = 'createdAt',
+    sortBy = 'createdAt',
     order = null,
     collate = null,
     log = false,
@@ -1408,17 +1407,17 @@ module.exports = {
     // const now = new Date().getTime();
     // const tag = `${modelName}-findBy-${now}`;
     try {
-      const inputHasNull = ValidatorHelper.checkNull({
+      const inputHasNull = ValidatorHelper.checkNull([
         modelName,
         filter,
-      });
+      ]);
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(inputHasNull));
       }
-      // if (by) {
+      // if (sortBy) {
       //   const getModelColumns = name => this.getModelColumns({ modelName: name });
       //   const isByExistInModel = getModelColumns(modelName)
-      //     .some(e => e.toString() === by.toString());
+      //     .some(e => e.toString() === sortBy.toString());
 
       //   if (!isByExistInModel && !_.isEmpty(include)) {
       //     include
@@ -1426,14 +1425,14 @@ module.exports = {
       //         console.log('inc=>', inc);
       //         const incModelName = inc.modelName ? inc.modelName : inc.model.name;
       //         const isByExistInIncludeModel = getModelColumns(incModelName)
-      //           .some(e => e.toString() === by.toString());
+      //           .some(e => e.toString() === sortBy.toString());
       //         if (isByExistInIncludeModel) {
       //           // eslint-disable-next-line
-      //           by = inc.model ? `${inc.model.name}.${by}` : `${inc.modelName}.${by}`;
+      //           sortBy = inc.model ? `${inc.model.name}.${sortBy}` : `${inc.modelName}.${sortBy}`;
       //         }
       //       });
       //   }
-      //   console.log('findBy order by=>', by);
+      //   console.log('findBy order sortBy=>', sortBy);
       // }
       // console.time(tag);
       const query = this.formatQuery({
@@ -1443,7 +1442,7 @@ module.exports = {
         perPage,
         filter,
         sort,
-        by,
+        sortBy,
         order,
         collate,
         modelName,
@@ -1494,7 +1493,7 @@ module.exports = {
           curPage: parseInt(curPage, 10),
           perPage: parseInt(perPage, 10),
           sort: sort.toUpperCase(),
-          by: by.toLowerCase(),
+          sortBy: sortBy.toLowerCase(),
           total,
         },
         filter,
@@ -1617,7 +1616,7 @@ module.exports = {
       }).map(e => ({
         label: sails.__((
           this.isCommonField(e.key)
-            ? `model${e.MESSAGE.replace(modelName, '')}`
+            ? `model${e.key.replace(modelName, '')}`
             : `model.${e.key}`)),
         // label: sails.__({
         //   phrase: this.isCommonField(e.key)

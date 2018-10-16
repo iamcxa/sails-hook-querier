@@ -1,0 +1,10 @@
+{
+  "globals": {
+    "Promise": true,
+    "sails": true,
+    "_": true,
+    "async": true,
+    "QueryService": true,
+    "QueryHelper": true
+  }
+}
