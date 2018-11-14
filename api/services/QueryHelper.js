@@ -1263,27 +1263,28 @@ module.exports = {
         }
         if (query.where.$and instanceof Array) {
           fields.forEach((field) => {
-            // 轉型
-            let value = isNumeric(field.value) ? parseInt(field.value, 10) : field.value;
-            value = _.isDate(value) ? new Date(value) : value;
-            query.where.$and.push(
-              Sequelize.where(
-                Sequelize.col(`${field.key}`), 'like', `%${value}%`,
-              ),
-            );
             // 檢查是否有 $or 條件
             const $or = field['$or'];
             if (!_.isNil($or) && _.isArray($or)) {
-              if (!query.where.$or) {
-                query.where.$or = []; 
-              }
+              const orArray = { $or: [] };
               $or.forEach((item) => {
-                query.where.$or.push(
-                  Sequelize.where(
-                    Sequelize.col(`${item.key}`), 'like', `%${item.value}%`,
-                  ),
-                );
+                // 轉型
+                let value = isNumeric(item.value) ? parseInt(item.value, 10) : item.value;
+                value = _.isDate(value) ? new Date(value) : value;
+                orArray.$or.push({
+                  [`$${item.key}$`]: { $like: `%${value}%` },
+                });
               });
+              query.where.$and.push(orArray);
+            } else {
+              // 轉型
+              let value = isNumeric(field.value) ? parseInt(field.value, 10) : field.value;
+              value = _.isDate(value) ? new Date(value) : value;
+              query.where.$and.push(
+                Sequelize.where(
+                  Sequelize.col(`${field.key}`), 'like', `%${value}%`,
+                ),
+              );
             }
           });
         }
