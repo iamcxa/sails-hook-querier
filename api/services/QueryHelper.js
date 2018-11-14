@@ -1262,15 +1262,29 @@ module.exports = {
           query.where.$and = [];
         }
         if (query.where.$and instanceof Array) {
-          fields.forEach((e) => {
+          fields.forEach((field) => {
             // 轉型
-            let value = isNumeric(e.value) ? parseInt(e.value, 10) : e.value;
+            let value = isNumeric(field.value) ? parseInt(field.value, 10) : field.value;
             value = _.isDate(value) ? new Date(value) : value;
             query.where.$and.push(
               Sequelize.where(
-                Sequelize.col(`${e.key}`), 'like', `%${value}%`,
+                Sequelize.col(`${field.key}`), 'like', `%${value}%`,
               ),
             );
+            // 檢查是否有 $or 條件
+            const $or = field['$or'];
+            if (!_.isNil($or) && _.isArray($or)) {
+              if (!query.where.$or) {
+                query.where.$or = []; 
+              }
+              $or.forEach((item) => {
+                query.where.$or.push(
+                  Sequelize.where(
+                    Sequelize.col(`${item.key}`), 'like', `%${item.value}%`,
+                  ),
+                );
+              });
+            }
           });
         }
       }
