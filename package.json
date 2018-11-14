@@ -1,6 +1,6 @@
 {
   "name": "sails-hook-sequelize-querier",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Hook to add powerful customize sequelize querier for sails application",
   "main": "index.js",
   "author": {
