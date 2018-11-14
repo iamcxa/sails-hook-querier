@@ -1176,9 +1176,10 @@ module.exports = {
     condition = '$and',
   }) {
     try {
-      const sortByColumn = include
-        ? `\`${modelName}\`.\`${sortBy}\``
-        : sortBy;
+      const sortByColumn = sortBy;
+      // include
+      //   ? `\`${modelName}\`.\`${sortBy}\``
+      //   : sortBy;
       let mOrder = order || [[Sequelize.col(sortByColumn), sort]];
       let intPage = Number(curPage);
       let intLimit = Number(perPage);
