@@ -10,7 +10,7 @@ module.exports = function (sails) {
         // TODO: 修正 Sequelize pre query 去掉 fullGroupBy
         // console.log('SequelizeConnections=>', SequelizeConnections.mysql);
         // console.log('Sequelize=>', Sequelize);
-        // const equelize = require('sequelize');
+        // const sequelize = require('sequelize');
         sails.log.warn('[!] FIXME: 需要依據 connection 自動移除 ONLY_FULL_GROUP_BY。');
         SequelizeConnections.mysql.query("SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
       } catch (e) {

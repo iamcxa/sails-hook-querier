@@ -7,6 +7,7 @@
 import _ from 'lodash';
 import moment from 'moment-timezone';
 
+const TAG = 'QueryHelper';
 const getDate = (date, format) => {
   if (!format) {
     // eslint-disable-next-line no-param-reassign
@@ -142,7 +143,13 @@ module.exports = {
             } else if (_.isString(value)
               && value.match(isDate) !== null) {
               // 檢查輸入是否包含日期
-              _.set(source, path, new Date(value));
+              try {
+                const valueAsDate = new Date(value);
+                _.set(source, path, valueAsDate);
+              } catch (e) {
+                sails.log.warn(`[!] ${TAG}.formatInput: Parse Value "${value}" into Date type failed(${e}). this may not be an issue, will fallback to it origin String type value.`);
+                _.set(source, path, value);
+              }
             } else if (value === 'Invalid date') {
               _.set(source, path, null);
             } else {
@@ -287,7 +294,7 @@ module.exports = {
         input,
       ]);
       if (inputHasNull) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(inputHasNull));
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
       const model = sails.models[modelName.toLowerCase()];
       if (!model || !model.name) {
@@ -401,9 +408,9 @@ module.exports = {
         where,
       ]);
       if (inputHasNull) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(inputHasNull));
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
-      console.log('update modelName=>', modelName);
+      // console.log('update modelName=>', modelName);
       const model = sails.models[modelName.toLowerCase()];
       if (!model) {
         throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS(model));
@@ -422,7 +429,9 @@ module.exports = {
       }
       let target = await model.findOne(query);
       if (!target) {
-        throw Error(MESSAGE.ERROR.NO_TARGET_FOUNDED);
+        throw Error(MESSAGE.BAD_REQUEST.NO_TARGET_FOUNDED({
+          where: `${modelName}:${_.values(where)}`,
+        }));
       }
       if (!format) {
         // eslint-disable-next-line
@@ -447,7 +456,7 @@ module.exports = {
         rawData: input,
       });
       console.log('data==============>');
-      console.dir(target);
+      console.dir(target.toJSON ? target.toJSON() : target);
       const structure = target.toJSON();
       // console.log('structure=>', structure);
       const updateIncludeObject = [];
@@ -494,7 +503,7 @@ module.exports = {
         ids,
       ]);
       if (inputHasNull) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(inputHasNull));
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
       if (!_.isArray(ids)) {
         throw Error(MESSAGE.BAD_REQUEST.CHECK_INPUT_PARAMETER_TYPE('ids', Array));
@@ -644,7 +653,7 @@ module.exports = {
         modelName,
       ]);
       if (inputHasNull) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(inputHasNull));
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
       if (!include && !where) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER('include or where'));
@@ -707,7 +716,9 @@ module.exports = {
       // console.dir(query);
       const data = await model.findOne(query);
       if (!data) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_TARGET_FOUNDED(`${modelName}:${_.values(where)}`));
+        throw Error(MESSAGE.BAD_REQUEST.NO_TARGET_FOUNDED({
+          where: `${modelName}:${_.values(where)}`,
+        }));
       }
 
       // 自動取出關聯的資料欄位與對應資料來源，並且將欄位設成 chosen 以供選擇
@@ -893,7 +904,7 @@ module.exports = {
       }
       const model = sails.models[modelName.toLowerCase()];
       if (!modelName) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER('modelName'));
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ modelName }));
       }
       if (!model) {
         throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS(model));
@@ -1165,7 +1176,10 @@ module.exports = {
     condition = '$and',
   }) {
     try {
-      let mOrder = order || [[Sequelize.col(sortBy), sort]];
+      const sortByColumn = include
+        ? `\`${modelName}\`.\`${sortBy}\``
+        : sortBy;
+      let mOrder = order || [[Sequelize.col(sortByColumn), sort]];
       let intPage = Number(curPage);
       let intLimit = Number(perPage);
       if (_.isNaN(intPage)) intPage = 1;
@@ -1234,7 +1248,15 @@ module.exports = {
       }
 
       // 如果有指定配對的搜尋欄位
-      const fields = filter.fields ? JSON.parse(decodeURIComponent(fields)) : [];
+      let fields = filter.fields;
+      if (_.isString(fields)) {
+        try {
+          fields = JSON.parse(decodeURIComponent(fields)); 
+        } catch (e) {
+          sails.log.warn(`[!] ${TAG}.formatQuery Parse "filter.fields" into Json-Array type failed.(${e})) this may not be an issue, please check what is actually be input by frontend.`);
+          fields = filter.fields;
+        }
+      }
       if (!_.isEmpty(fields)) {
         if (!query.where.$and) {
           query.where.$and = [];
@@ -1412,7 +1434,7 @@ module.exports = {
         filter,
       ]);
       if (inputHasNull) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(inputHasNull));
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
       // if (sortBy) {
       //   const getModelColumns = name => this.getModelColumns({ modelName: name });
