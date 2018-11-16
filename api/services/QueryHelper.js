@@ -138,7 +138,8 @@ module.exports = {
           if (_.hasIn(rawData, path)) {
             // console.log('_.get(rawData, path)=>', _.get(rawData, path));
             const value = _.get(rawData, path);
-            if (_.isNil(value) || (!isNumeric(value) && _.isEmpty(value))) {
+            if (_.isNil(value) 
+                || (!isNumeric(value) && _.isEmpty(value) && !_.isBoolean(value) && !_.isFunction(value))) {
               _.set(source, path, null);
             } else if (_.isString(value)
               && value.match(isDate) !== null) {
@@ -418,8 +419,8 @@ module.exports = {
       if (langCode) {
         // TODO: 語系篩選
       }
-      console.log('input==============>');
-      console.log('modelName=>', modelName);
+      console.log('update input==============>');
+      console.log('update modelName=>', modelName);
       console.dir(input);
       const query = {
         where,
@@ -445,19 +446,21 @@ module.exports = {
             exclude: ['id', 'createdAt', 'updatedAt'],
           })) : null,
         });
-        console.log('format==============>');
+        console.log('update format==============>');
         console.dir(format);
       }
-      target = this.formatInput({
+      target = _.merge(target, this.formatInput({
         modelName,
         format,
         formatCb,
         source: target,
         rawData: input,
-      });
-      console.log('data==============>');
+      }));
+      console.log('update data==============>');
+      // console.log('target.toJSON=>', target.toJSON);
+      // console.log('target.save=>', target.save);
       console.dir(target.toJSON ? target.toJSON() : target);
-      const structure = target.toJSON();
+      const structure = target.toJSON ? target.toJSON() : target;
       // console.log('structure=>', structure);
       const updateIncludeObject = [];
       Object.keys(structure).forEach((item) => {
@@ -1250,6 +1253,7 @@ module.exports = {
 
       // 如果有指定配對的搜尋欄位
       let fields = filter.fields;
+      console.log('queryhelper fields=>', fields);
       if (_.isString(fields)) {
         try {
           fields = JSON.parse(decodeURIComponent(fields)); 
