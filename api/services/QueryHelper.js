@@ -1253,7 +1253,6 @@ module.exports = {
 
       // 如果有指定配對的搜尋欄位
       let fields = filter.fields;
-      console.log('queryhelper fields=>', fields);
       if (_.isString(fields)) {
         try {
           fields = JSON.parse(decodeURIComponent(fields)); 
