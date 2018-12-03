@@ -290,10 +290,10 @@ module.exports = {
     toJSON = null,
   } = {}) {
     try {
-      const inputHasNull = ValidatorHelper.checkNull([
+      const inputHasNull = ValidatorHelper.checkNull({
         modelName,
         input,
-      ]);
+      });
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
@@ -403,11 +403,11 @@ module.exports = {
     updateCb = null,
   } = {}) {
     try {
-      const inputHasNull = ValidatorHelper.checkNull([
+      const inputHasNull = ValidatorHelper.checkNull({
         modelName,
         input,
         where,
-      ]);
+      });
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
@@ -501,10 +501,10 @@ module.exports = {
     ids = [],
   }) {
     try {
-      const inputHasNull = ValidatorHelper.checkNull([
+      const inputHasNull = ValidatorHelper.checkNull({
         modelName,
         ids,
-      ]);
+      });
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
@@ -641,6 +641,7 @@ module.exports = {
     include = null,
     attributes = null,
   }, {
+    log = false,
     required = null,
     readonly = null,
     view = false,
@@ -652,9 +653,9 @@ module.exports = {
   } = {}) {
     const extra = {};
     try {
-      const inputHasNull = ValidatorHelper.checkNull([
+      const inputHasNull = ValidatorHelper.checkNull({
         modelName,
-      ]);
+      });
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
@@ -713,6 +714,13 @@ module.exports = {
       if (attributes) {
         query.attributes = attributes;
         fields = fields.filter(e => attributes.some(attr => e.name === attr));
+      }
+      if (log) {
+        if (_.isFunction(log)) {
+          query.logging = log;
+        } else {
+          query.logging = console.log;
+        }
       }
       // console.log('fields=>', fields);
       // console.log('query=>');
@@ -1174,6 +1182,8 @@ module.exports = {
     sortBy = 'createdAt',
     order = null,
     group = null,
+    subQuery = null,
+    duplicating = null,
     collate = null,
     log = false,
     condition = '$and',
@@ -1252,7 +1262,9 @@ module.exports = {
       }
 
       // 如果有指定配對的搜尋欄位
-      let fields = filter.fields;
+      let fields = _.has(filter, 'fields')
+        ? filter.fields
+        : null;
       if (_.isString(fields)) {
         try {
           fields = JSON.parse(decodeURIComponent(fields)); 
@@ -1338,8 +1350,8 @@ module.exports = {
       query = {
         ...query,
         collate,
-        subQuery: false,
-        duplicating: false,
+        subQuery: subQuery || false,
+        duplicating: duplicating || false,
       };
       if (log) {
         if (_.isObject(log)) {
@@ -1448,10 +1460,10 @@ module.exports = {
     // const now = new Date().getTime();
     // const tag = `${modelName}-findBy-${now}`;
     try {
-      const inputHasNull = ValidatorHelper.checkNull([
+      const inputHasNull = ValidatorHelper.checkNull({
         modelName,
         filter,
-      ]);
+      });
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
