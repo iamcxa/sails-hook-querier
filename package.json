@@ -1,6 +1,6 @@
 {
   "name": "sails-hook-sequelize-querier",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Hook to add powerful customize sequelize querier for sails application",
   "main": "index.js",
   "author": {
@@ -34,7 +34,8 @@
     "lodash": "^4.17.11",
     "sails-hook-sequelize": "git+https://github.com/MoreAppio/sails-hook-sequelize.git",
     "sails-util-micro-apps": "git+https://github.com/MoreAppio/sails-util-micro-apps.git",
-    "sequelize": "^4.39.0"
+    "sequelize": "^4.39.0",
+    "supertest": "^3.3.0"
   },
   "engines": {
     "node": "^8.9.1"

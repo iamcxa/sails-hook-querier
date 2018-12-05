@@ -1272,6 +1272,7 @@ module.exports = {
           sails.log.warn(`[!] ${TAG}.formatQuery Parse "filter.fields" into Json-Array type failed.(${e})) this may not be an issue, please check what is actually be input by frontend.`);
           fields = filter.fields;
         }
+        // console.log('[QueryHelper] fields=>', fields);
       }
       if (!_.isEmpty(fields)) {
         if (!query.where.$and) {
@@ -1285,22 +1286,38 @@ module.exports = {
               const orArray = { $or: [] };
               $or.forEach((item) => {
                 // 轉型
-                let value = isNumeric(item.value) ? parseInt(item.value, 10) : item.value;
+                const isNumber = isNumeric(item.value);
+                let value = isNumber ? parseInt(item.value, 10) : item.value;
                 value = _.isDate(value) ? new Date(value) : value;
-                orArray.$or.push({
-                  [`$${item.key}$`]: { $like: `%${value}%` },
-                });
+                if (isNumeric) {
+                  orArray.$or.push({
+                    [`$${item.key}$`]: { $eq: value },
+                  });
+                } else {
+                  orArray.$or.push({
+                    [`$${item.key}$`]: { $like: `%${value}%` },
+                  });
+                }
               });
               query.where.$and.push(orArray);
             } else {
               // 轉型
-              let value = isNumeric(field.value) ? parseInt(field.value, 10) : field.value;
+              const isNumber = isNumeric(item.value);
+              let value = isNumber ? parseInt(field.value, 10) : field.value;
               value = _.isDate(value) ? new Date(value) : value;
-              query.where.$and.push(
-                Sequelize.where(
-                  Sequelize.col(`${field.key}`), 'like', `%${value}%`,
-                ),
-              );
+              if (isNumber) {
+                query.where.$and.push(
+                  Sequelize.where(
+                    Sequelize.col(`${field.key}`), 'eq', value,
+                  ),
+                );
+              } else {
+                query.where.$and.push(
+                  Sequelize.where(
+                    Sequelize.col(`${field.key}`), 'like', `%${value}%`,
+                  ),
+                );
+              }
             }
           });
         }
@@ -1442,6 +1459,7 @@ module.exports = {
     excludeColumns = null,
   } = {}, {
     langCode = 'zh-TW',
+    whereCondition = '$and',
     filter = null,
     curPage = 1,
     perPage = 10,
@@ -1494,6 +1512,7 @@ module.exports = {
         curPage,
         perPage,
         filter,
+        condition: whereCondition,
         sort,
         sortBy,
         order,
