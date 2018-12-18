@@ -6,6 +6,7 @@
 // import moment from 'moment';
 import _ from 'lodash';
 import moment from 'moment-timezone';
+import inflection from 'inflection';
 
 const TAG = 'QueryHelper';
 const getDate = (date, format) => {
@@ -252,6 +253,55 @@ module.exports = {
     }
   },
 
+  getModelByName(modelName) {
+    try {
+      if (!modelName) {
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ modelName }));
+      }
+      let model = null;
+      if (_.isString(modelName)) {
+        model = sails.models[modelName.toLowerCase()];
+      }
+      if (!model || !_.isObject(model)) {
+        throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({ modelName }));
+      }
+      return model;
+    } catch (e) {
+      throw e;
+    }
+  },
+
+  getIncludeModelByObject(includeModelObject) {
+    try {
+      // console.log('includeModelObject=>', includeModelObject);
+      // console.log('includeModelObject=>', includeModelObject.model);
+      // console.log('includeModelObject=>', includeModelObject.model.name);
+      if (!includeModelObject) {
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ includeModelObject }));
+      }
+      let model = null;
+      if (_.isObject(includeModelObject)) {
+        // 如果是 { model: ModelClass } 形式
+        if (includeModelObject.model && includeModelObject.model.name) {
+          model = sails.models[includeModelObject.model.name.toLowerCase()];
+        // 如果是 { modelName: ModelClass } 形式
+        } else if (includeModelObject.modelName) {
+          model = sails.models[modelName.toLowerCase()];
+        // 如果是 ModelClass {} 形式
+        } else if (includeModelObject.name) {
+          model = includeModelObject;
+        }
+      }
+      // console.log('model=>', model);
+      if (!model) {
+        throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({ includeModelObject }));
+      }
+      return model;
+    } catch (e) {
+      throw e;
+    }
+  },
+
   /**
    * 依據給予的資料建立
    * @version 1.0
@@ -297,10 +347,7 @@ module.exports = {
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
-      const model = sails.models[modelName.toLowerCase()];
-      if (!model || !model.name) {
-        throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS(model));
-      }
+      const model = this.getModelByName(modelName);
       if (langCode) {
         // TODO: 語系篩選
       }
@@ -319,7 +366,13 @@ module.exports = {
           // modelPrefix: !_.isEmpty(include),
           modelPrefix: false,
           exclude: ['id', 'createdAt', 'updatedAt'],
-          include: [],
+          include: include
+            ? _.flatten(include.map(inc => this.getModelColumns({
+                modelName: this.getIncludeModelByObject(inc).name,
+                modelPrefix: true,
+                exclude: ['id', 'createdAt', 'updatedAt'],
+              })))
+            : null,
         });
         console.log('format==============>');
         console.dir(format);
@@ -400,7 +453,6 @@ module.exports = {
   } = {}, {
     format = null,
     formatCb = null,
-    updateCb = null,
   } = {}) {
     try {
       const inputHasNull = ValidatorHelper.checkNull({
@@ -411,16 +463,12 @@ module.exports = {
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
-      // console.log('update modelName=>', modelName);
-      const model = sails.models[modelName.toLowerCase()];
-      if (!model) {
-        throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS(model));
-      }
+      console.log('update modelName=>', modelName);
+      const model = this.getModelByName(modelName);
       if (langCode) {
         // TODO: 語系篩選
       }
       console.log('update input==============>');
-      console.log('update modelName=>', modelName);
       console.dir(input);
       const query = {
         where,
@@ -435,16 +483,27 @@ module.exports = {
         }));
       }
       if (!format) {
+        const associations = this.getAssociations(modelName, {
+          singular: true,
+          one2One: true, 
+        });
+        console.log('associations=>', associations);
         // eslint-disable-next-line
         format = this.getModelColumns({
           modelName,
           modelPrefix: false,
           exclude: ['id', 'createdAt', 'updatedAt'],
-          include: include ? include.map(inc => this.getModelColumns({
-            modelName: _.isString(inc) ? inc : inc.name,
-            modelPrefix: true,
-            exclude: ['id', 'createdAt', 'updatedAt'],
-          })) : null,
+          include: include
+            ? _.flatten(include.map(inc => this.getModelColumns({
+                modelName: this.getIncludeModelByObject(inc).name,
+                modelPrefix: true,
+                isPrefixPlural: this.getAssociations(modelName, {
+                  singular: true,
+                  one2One: true, 
+                }).some(a => a === this.getIncludeModelByObject(inc).name),
+                exclude: ['id', 'createdAt', 'updatedAt'],
+              })))
+            : null,
         });
         console.log('update format==============>');
         console.dir(format);
@@ -469,9 +528,6 @@ module.exports = {
         }
       });
       let result = await Promise.all(updateIncludeObject) && await target.save();
-      if (!_.isNil(updateCb) && _.isFunction(updateCb)) {
-        result = await updateCb(result);
-      }
       return result;
     } catch (e) {
       sails.log.error(e);
@@ -511,10 +567,7 @@ module.exports = {
       if (!_.isArray(ids)) {
         throw Error(MESSAGE.BAD_REQUEST.CHECK_INPUT_PARAMETER_TYPE('ids', Array));
       }
-      const model = sails.models[modelName.toLowerCase()];
-      if (!model) {
-        throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS(model));
-      }
+      const model = this.getModelByName(modelName);
       const results = [];
       /* eslint no-await-in-loop: 0 */
       for (const id of ids) {
@@ -562,6 +615,30 @@ module.exports = {
       return results;
     } catch (e) {
       throw e;
+    }
+  },
+  
+  /**
+   * 替 fields 加入 or 條件
+   * @param {*} fields
+   * @returns
+   */
+  formatFieldQueryWithOrCondition(fields) {
+    try {
+      const fieldsOr = [];
+      const fieldsOrCommand = [];
+      fields.forEach((e) => {
+        if (!fieldsOr.find(x => x === e.key)) {
+          fieldsOr.push(e.key);
+          fieldsOrCommand.push({ $or: [{ key: e.key, value: e.value }] });
+        } else {
+          const i = fieldsOr.findIndex(x => x === e.key);
+          fieldsOrCommand[i].$or.push({ key: e.key, value: e.value });
+        }
+      });
+      return fieldsOrCommand;
+    } catch (err) {
+      throw err;
     }
   },
 
@@ -653,18 +730,9 @@ module.exports = {
   } = {}) {
     const extra = {};
     try {
-      const inputHasNull = ValidatorHelper.checkNull({
-        modelName,
-      });
-      if (inputHasNull) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
-      }
+      const model = this.getModelByName(modelName);
       if (!include && !where) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER('include or where'));
-      }
-      const model = sails.models[modelName.toLowerCase()];
-      if (!model) {
-        throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS(model));
       }
       if (langCode) {
         // TODO: 語系篩選
@@ -684,12 +752,23 @@ module.exports = {
       if (include && _.isArray(include)) {
         query.include = [];
         include.forEach((e) => {
+          if (!e.model && !e.modelName) {
+            throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({
+              field: 'include',
+              required: ['model', 'modelName'],
+              input: `${e}`,
+            }));
+          }
+          const thisModelName = 
+            e.model
+            ? e.model.name
+            : e.modelName;
           const arr = this.getModelOutputColumns({
-            modelName: e.model ? e.model.name : e.modelName,
+            modelName: thisModelName,
             as: e.as,
             exclude: viewExclude
               ? viewExclude
-                .filter(ex => ex.indexOf(e.model ? e.model.name : e.modelName) > -1)
+                .filter(ex => ex.indexOf(thisModelName) > -1)
                 .concat(['id', 'createdAt', 'updatedAt', 'deletedAt'])
               : ['id', 'createdAt', 'updatedAt', 'deletedAt'],
             modelPrefix: true,
@@ -699,7 +778,10 @@ module.exports = {
           });
           fields = fields.concat(arr);
           const inc = {
-            model: e.model ? e.model : sails.models[e.modelName.toLowerCase()],
+            model:
+              e.model
+              ? e.model
+              : this.getModelByName(e.modelName),
           };
           if (e.as) { inc.as = e.as; }
           if (e.limit) { inc.limit = e.limit; }
@@ -819,7 +901,7 @@ module.exports = {
     integer = false,
   } = {}) {
     try {
-      const model = sails.models[modelName.toLowerCase()];
+      const model = this.getModelByName(modelName);
       // 取出全部的 model field
       const targets = [];
       // eslint-disable-next-line
@@ -881,7 +963,7 @@ module.exports = {
       if (!modelName || !columnName) {
         throw Error('Missing required parameter: `modelName` is required.');
       }
-      const model = sails.models[modelName.toLowerCase()];
+      const model = this.getModelByName(modelName);
       const values = model.rawAttributes[columnName].values;
       return _.isArray(values) ? values : null;
     } catch (e) {
@@ -913,13 +995,7 @@ module.exports = {
       } else if (_.isString(modelPrefix)) {
         prefix = `${modelPrefix}.`;
       }
-      const model = sails.models[modelName.toLowerCase()];
-      if (!modelName) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ modelName }));
-      }
-      if (!model) {
-        throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS(model));
-      }
+      const model = this.getModelByName(modelName);
       const fields = [];
       for (const name of _.keys(model.rawAttributes)) {
         const modelAttr = model.rawAttributes[name];
@@ -1086,19 +1162,26 @@ module.exports = {
    */
   getModelColumns({
     modelPrefix = false,
+    isPrefixPlural = false,
     modelName = null,
     exclude = [],
     include = [],
     required = false,
   }) {
-    let prefix = '';
-    if (_.isBoolean(modelPrefix)) {
-      prefix = modelPrefix ? `${modelName}.` : '';
-    } else if (_.isString(modelPrefix)) {
-      prefix = `${modelPrefix}.`;
-    }
     try {
-      const model = sails.models[modelName.toLowerCase()];
+      // 取得 model
+      const model = this.getModelByName(modelName);
+      // 取得單複數 model name
+      const outputModelName = isPrefixPlural
+        ? inflection.pluralize(model.name)
+        : model.name;
+      // 組合
+      let prefix = '';
+      if (_.isBoolean(modelPrefix)) {
+        prefix = modelPrefix ? `${outputModelName}.` : '';
+      } else if (_.isString(modelPrefix)) {
+        prefix = `${modelPrefix}.`;
+      }
       // 自動取得所有欄位
       const attributes = _.keys(model.rawAttributes)
         .filter(column => !exclude.some(ex => column === ex))
@@ -1140,7 +1223,7 @@ module.exports = {
     columnName = null,
   }) {
     try {
-      const model = sails.models[modelName.toLowerCase()];
+      const model = this.getModelByName(modelName);
       // 自動取得所有欄位
       const column = model.rawAttributes[columnName];
       if (!_.isNil(column)) {
@@ -1378,7 +1461,7 @@ module.exports = {
       }
       if (_.isNil(group) && include) {
         query.group = [`${modelName}.id`];
-      } else if (!_.isNil(group)) {
+      } else if (!_.isNil(group) && group !== false) {
         query.group = group;
       }
       // console.log('query=>');
@@ -1526,13 +1609,14 @@ module.exports = {
         sails.log.debug('query=>');
         console.dir(query);
       }
+      const model = this.getModelByName(modelName);
       let data = null;
       if (scope) {
-        data = await sails.models[modelName.toLowerCase()]
+        data = await model
           .scope(scope)
           .findAndCountAll(query);
       } else {
-        data = await sails.models[modelName.toLowerCase()]
+        data = await model
           .findAndCountAll(query);
       }
       // console.log('data=>', data);
@@ -1592,7 +1676,8 @@ module.exports = {
     one2One = false,
     one2Many = false,
   } = {}) {
-    const associations = sails.models[modelName.toLowerCase()].associations;
+    const model = this.getModelByName(modelName);
+    const associations = model.associations;
     const result = [];
     Object.keys(associations).forEach((key) => {
       const association = {};
