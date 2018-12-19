@@ -24,6 +24,7 @@ const isNumeric = val => (!isNaN(parseFloat(val)) && isFinite(val));
 
 
 module.exports = {
+  commonFields: ['createdAt', 'updatedAt', 'deletedAt', 'id',],
   /**
    * 定義共通資料欄位，用來將 Model Name 去除，以便使用同一組 i18n。
    * @example model.User.createdAt ==> model.createdAt
@@ -31,8 +32,15 @@ module.exports = {
    */
   isCommonField(name) {
     try {
-      return ['createdAt', 'updatedAt', 'deletedAt', 'id', 'isValid', 'index', 'isActive']
-        .some(e => name.indexOf(e) !== -1);
+      return this.commonFields.concat([
+        'isValid',
+        'index',
+        'isActive',
+        'isActivated',
+        'isConfirmed',
+        'activatedAt',
+        'confirmedAt',
+      ]).some(e => name.indexOf(e) !== -1);
     } catch (e) {
       sails.log.error(e);
       throw e;
@@ -363,14 +371,13 @@ module.exports = {
         // eslint-disable-next-line
         format = this.getModelColumns({
           modelName,
-          // modelPrefix: !_.isEmpty(include),
           modelPrefix: false,
-          exclude: ['id', 'createdAt', 'updatedAt'],
           include: include
-            ? _.flatten(include.map(inc => this.getModelColumns({
-                modelName: this.getIncludeModelByObject(inc).name,
-                modelPrefix: true,
-                exclude: ['id', 'createdAt', 'updatedAt'],
+            ? _.flatten(this.getAssociations(modelName, {
+                raw: true,
+              }).map(association => this.getModelColumns({
+                modelName: association.singular,
+                modelPrefix: association.name,
               })))
             : null,
         });
@@ -383,8 +390,6 @@ module.exports = {
         formatCb,
         source: this.buildEmptyModel({
           modelName,
-          // 排除 updatedAt，因為附屬資料不需要
-          exclude: ['id', 'createdAt', 'updatedAt'],
         }),
         rawData: input,
       });
@@ -483,25 +488,18 @@ module.exports = {
         }));
       }
       if (!format) {
-        const associations = this.getAssociations(modelName, {
-          singular: true,
-          one2One: true, 
-        });
+        const associations = this.getAssociations(modelName);
         console.log('associations=>', associations);
         // eslint-disable-next-line
         format = this.getModelColumns({
           modelName,
           modelPrefix: false,
-          exclude: ['id', 'createdAt', 'updatedAt'],
           include: include
-            ? _.flatten(include.map(inc => this.getModelColumns({
-                modelName: this.getIncludeModelByObject(inc).name,
-                modelPrefix: true,
-                isPrefixPlural: this.getAssociations(modelName, {
-                  singular: true,
-                  one2One: true, 
-                }).some(a => a === this.getIncludeModelByObject(inc).name),
-                exclude: ['id', 'createdAt', 'updatedAt'],
+            ? _.flatten(this.getAssociations(modelName, {
+                raw: true,
+              }).map(association => this.getModelColumns({
+                modelName: association.singular,
+                modelPrefix: association.name,
               })))
             : null,
         });
@@ -769,8 +767,7 @@ module.exports = {
             exclude: viewExclude
               ? viewExclude
                 .filter(ex => ex.indexOf(thisModelName) > -1)
-                .concat(['id', 'createdAt', 'updatedAt', 'deletedAt'])
-              : ['id', 'createdAt', 'updatedAt', 'deletedAt'],
+              : null,
             modelPrefix: true,
             langCode,
             required,
@@ -1045,6 +1042,7 @@ module.exports = {
         return this.isCommonField(name) ? `model.${name}` : output;
       };
       return fields
+        .filter(e => !this.commonFields.some(ex => e.name === ex))
         .filter(e => (!_.isEmpty(include)
           ? include.some(inc => e.name === inc)
           : e))
@@ -1185,6 +1183,7 @@ module.exports = {
       // 自動取得所有欄位
       const attributes = _.keys(model.rawAttributes)
         .filter(column => !exclude.some(ex => column === ex))
+        .filter(column => !this.commonFields.some(ex => column === ex))
         .filter((column) => {
           if (required) {
             const target = model.rawAttributes[column];
@@ -1675,6 +1674,7 @@ module.exports = {
     plural = false,
     one2One = false,
     one2Many = false,
+    raw = false,
   } = {}) {
     const model = this.getModelByName(modelName);
     const associations = model.associations;
@@ -1695,6 +1695,12 @@ module.exports = {
             if (key === singularName) result.push(key);
           } else if (one2Many) {
             if (key === pluralName) result.push(key);
+          } else if (raw) {
+            result.push({
+              name: key,
+              singular: singularName,
+              plural: pluralName,
+            })
           } else {
             result.push(key);
           }
@@ -1737,7 +1743,6 @@ module.exports = {
         return (QueryService.getModelColumns({
           modelName: e.model ? e.model.name : e.modelName,
           modelPrefix: true,
-          exclude: ['id', 'updatedAt', 'deletedAt'],
         })) || [];
       })) : [];
       // console.log('includeColumns=>', includeColumns);
@@ -1746,7 +1751,7 @@ module.exports = {
       let columns = includeColumns || this.getModelColumns({
         modelName,
         modelPrefix: false,
-        exclude: excludeColumns || ['updatedAt', 'deletedAt'],
+        exclude: excludeColumns,
         include: autoIncludeColumns,
       });
       if (excludeColumns) {
@@ -1813,13 +1818,11 @@ module.exports = {
       const fieldNames = QueryService.getModelOutputColumns({
         modelPrefix: false,
         modelName,
-        exclude: ['id', 'createdAt', 'updatedAt', 'deletedAt'],
         langCode,
       });
       // 建立空資料
       const emptyModel = QueryService.buildEmptyModel({
         modelName,
-        exclude: ['id', 'createdAt'],
       });
 
       // 自動取出關聯的資料欄位
