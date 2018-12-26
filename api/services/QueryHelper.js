@@ -7,6 +7,7 @@
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import inflection from 'inflection';
+import Joi from 'Joi';
 
 const TAG = 'QueryHelper';
 const getDate = (date, format) => {
@@ -22,9 +23,29 @@ const getDate = (date, format) => {
 const isDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/g;
 const isNumeric = val => (!isNaN(parseFloat(val)) && isFinite(val));
 
+const Console = console;
 
 module.exports = {
+  langCode: 'zh-TW',
+  log: false,
   commonFields: ['createdAt', 'updatedAt', 'deletedAt', 'id',],
+
+  validate({
+    value,
+    schema,
+    options,
+    callback,
+  }) {
+    return Joi.validate(
+      value,
+      _.isFunction(schema)
+        ? Joi.object().keys(schema(Joi))
+        : schema,
+      options,
+      callback,
+    );
+  },
+
   /**
    * 定義共通資料欄位，用來將 Model Name 去除，以便使用同一組 i18n。
    * @example model.User.createdAt ==> model.createdAt
@@ -143,9 +164,9 @@ module.exports = {
       // 比對來源與目的物件是否有以下欄位
       if (format) {
         for (const path of format) {
-          // console.log('path=>', path);
+          // Console.log('path=>', path);
           if (_.hasIn(rawData, path)) {
-            // console.log('_.get(rawData, path)=>', _.get(rawData, path));
+            // Console.log('_.get(rawData, path)=>', _.get(rawData, path));
             const value = _.get(rawData, path);
             if (_.isNil(value) 
                 || (!isNumeric(value) && _.isEmpty(value) && !_.isBoolean(value) && !_.isFunction(value))) {
@@ -281,9 +302,9 @@ module.exports = {
 
   getIncludeModelByObject(includeModelObject) {
     try {
-      // console.log('includeModelObject=>', includeModelObject);
-      // console.log('includeModelObject=>', includeModelObject.model);
-      // console.log('includeModelObject=>', includeModelObject.model.name);
+      // Console.log('includeModelObject=>', includeModelObject);
+      // Console.log('includeModelObject=>', includeModelObject.model);
+      // Console.log('includeModelObject=>', includeModelObject.model.name);
       if (!includeModelObject) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ includeModelObject }));
       }
@@ -300,7 +321,7 @@ module.exports = {
           model = includeModelObject;
         }
       }
-      // console.log('model=>', model);
+      // Console.log('model=>', model);
       if (!model) {
         throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({ includeModelObject }));
       }
@@ -338,7 +359,7 @@ module.exports = {
    * @returns {Object} created item
    */
   async create({
-    langCode = 'zh-TW',
+    langCode = this.langCode,
     modelName = null,
     include = null,
     input = null,
@@ -348,23 +369,46 @@ module.exports = {
     toJSON = null,
   } = {}) {
     try {
-      const inputHasNull = ValidatorHelper.checkNull({
-        modelName,
-        input,
+      // const inputHasNull = ValidatorHelper.checkNull({
+      // });
+      // if (inputHasNull) {
+      //   throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
+      // }
+      const { error } = this.validate({
+        value: {
+          langCode,
+          modelName,
+          include,
+          input,
+          format,
+          formatCb,
+          toJSON,
+        },
+        schema: j => ({
+          langCode: j.string(),
+          modelName: j.string().required(),
+          include: j.array().items(j.object()),
+          input: j.object().required(),
+          format: j.array().items(j.string()),
+          formatCb: j.func(),
+          toJSON: j.boolean(),
+        }),
       });
-      if (inputHasNull) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
+      if (error) {
+        throw Error(MESSAGE.BAD_REQUEST.PARAMETER_FORMAT_INVALID({
+          error: error.message,
+        }));
       }
       const model = this.getModelByName(modelName);
       if (langCode) {
         // TODO: 語系篩選
       }
-      console.log('modelName=>', modelName);
-      console.log('include=>', include);
-      console.log('input==============>');
-      console.dir(input);
-      // console.log('source==============>');
-      // console.dir(this.buildEmptyModel({
+      // Console.log('modelName=>', modelName);
+      // Console.log('include=>', include);
+      // Console.log('input==============>');
+      // Console.dir(input);
+      // Console.log('source==============>');
+      // Console.dir(this.buildEmptyModel({
       //   modelName,
       // }));
       if (!format) {
@@ -381,8 +425,8 @@ module.exports = {
               })))
             : null,
         });
-        console.log('format==============>');
-        console.dir(format);
+        // Console.log('format==============>');
+        // Console.dir(format);
       }
       const data = this.formatInput({
         modelName,
@@ -393,17 +437,17 @@ module.exports = {
         }),
         rawData: input,
       });
-      console.log('data==============>');
-      console.dir(data);
+      // Console.log('data==============>');
+      // Console.dir(data);
       // const cretaeBuild = await model.build(data, { include });
-      // console.log('build==============>');
-      // console.dir(cretaeBuild);
+      // Console.log('build==============>');
+      // Console.dir(cretaeBuild);
       // const errors = await cretaeBuild.validate().catch((e) => {
-      //   console.log("!!!!!!catch");
-      //   console.log(e);
+      //   Console.log("!!!!!!catch");
+      //   Console.log(e);
       //   throw e;
       // });
-      // console.log(errors);
+      // Console.log(errors);
       // return await cretaeBuild.save();
       const createdItem = await model.create(data, { include });
       if (!createdItem) {
@@ -468,13 +512,13 @@ module.exports = {
       if (inputHasNull) {
         throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
       }
-      console.log('update modelName=>', modelName);
+      // Console.log('update modelName=>', modelName);
       const model = this.getModelByName(modelName);
       if (langCode) {
         // TODO: 語系篩選
       }
-      console.log('update input==============>');
-      console.dir(input);
+      // Console.log('update input==============>');
+      // Console.dir(input);
       const query = {
         where,
       };
@@ -489,7 +533,7 @@ module.exports = {
       }
       if (!format) {
         const associations = this.getAssociations(modelName);
-        console.log('associations=>', associations);
+        Console.log('associations=>', associations);
         // eslint-disable-next-line
         format = this.getModelColumns({
           modelName,
@@ -503,8 +547,8 @@ module.exports = {
               })))
             : null,
         });
-        console.log('update format==============>');
-        console.dir(format);
+        // Console.log('update format==============>');
+        // Console.dir(format);
       }
       target = _.merge(target, this.formatInput({
         modelName,
@@ -513,12 +557,12 @@ module.exports = {
         source: target,
         rawData: input,
       }));
-      console.log('update data==============>');
-      // console.log('target.toJSON=>', target.toJSON);
-      // console.log('target.save=>', target.save);
-      console.dir(target.toJSON ? target.toJSON() : target);
+      // Console.log('update data==============>');
+      // Console.log('target.toJSON=>', target.toJSON);
+      // Console.log('target.save=>', target.save);
+      Console.dir(target.toJSON ? target.toJSON() : target);
       const structure = target.toJSON ? target.toJSON() : target;
-      // console.log('structure=>', structure);
+      // Console.log('structure=>', structure);
       const updateIncludeObject = [];
       Object.keys(structure).forEach((item) => {
         if (_.isObject(structure[item]) && target[item].save) {
@@ -609,7 +653,7 @@ module.exports = {
         });
         results.push({ success: Boolean(result), id, });
       }
-      // console.log('results=>', results);
+      // Console.log('results=>', results);
       return results;
     } catch (e) {
       throw e;
@@ -798,12 +842,12 @@ module.exports = {
         if (_.isFunction(log)) {
           query.logging = log;
         } else {
-          query.logging = console.log;
+          query.logging = Console.log;
         }
       }
-      // console.log('fields=>', fields);
-      // console.log('query=>');
-      // console.dir(query);
+      // Console.log('fields=>', fields);
+      // Console.log('query=>');
+      // Console.dir(query);
       const data = await model.findOne(query);
       if (!data) {
         throw Error(MESSAGE.BAD_REQUEST.NO_TARGET_FOUNDED({
@@ -822,28 +866,28 @@ module.exports = {
           });
           for (const target of associatedModels) {
             const modelData = await sails.models[target.toLowerCase()].findAll();
-            // console.log('modelData=>', modelData);
+            // Console.log('modelData=>', modelData);
             associatedData[target] = modelData;
           }
           fields.map((field) => {
             const isThisFieldAssociated = associatedModels.some(ass => field.name === `${ass}Id`);
-            // console.log('isThisFieldAssociated=>', isThisFieldAssociated);
+            // Console.log('isThisFieldAssociated=>', isThisFieldAssociated);
             if (isThisFieldAssociated) {
               const associatedModelName = field.name.replace('Id', '');
               const values = associatedData[associatedModelName];
               /* eslint no-param-reassign: 0 */
               let modelOutputPropName = null;
               {
-                // console.log('associatedModelName=>', associatedModelName);
+                // Console.log('associatedModelName=>', associatedModelName);
                 // 如果有指定哪個 model 使用哪個 prop 輸出
                 const assignModelOutputField = outputFieldNamePairs
                   ? outputFieldNamePairs.filter(pair => pair.modelName === associatedModelName)[0]
                   : null;
-                // console.log('assignModelOutputField=>', assignModelOutputField);
+                // Console.log('assignModelOutputField=>', assignModelOutputField);
                 modelOutputPropName = assignModelOutputField
                   ? assignModelOutputField.target
                   : null;
-                // console.log('modelOutputPropName=>', modelOutputPropName);
+                // Console.log('modelOutputPropName=>', modelOutputPropName);
               }
               // 可能要再加上一對多判斷
               field.type = 'chosen';
@@ -1187,7 +1231,7 @@ module.exports = {
         .filter((column) => {
           if (required) {
             const target = model.rawAttributes[column];
-            // console.log('target=>', target);
+            // Console.log('target=>', target);
             return target.allowNull !== true && target.primaryKey !== true;
           }
           return true;
@@ -1333,7 +1377,7 @@ module.exports = {
         if (_.isArray(filter.where)) {
           // eslint-disable-next-line guard-for-in
           for (const field of filter.where) {
-            // console.log('field=>', field);
+            // Console.log('field=>', field);
             query.where[condition].push(field);
           }
         } else if (_.isObject(filter.where)) {
@@ -1354,7 +1398,7 @@ module.exports = {
           sails.log.warn(`[!] ${TAG}.formatQuery Parse "filter.fields" into Json-Array type failed.(${e})) this may not be an issue, please check what is actually be input by frontend.`);
           fields = filter.fields;
         }
-        // console.log('[QueryHelper] fields=>', fields);
+        // Console.log('[QueryHelper] fields=>', fields);
       }
       if (!_.isEmpty(fields)) {
         if (!query.where.$and) {
@@ -1456,15 +1500,15 @@ module.exports = {
         if (_.isObject(log)) {
           query.logging = log;
         }
-        query.logging = console.log;
+        query.logging = Console.log;
       }
       if (_.isNil(group) && include) {
         query.group = [`${modelName}.id`];
       } else if (!_.isNil(group) && group !== false) {
         query.group = group;
       }
-      // console.log('query=>');
-      // console.dir(query);
+      // Console.log('query=>');
+      // Console.dir(query);
       return query;
     } catch (e) {
       sails.log.error(e);
@@ -1575,7 +1619,7 @@ module.exports = {
       //   if (!isByExistInModel && !_.isEmpty(include)) {
       //     include
       //       .forEach((inc) => {
-      //         console.log('inc=>', inc);
+      //         Console.log('inc=>', inc);
       //         const incModelName = inc.modelName ? inc.modelName : inc.model.name;
       //         const isByExistInIncludeModel = getModelColumns(incModelName)
       //           .some(e => e.toString() === sortBy.toString());
@@ -1585,9 +1629,9 @@ module.exports = {
       //         }
       //       });
       //   }
-      //   console.log('findBy order sortBy=>', sortBy);
+      //   Console.log('findBy order sortBy=>', sortBy);
       // }
-      // console.time(tag);
+      // Console.time(tag);
       const query = this.formatQuery({
         attributes,
         langCode,
@@ -1606,7 +1650,7 @@ module.exports = {
       });
       if (log) {
         sails.log.debug('query=>');
-        console.dir(query);
+        Console.dir(query);
       }
       const model = this.getModelByName(modelName);
       let data = null;
@@ -1618,7 +1662,7 @@ module.exports = {
         data = await model
           .findAndCountAll(query);
       }
-      // console.log('data=>', data);
+      // Console.log('data=>', data);
 
       const items = data.rows.map(e => this.formatOutput({
         modelName,
@@ -1641,7 +1685,7 @@ module.exports = {
           _associations: this.getAssociations(modelName),
         };
       }
-      // console.timeEnd(tag);
+      // Console.timeEnd(tag);
       return {
         paging: {
           lastPage: Math.ceil(total / perPage) || 1,
@@ -1656,7 +1700,7 @@ module.exports = {
         ...extra,
       };
     } catch (e) {
-      // console.timeEnd(tag);
+      // Console.timeEnd(tag);
       sails.log.error(e);
       throw e;
     }
@@ -1736,7 +1780,7 @@ module.exports = {
     try {
       // 取出全部的 table 欄位
       const autoIncludeColumns = include ? _.flattenDeep(include.map((e) => {
-        // console.log('autoIncludeColumns e=>', e);
+        // Console.log('autoIncludeColumns e=>', e);
         if (!_.isObject(e)) {
           throw Error('include model must be an object.');
         }
@@ -1745,7 +1789,7 @@ module.exports = {
           modelPrefix: true,
         })) || [];
       })) : [];
-      // console.log('includeColumns=>', includeColumns);
+      // Console.log('includeColumns=>', includeColumns);
 
       // 取出表格欄位
       let columns = includeColumns || this.getModelColumns({
@@ -1834,28 +1878,28 @@ module.exports = {
         });
         for (const target of associatedModels) {
           const modelData = await sails.models[target.toLowerCase()].findAll();
-          // console.log('modelData=>', modelData);
+          // Console.log('modelData=>', modelData);
           associatedData[target] = modelData;
         }
         fieldNames.map((field) => {
           const isThisFieldAssociated = associatedModels.some(ass => field.name === `${ass}Id`);
-          // console.log('isThisFieldAssociated=>', isThisFieldAssociated);
+          // Console.log('isThisFieldAssociated=>', isThisFieldAssociated);
           if (isThisFieldAssociated) {
             const associatedModelName = field.name.replace('Id', '');
             const values = associatedData[associatedModelName];
             /* eslint no-param-reassign: 0 */
             let modelOutputPropName = null;
             {
-              // console.log('associatedModelName=>', associatedModelName);
+              // Console.log('associatedModelName=>', associatedModelName);
               // 如果有指定哪個 model 使用哪個 prop 輸出
               const assignModelOutputField = outputFieldNamePairs
                 ? outputFieldNamePairs.filter(pair => pair.modelName === associatedModelName)[0]
                 : null;
-              // console.log('assignModelOutputField=>', assignModelOutputField);
+              // Console.log('assignModelOutputField=>', assignModelOutputField);
               modelOutputPropName = assignModelOutputField
                 ? assignModelOutputField.target
                 : null;
-              // console.log('modelOutputPropName=>', modelOutputPropName);
+              // Console.log('modelOutputPropName=>', modelOutputPropName);
             }
             // 可能要再加上一對多判斷
             field.type = 'chosen';
