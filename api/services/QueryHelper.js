@@ -360,21 +360,16 @@ module.exports = {
    */
   async create({
     langCode = this.langCode,
-    modelName = null,
-    include = null,
-    input = null,
+    modelName = undefined,
+    include = undefined,
+    input = undefined,
   } = {}, {
-    format = null,
-    formatCb = null,
-    toJSON = null,
+    toJSON = undefined,
+    format = undefined,
+    formatCb = undefined,
   } = {}) {
     try {
-      // const inputHasNull = ValidatorHelper.checkNull({
-      // });
-      // if (inputHasNull) {
-      //   throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
-      // }
-      const { error } = this.validate({
+      const { error, value } = this.validate({
         value: {
           langCode,
           modelName,
@@ -385,18 +380,19 @@ module.exports = {
           toJSON,
         },
         schema: j => ({
-          langCode: j.string(),
           modelName: j.string().required(),
-          include: j.array().items(j.object()),
           input: j.object().required(),
-          format: j.array().items(j.string()),
-          formatCb: j.func(),
+          langCode: j.string(),
+          include: j.array().items(j.any()),
+          format: j.array().items(j.string()).allow(null),
+          formatCb: j.func().allow(null),
           toJSON: j.boolean(),
         }),
       });
       if (error) {
         throw Error(MESSAGE.BAD_REQUEST.PARAMETER_FORMAT_INVALID({
-          error: error.message,
+          error,
+          value,
         }));
       }
       const model = this.getModelByName(modelName);
@@ -494,7 +490,7 @@ module.exports = {
    * @returns {Object} updated item
    */
   async update({
-    langCode = 'zh-TW',
+    langCode = this.langCode,
     modelName = null,
     include = null,
     input = null,
@@ -504,13 +500,31 @@ module.exports = {
     formatCb = null,
   } = {}) {
     try {
-      const inputHasNull = ValidatorHelper.checkNull({
-        modelName,
-        input,
-        where,
+      const { error, value } = this.validate({
+        value: {
+          modelName,
+          input,
+          where,
+          langCode,
+          include,
+          format,
+          formatCb,
+        },
+        schema: j => ({
+          modelName: j.string().required(),
+          input: j.object().required(),
+          where: j.object().required(),
+          langCode: j.string(),
+          include: j.array().items(j.any()),
+          format: j.array().items(j.string()).allow(null),
+          formatCb: j.func().allow(null),
+        }),
       });
-      if (inputHasNull) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
+      if (error) {
+        throw Error(MESSAGE.BAD_REQUEST.PARAMETER_FORMAT_INVALID({
+          error,
+          value,
+        }));
       }
       // Console.log('update modelName=>', modelName);
       const model = this.getModelByName(modelName);
