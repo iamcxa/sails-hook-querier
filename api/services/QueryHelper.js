@@ -7,7 +7,7 @@
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import inflection from 'inflection';
-import Joi from 'Joi';
+import Joi from 'joi';
 
 const TAG = 'QueryHelper';
 const getDate = (date, format) => {
