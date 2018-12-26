@@ -1,3 +1,3 @@
 module.exports['sequelize-querier'] = {
-  enable: true,
+  // enable: true,
 };
