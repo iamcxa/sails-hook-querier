@@ -515,7 +515,7 @@ module.exports = {
           input: j.object().required(),
           where: j.object().required(),
           langCode: j.string(),
-          include: j.array().items(j.any()),
+          include: j.array().items(j.any()).allow(null),
           format: j.array().items(j.string()).allow(null),
           formatCb: j.func().allow(null),
         }),
@@ -547,7 +547,7 @@ module.exports = {
       }
       if (!format) {
         const associations = this.getAssociations(modelName);
-        Console.log('associations=>', associations);
+        // Console.log('associations=>', associations);
         // eslint-disable-next-line
         format = this.getModelColumns({
           modelName,
@@ -574,7 +574,7 @@ module.exports = {
       // Console.log('update data==============>');
       // Console.log('target.toJSON=>', target.toJSON);
       // Console.log('target.save=>', target.save);
-      Console.dir(target.toJSON ? target.toJSON() : target);
+      // Console.dir(target.toJSON ? target.toJSON() : target);
       const structure = target.toJSON ? target.toJSON() : target;
       // Console.log('structure=>', structure);
       const updateIncludeObject = [];
