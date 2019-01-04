@@ -1706,7 +1706,7 @@ module.exports = {
           curPage: parseInt(curPage, 10),
           perPage: parseInt(perPage, 10),
           sort: sort.toUpperCase(),
-          sortBy: sortBy.toLowerCase(),
+          sortBy: order || sortBy.toLowerCase(),
           total,
         },
         filter,

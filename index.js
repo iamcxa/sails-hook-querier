@@ -6,7 +6,7 @@ module.exports = function (sails) {
       __configKey__: {
         enable: true,
         exposeToGlobal: true,
-        _hookTimeout: 10 * 1000,
+        _hookTimeout: 30 * 1000,
       },
     },
     bootstrap() {
@@ -30,9 +30,9 @@ module.exports = function (sails) {
       });
     },
     initialize(next) {
-      loader.injectAll({
+      loader.inject({
         // models: `${__dirname}/api/models`,
-        helpers: `${__dirname}/api/helpers`,
+        // helpers: `${__dirname}/api/helpers`,
         services: `${__dirname}/api/services`,
         // responses: `${__dirname}/api/responses`,
         // controllers: `${__dirname}/api/controllers`,
