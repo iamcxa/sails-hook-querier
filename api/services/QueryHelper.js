@@ -1,7 +1,7 @@
 /**
- * @module QueryService
+ * @module QueryHelper
  * @author Kent Chen<iamcxa@gmail.com>
-*/
+ */
 /* eslint no-underscore-dangle: 0 */
 // import moment from 'moment';
 import _ from 'lodash';
@@ -15,10 +15,10 @@ const getDate = (date, format) => {
     // eslint-disable-next-line no-param-reassign
     format = 'YYYY-MM-DD';
   }
-  return (date
-    ? moment(date)
-      .tz('Asia/Taipei')
-      .format(format) : null);
+  return (date ?
+    moment(date)
+    .tz('Asia/Taipei')
+    .format(format) : null);
 };
 const isDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/g;
 const isNumeric = val => (!isNaN(parseFloat(val)) && isFinite(val));
@@ -28,7 +28,7 @@ const Console = console;
 module.exports = {
   langCode: 'zh-TW',
   log: false,
-  commonFields: ['createdAt', 'updatedAt', 'deletedAt', 'id',],
+  commonFields: ['createdAt', 'updatedAt', 'deletedAt', 'id', ],
 
   validate({
     value,
@@ -38,9 +38,9 @@ module.exports = {
   }) {
     return Joi.validate(
       value,
-      _.isFunction(schema)
-        ? Joi.object().keys(schema(Joi))
-        : schema,
+      _.isFunction(schema) ?
+      Joi.object().keys(schema(Joi)) :
+      schema,
       options,
       callback,
     );
@@ -72,7 +72,7 @@ module.exports = {
    * 依據輸入的 format 物件來格式化輸出，將 data 與 format 合併並保留 format 作為預設值。
    * @version 20180310
    * @example
-   * QueryService.matchFormat({
+   * QueryHelper.matchFormat({
    *    format: {
    *      updatedAt: '',
    *      createdAt: '',
@@ -138,11 +138,11 @@ module.exports = {
    *     source{Object} = null,     要被填入的空白資料欄位。
    *   }
    * @example
-   * QueryService.formatInput({
+   * QueryHelper.formatInput({
    *    modelName,
    *    format,
    *    formatCb,
-   *    source: QueryService.buildEmptyModel({
+   *    source: QueryHelper.buildEmptyModel({
    *       modelName,
    *    }),
    *    rawData: input,
@@ -168,11 +168,11 @@ module.exports = {
           if (_.hasIn(rawData, path)) {
             // Console.log('_.get(rawData, path)=>', _.get(rawData, path));
             const value = _.get(rawData, path);
-            if (_.isNil(value) 
-                || (!isNumeric(value) && _.isEmpty(value) && !_.isBoolean(value) && !_.isFunction(value))) {
+            if (_.isNil(value) ||
+              (!isNumeric(value) && _.isEmpty(value) && !_.isBoolean(value) && !_.isFunction(value))) {
               _.set(source, path, null);
-            } else if (_.isString(value)
-              && value.match(isDate) !== null) {
+            } else if (_.isString(value) &&
+              value.match(isDate) !== null) {
               // 檢查輸入是否包含日期
               try {
                 const valueAsDate = new Date(value);
@@ -210,7 +210,7 @@ module.exports = {
    *     readonly{Array} = [],     要被設定為 readonly 的欄位名稱。
    *  }
    * @example
-   * QueryService.formatOutput({
+   * QueryHelper.formatOutput({
    *    format,
    *    formatCb,
    *    fields,
@@ -261,10 +261,10 @@ module.exports = {
           }
           return ({
             ...field,
-            required: required
-              ? required.some(r => r === field) : false,
-            readonly: readonly
-              ? readonly.some(r => r === field) : false,
+            required: required ?
+              required.some(r => r === field) : false,
+            readonly: readonly ?
+              readonly.some(r => r === field) : false,
           });
         });
       }
@@ -274,8 +274,8 @@ module.exports = {
           ...extra,
         };
       }
-      return (!_.isNil(formatCb) && _.isFunction(formatCb))
-        ? formatCb(result) : result;
+      return (!_.isNil(formatCb) && _.isFunction(formatCb)) ?
+        formatCb(result) : result;
     } catch (e) {
       sails.log.error(e);
       throw e;
@@ -285,14 +285,18 @@ module.exports = {
   getModelByName(modelName) {
     try {
       if (!modelName) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ modelName }));
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({
+          modelName
+        }));
       }
       let model = null;
       if (_.isString(modelName)) {
         model = sails.models[modelName.toLowerCase()];
       }
       if (!model || !_.isObject(model)) {
-        throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({ modelName }));
+        throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({
+          modelName
+        }));
       }
       return model;
     } catch (e) {
@@ -306,24 +310,28 @@ module.exports = {
       // Console.log('includeModelObject=>', includeModelObject.model);
       // Console.log('includeModelObject=>', includeModelObject.model.name);
       if (!includeModelObject) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ includeModelObject }));
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({
+          includeModelObject
+        }));
       }
       let model = null;
       if (_.isObject(includeModelObject)) {
         // 如果是 { model: ModelClass } 形式
         if (includeModelObject.model && includeModelObject.model.name) {
           model = sails.models[includeModelObject.model.name.toLowerCase()];
-        // 如果是 { modelName: ModelClass } 形式
+          // 如果是 { modelName: ModelClass } 形式
         } else if (includeModelObject.modelName) {
           model = sails.models[modelName.toLowerCase()];
-        // 如果是 ModelClass {} 形式
+          // 如果是 ModelClass {} 形式
         } else if (includeModelObject.name) {
           model = includeModelObject;
         }
       }
       // Console.log('model=>', model);
       if (!model) {
-        throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({ includeModelObject }));
+        throw Error(MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({
+          includeModelObject
+        }));
       }
       return model;
     } catch (e) {
@@ -345,7 +353,7 @@ module.exports = {
    *     formatCb{Object} = null,      原始資料的格式化 callback。
    *   }
    * @example 依據 input 建立一筆 User 的新資料，並且包含建立 Parent 與 Passport，同時附有建立資料前的 formatCb。
-   * QueryService.create({
+   * QueryHelper.create({
    *    modelName: 'User',
    *    include: [Parent, Passport],
    *    input: rawData,
@@ -369,7 +377,10 @@ module.exports = {
     formatCb = undefined,
   } = {}) {
     try {
-      const { error, value } = this.validate({
+      const {
+        error,
+        value
+      } = this.validate({
         value: {
           langCode,
           modelName,
@@ -412,14 +423,14 @@ module.exports = {
         format = this.getModelColumns({
           modelName,
           modelPrefix: false,
-          include: include
-            ? _.flatten(this.getAssociations(modelName, {
-                raw: true,
-              }).map(association => this.getModelColumns({
-                modelName: association.singular,
-                modelPrefix: association.name,
-              })))
-            : null,
+          include: include ?
+            _.flatten(this.getAssociations(modelName, {
+              raw: true,
+            }).map(association => this.getModelColumns({
+              modelName: association.singular,
+              modelPrefix: association.name,
+            }))) :
+            null,
         });
         // Console.log('format==============>');
         // Console.dir(format);
@@ -445,11 +456,15 @@ module.exports = {
       // });
       // Console.log(errors);
       // return await cretaeBuild.save();
-      const createdItem = await model.create(data, { include });
+      const createdItem = await model.create(data, {
+        include
+      });
       if (!createdItem) {
-        throw Error('QueryService.Create.Failed.Null.Created.Item');
+        throw Error('QueryHelper.Create.Failed.Null.Created.Item');
       }
-      return toJSON ? createdItem.get({ plain: true }) : createdItem;
+      return toJSON ? createdItem.get({
+        plain: true
+      }) : createdItem;
     } catch (e) {
       sails.log.error(e);
       throw e;
@@ -472,7 +487,7 @@ module.exports = {
    *     updateCb{Object} = null,      資料更新完成後，輸出之前的 callback（支援 await）。
    *   }
    * @example 依據 User ID 更新 User，並且更新連帶的 Parent 與 Student，同時有給予一組輸入格式 format。
-   * QueryService.update({
+   * QueryHelper.update({
    *    modelName: 'User',
    *    include: [Passport, {
    *      model: Parent,
@@ -500,7 +515,10 @@ module.exports = {
     formatCb = null,
   } = {}) {
     try {
-      const { error, value } = this.validate({
+      const {
+        error,
+        value
+      } = this.validate({
         value: {
           modelName,
           input,
@@ -552,14 +570,14 @@ module.exports = {
         format = this.getModelColumns({
           modelName,
           modelPrefix: false,
-          include: include
-            ? _.flatten(this.getAssociations(modelName, {
-                raw: true,
-              }).map(association => this.getModelColumns({
-                modelName: association.singular,
-                modelPrefix: association.name,
-              })))
-            : null,
+          include: include ?
+            _.flatten(this.getAssociations(modelName, {
+              raw: true,
+            }).map(association => this.getModelColumns({
+              modelName: association.singular,
+              modelPrefix: association.name,
+            }))) :
+            null,
         });
         // Console.log('update format==============>');
         // Console.dir(format);
@@ -599,7 +617,7 @@ module.exports = {
    *    ids{Array} = [],           要刪除的欄位 ID 陣列。
    * }
    * @example 刪除 User 表中，ID 為 1~4 的資料。
-   * QueryService.destroy({
+   * QueryHelper.destroy({
    *    modelName: 'User',
    *    ids: [1, 2, 3, 4],
    * });
@@ -618,7 +636,9 @@ module.exports = {
         ids,
       });
       if (inputHasNull) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({
+          inputHasNull
+        }));
       }
       if (!_.isArray(ids)) {
         throw Error(MESSAGE.BAD_REQUEST.CHECK_INPUT_PARAMETER_TYPE('ids', Array));
@@ -646,7 +666,9 @@ module.exports = {
             if (associatedId) {
               const includedModelInstance = sails.models[includeModelName.toLowerCase()];
               const deletedAssociatedModelId = await includedModelInstance.destroy({
-                where: { id: associatedId },
+                where: {
+                  id: associatedId
+                },
                 force,
               });
               const message = `[!] Delete  "${modelName}"'s associated model "${includeModelName}" with id "${associatedId}" (?=${deletedAssociatedModelId})`;
@@ -662,10 +684,15 @@ module.exports = {
           }
         }
         const result = await model.destroy({
-          where: { id },
+          where: {
+            id
+          },
           force,
         });
-        results.push({ success: Boolean(result), id, });
+        results.push({
+          success: Boolean(result),
+          id,
+        });
       }
       // Console.log('results=>', results);
       return results;
@@ -673,7 +700,7 @@ module.exports = {
       throw e;
     }
   },
-  
+
   /**
    * 替 fields 加入 or 條件
    * @param {*} fields
@@ -686,10 +713,18 @@ module.exports = {
       fields.forEach((e) => {
         if (!fieldsOr.find(x => x === e.key)) {
           fieldsOr.push(e.key);
-          fieldsOrCommand.push({ $or: [{ key: e.key, value: e.value }] });
+          fieldsOrCommand.push({
+            $or: [{
+              key: e.key,
+              value: e.value
+            }]
+          });
         } else {
           const i = fieldsOr.findIndex(x => x === e.key);
-          fieldsOrCommand[i].$or.push({ key: e.key, value: e.value });
+          fieldsOrCommand[i].$or.push({
+            key: e.key,
+            value: e.value
+          });
         }
       });
       return fieldsOrCommand;
@@ -715,7 +750,7 @@ module.exports = {
    *     formatCb{Function} = null, 最後輸出前再次格式化資料的 callback。
    *   }
    * @example 依據 Parent ID 查詢 User 與 Parent，同時包含 Student。
-   * QueryService.getDetail({
+   * QueryHelper.getDetail({
    *    modelName: 'User',
    *    where: { id: { $not: null } },
    *    attributes: [
@@ -804,7 +839,9 @@ module.exports = {
       });
       // 組合查詢 Query
       const query = {};
-      if (where) { query.where = where; }
+      if (where) {
+        query.where = where;
+      }
       if (include && _.isArray(include)) {
         query.include = [];
         include.forEach((e) => {
@@ -815,17 +852,17 @@ module.exports = {
               input: `${e}`,
             }));
           }
-          const thisModelName = 
-            e.model
-            ? e.model.name
-            : e.modelName;
+          const thisModelName =
+            e.model ?
+            e.model.name :
+            e.modelName;
           const arr = this.getModelOutputColumns({
             modelName: thisModelName,
             as: e.as,
-            exclude: viewExclude
-              ? viewExclude
-                .filter(ex => ex.indexOf(thisModelName) > -1)
-              : null,
+            exclude: viewExclude ?
+              viewExclude
+              .filter(ex => ex.indexOf(thisModelName) > -1) :
+              null,
             modelPrefix: true,
             langCode,
             required,
@@ -833,18 +870,31 @@ module.exports = {
           });
           fields = fields.concat(arr);
           const inc = {
-            model:
-              e.model
-              ? e.model
-              : this.getModelByName(e.modelName),
+            model: e.model ?
+              e.model :
+              this.getModelByName(e.modelName),
           };
-          if (e.as) { inc.as = e.as; }
-          if (e.limit) { inc.limit = e.limit; }
-          if (e.where) { inc.where = e.where; }
-          if (e.through) { inc.through = e.through; }
-          if (e.include) { inc.include = e.include; }
-          if (e.required) { inc.required = e.required; }
-          if (e.attributes) { inc.attributes = e.attributes; }
+          if (e.as) {
+            inc.as = e.as;
+          }
+          if (e.limit) {
+            inc.limit = e.limit;
+          }
+          if (e.where) {
+            inc.where = e.where;
+          }
+          if (e.through) {
+            inc.through = e.through;
+          }
+          if (e.include) {
+            inc.include = e.include;
+          }
+          if (e.required) {
+            inc.required = e.required;
+          }
+          if (e.attributes) {
+            inc.attributes = e.attributes;
+          }
           query.include.push(inc);
         });
       }
@@ -871,8 +921,7 @@ module.exports = {
 
       // 自動取出關聯的資料欄位與對應資料來源，並且將欄位設成 chosen 以供選擇
       if (view) {
-        extra._associations = this.getAssociations(modelName);
-        {
+        extra._associations = this.getAssociations(modelName); {
           const associatedData = {};
           // 只取出 1v1 的關聯，即當下 model 中的 AbcId 欄位的 model Abc
           const associatedModels = this.getAssociations(modelName, {
@@ -890,36 +939,37 @@ module.exports = {
               const associatedModelName = field.name.replace('Id', '');
               const values = associatedData[associatedModelName];
               /* eslint no-param-reassign: 0 */
-              let modelOutputPropName = null;
-              {
+              let modelOutputPropName = null; {
                 // Console.log('associatedModelName=>', associatedModelName);
                 // 如果有指定哪個 model 使用哪個 prop 輸出
-                const assignModelOutputField = outputFieldNamePairs
-                  ? outputFieldNamePairs.filter(pair => pair.modelName === associatedModelName)[0]
-                  : null;
+                const assignModelOutputField = outputFieldNamePairs ?
+                  outputFieldNamePairs.filter(pair => pair.modelName === associatedModelName)[0] :
+                  null;
                 // Console.log('assignModelOutputField=>', assignModelOutputField);
-                modelOutputPropName = assignModelOutputField
-                  ? assignModelOutputField.target
-                  : null;
+                modelOutputPropName = assignModelOutputField ?
+                  assignModelOutputField.target :
+                  null;
                 // Console.log('modelOutputPropName=>', modelOutputPropName);
               }
               // 可能要再加上一對多判斷
               field.type = 'chosen';
               field.required = true;
-              field.values = values
-                ? values
-                  .concat([{ id: null }])
-                  .map((v) => {
-                    let name = v[modelOutputPropName] || v.name || v.key || v.id;
-                    if (_.isFunction(modelOutputPropName)) {
-                      name = modelOutputPropName(v);
-                    }
-                    return {
-                      value: v.id,
-                      name,
-                    };
-                  })
-                : [];
+              field.values = values ?
+                values
+                .concat([{
+                  id: null
+                }])
+                .map((v) => {
+                  let name = v[modelOutputPropName] || v.name || v.key || v.id;
+                  if (_.isFunction(modelOutputPropName)) {
+                    name = modelOutputPropName(v);
+                  }
+                  return {
+                    value: v.id,
+                    name,
+                  };
+                }) :
+                [];
             }
             return field;
           });
@@ -946,7 +996,7 @@ module.exports = {
    * @version 1.0
    * @param {String} modelName = null 要查詢的目標 Sequelize Model 名稱。
    * @example 取出 Parent 中，全部屬性為文字類型的欄位名稱。
-   * QueryService.getModelSearchableColumns('Parent');
+   * QueryHelper.getModelSearchableColumns('Parent');
    * // *  [{ key: 'Parent.education', type: 'String' }
    * // *   { key: 'Parent.password', type: 'String' }]
    * @returns {Array} Object contains field and type
@@ -961,27 +1011,27 @@ module.exports = {
       const targets = [];
       // eslint-disable-next-line
       for (const key in model.rawAttributes) {
-        if (model.rawAttributes[key].type.key === 'STRING'
-            || model.rawAttributes[key].type.key === 'TEXT'
-            || model.rawAttributes[key].type.key === 'JSON'
-            || model.rawAttributes[key].type.key === 'UUID'
-            || model.rawAttributes[key].type.key === 'ENUM'
+        if (model.rawAttributes[key].type.key === 'STRING' ||
+          model.rawAttributes[key].type.key === 'TEXT' ||
+          model.rawAttributes[key].type.key === 'JSON' ||
+          model.rawAttributes[key].type.key === 'UUID' ||
+          model.rawAttributes[key].type.key === 'ENUM'
         ) {
           targets.push({
             key: `${modelName}.${key}`,
             type: 'STRING',
           });
         }
-        if (date
-            && (model.rawAttributes[key].type.key === 'DATE'
-            || model.rawAttributes[key].type.key === 'DATEONLY')) {
+        if (date &&
+          (model.rawAttributes[key].type.key === 'DATE' ||
+            model.rawAttributes[key].type.key === 'DATEONLY')) {
           targets.push({
             key: `${modelName}.${key}`,
             type: 'DATE',
           });
         }
-        if (integer
-          && model.rawAttributes[key].type.key === 'INTEGER') {
+        if (integer &&
+          model.rawAttributes[key].type.key === 'INTEGER') {
           targets.push({
             key: `${modelName}.${key}`,
             type: 'NUMBER',
@@ -1006,7 +1056,7 @@ module.exports = {
    * @param {String} [modelName=null]
    * @param {String} [columnName=null]
    * @example 取出 Parent 中 ENUM 欄位 union 的全部值。
-   * QueryService.getEnumValues('Parent', 'union');
+   * QueryHelper.getEnumValues('Parent', 'union');
    * // * [ '非會員', '個人會員', '學生會員', '相關會員', '理事', '監事', '理事長', '常務理事', '常務監事' ]
    * @returns {Array} column's ENUM values.
    */
@@ -1075,15 +1125,16 @@ module.exports = {
           case 'DATEONLY':
             field.type = 'date';
             break;
-          default: {
-            // eslint-disable-next-line no-underscore-dangle
-            const length = modelAttr.type._length;
-            if (length) {
-              field.limit = length - 1;
+          default:
+            {
+              // eslint-disable-next-line no-underscore-dangle
+              const length = modelAttr.type._length;
+              if (length) {
+                field.limit = length - 1;
+              }
+              field.type = modelAttr.type.key.toLowerCase();
+              break;
             }
-            field.type = modelAttr.type.key.toLowerCase();
-            break;
-          }
         }
         fields.push(field);
       }
@@ -1095,18 +1146,18 @@ module.exports = {
       }).concat(required || []);
 
       const getPhrase = (name) => {
-        const output = modelPrefix
-          ? `model.${_.upperFirst(name)}` : `model.${_.upperFirst(modelName)}.${name}`;
+        const output = modelPrefix ?
+          `model.${_.upperFirst(name)}` : `model.${_.upperFirst(modelName)}.${name}`;
         return this.isCommonField(name) ? `model.${name}` : output;
       };
       return fields
         .filter(e => !this.commonFields.some(ex => e.name === ex))
-        .filter(e => (!_.isEmpty(include)
-          ? include.some(inc => e.name === inc)
-          : e))
-        .filter(e => (!_.isEmpty(exclude)
-          ? (!exclude.some(ex => e.name === ex))
-          : e))
+        .filter(e => (!_.isEmpty(include) ?
+          include.some(inc => e.name === inc) :
+          e))
+        .filter(e => (!_.isEmpty(exclude) ?
+          (!exclude.some(ex => e.name === ex)) :
+          e))
         .map(field => ({
           ...field,
           label: sails.__(getPhrase(field.name)),
@@ -1134,7 +1185,7 @@ module.exports = {
    *     include{Array} = [], 要額外加入的欄位名稱。
    * }
    * @example
-   * QueryService.buildEmptyModel({
+   * QueryHelper.buildEmptyModel({
    *    modelName: 'User',
    *    exclude: ['id'],
    * }),
@@ -1189,7 +1240,7 @@ module.exports = {
    *   }
    * @example 取得 Parent 的欄位，同時加上 email/nameTW/nameEN 三個額外欄位、排除
    * id/UserId/createdAt/updatedAt 四個欄位，並且在查詢得到的欄位名稱前加上 `Parent` prefix。
-   * QueryService.getModelColumns({
+   * QueryHelper.getModelColumns({
    *    modelName: 'Parent',
    *    modelPrefix: true,
    *    exclude: ['id', 'UserId', 'createdAt', 'updatedAt'],
@@ -1228,9 +1279,9 @@ module.exports = {
       // 取得 model
       const model = this.getModelByName(modelName);
       // 取得單複數 model name
-      const outputModelName = isPrefixPlural
-        ? inflection.pluralize(model.name)
-        : model.name;
+      const outputModelName = isPrefixPlural ?
+        inflection.pluralize(model.name) :
+        model.name;
       // 組合
       let prefix = '';
       if (_.isBoolean(modelPrefix)) {
@@ -1319,7 +1370,7 @@ module.exports = {
     perPage = 10,
     paging = true,
     sort = 'DESC',
-    sortBy = 'createdAt',
+    sortBy = null,
     order = null,
     group = null,
     subQuery = null,
@@ -1328,12 +1379,23 @@ module.exports = {
     log = false,
     condition = '$and',
   }) {
+    let sortByColumn;
     try {
-      const sortByColumn = sortBy;
+      const columns = this.getModelColumns({ modelName });
+      if (sortBy) {
+        sortByColumn = sortBy
+      } else if (columns.some(c => c === 'createdAt')) {
+        sortByColumn = 'createdAt'
+      } else if (columns.some(c => c === 'id')) {
+        sortByColumn = 'id'
+      }
+      // const sortByColumn = sortBy ? ;
       // include
       //   ? `\`${modelName}\`.\`${sortBy}\``
       //   : sortBy;
-      let mOrder = order || [[Sequelize.col(sortByColumn), sort]];
+      let mOrder = order || [
+        [Sequelize.col(sortByColumn), sort]
+      ];
       let intPage = Number(curPage);
       let intLimit = Number(perPage);
       if (_.isNaN(intPage)) intPage = 1;
@@ -1368,13 +1430,27 @@ module.exports = {
           const inc = {
             model: e.model ? e.model : sails.models[e.modelName.toLowerCase()],
           };
-          if (e.as) { inc.as = e.as; }
-          if (e.limit) { inc.limit = e.limit; }
-          if (e.where) { inc.where = e.where; }
-          if (e.include) { inc.include = e.include; }
-          if (e.through) { inc.through = e.through; }
-          if (e.required) { inc.required = e.required; }
-          if (e.attributes) { inc.attributes = e.attributes; }
+          if (e.as) {
+            inc.as = e.as;
+          }
+          if (e.limit) {
+            inc.limit = e.limit;
+          }
+          if (e.where) {
+            inc.where = e.where;
+          }
+          if (e.include) {
+            inc.include = e.include;
+          }
+          if (e.through) {
+            inc.through = e.through;
+          }
+          if (e.required) {
+            inc.required = e.required;
+          }
+          if (e.attributes) {
+            inc.attributes = e.attributes;
+          }
           query.include.push(inc);
         });
       }
@@ -1402,12 +1478,12 @@ module.exports = {
       }
 
       // 如果有指定配對的搜尋欄位
-      let fields = _.has(filter, 'fields')
-        ? filter.fields
-        : null;
+      let fields = _.has(filter, 'fields') ?
+        filter.fields :
+        null;
       if (_.isString(fields)) {
         try {
-          fields = JSON.parse(decodeURIComponent(fields)); 
+          fields = JSON.parse(decodeURIComponent(fields));
         } catch (e) {
           sails.log.warn(`[!] ${TAG}.formatQuery Parse "filter.fields" into Json-Array type failed.(${e})) this may not be an issue, please check what is actually be input by frontend.`);
           fields = filter.fields;
@@ -1418,49 +1494,64 @@ module.exports = {
         if (!query.where.$and) {
           query.where.$and = [];
         }
-        if (query.where.$and instanceof Array) {
-          fields.forEach((field) => {
-            // 檢查是否有 $or 條件
-            const $or = field['$or'];
-            if (!_.isNil($or) && _.isArray($or)) {
-              const orArray = { $or: [] };
-              $or.forEach((item) => {
-                // 轉型
-                const isNumber = isNumeric(item.value);
-                let value = isNumber ? parseInt(item.value, 10) : item.value;
-                value = _.isDate(value) ? new Date(value) : value;
-                if (isNumeric) {
-                  orArray.$or.push({
-                    [`$${item.key}$`]: { $eq: value },
-                  });
-                } else {
-                  orArray.$or.push({
-                    [`$${item.key}$`]: { $like: `%${value}%` },
-                  });
-                }
-              });
-              query.where.$and.push(orArray);
-            } else {
+
+        fields.forEach((field) => {
+          console.log('QueryHelper field=>', field);
+          // 檢查是否有 $or 條件
+          const $or = field['$or'];
+          if (!_.isNil($or) && _.isArray($or)) {
+            const condition = {
+              $or: []
+            };
+            $or.forEach((item) => {
               // 轉型
               const isNumber = isNumeric(item.value);
-              let value = isNumber ? parseInt(field.value, 10) : field.value;
+              let value = isNumber ? parseInt(item.value, 10) : item.value;
               value = _.isDate(value) ? new Date(value) : value;
-              if (isNumber) {
-                query.where.$and.push(
-                  Sequelize.where(
-                    Sequelize.col(`${field.key}`), 'eq', value,
-                  ),
-                );
+              if (isNumeric) {
+                condition.$or.push({
+                  [`$${item.key}$`]: {
+                    $eq: value
+                  },
+                });
               } else {
-                query.where.$and.push(
-                  Sequelize.where(
-                    Sequelize.col(`${field.key}`), 'like', `%${value}%`,
-                  ),
-                );
+                condition.$or.push({
+                  [`$${item.key}$`]: {
+                    $like: `%${value}%`
+                  },
+                });
               }
+            });
+            // 檢查 where 類型
+            if (_.isArray(query.where.$and)) {
+              query.where.$and.push(condition);
+            } else if (_.isPlainObject(query.where.$and)) {
+              query.where.$and = {
+                ...query.where.$and,
+                ...condition,
+              };
             }
-          });
-        }
+            // console.log('query.where.$and=>', query.where.$and);
+          } else {
+            // 轉型
+            const isNumber = isNumeric(item.value);
+            let value = isNumber ? parseInt(field.value, 10) : field.value;
+            value = _.isDate(value) ? new Date(value) : value;
+            if (isNumber) {
+              query.where.$and.push(
+                Sequelize.where(
+                  Sequelize.col(`${field.key}`), 'eq', value,
+                ),
+              );
+            } else {
+              query.where.$and.push(
+                Sequelize.where(
+                  Sequelize.col(`${field.key}`), 'like', `%${value}%`,
+                ),
+              );
+            }
+          }
+        });
       }
 
       // 全文檢索 - 如果有輸入關鍵字
@@ -1550,7 +1641,7 @@ module.exports = {
    *     formatCb = null,
    *   }
    * @example 查詢 User 包含 Parent
-   * QueryService.findBy({
+   * QueryHelper.findBy({
    *     modelName: 'User',
    *     include: [
    *       { model: Parent,
@@ -1564,7 +1655,7 @@ module.exports = {
    *         keyword: mFilter.searchText,
    *         extra: [
    *           'User.nameEN', 'User.nameTW',
-   *           ...QueryService.getModelSearchableColumns('Parent'),
+   *           ...QueryHelper.getModelSearchableColumns('Parent'),
    *         ],
    *       },
    *     },
@@ -1593,10 +1684,10 @@ module.exports = {
   async findBy({
     modelName = null,
     scope = null,
-    include = null,
+    include = [],
     attributes = null,
-    includeColumns = null,
-    excludeColumns = null,
+    includeColumns = [],
+    excludeColumns = [],
   } = {}, {
     langCode = 'zh-TW',
     whereCondition = '$and',
@@ -1604,7 +1695,7 @@ module.exports = {
     curPage = 1,
     perPage = 10,
     sort = 'DESC',
-    sortBy = 'createdAt',
+    sortBy = null,
     order = null,
     collate = null,
     log = false,
@@ -1623,7 +1714,9 @@ module.exports = {
         filter,
       });
       if (inputHasNull) {
-        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({ inputHasNull }));
+        throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({
+          inputHasNull
+        }));
       }
       // if (sortBy) {
       //   const getModelColumns = name => this.getModelColumns({ modelName: name });
@@ -1685,8 +1778,8 @@ module.exports = {
         data: e ? e.toJSON() : null,
         view,
       }));
-      const total = typeof data.count === 'number'
-        ? data.count : data.count.length;
+      const total = typeof data.count === 'number' ?
+        data.count : data.count.length;
       if (view) {
         extra = {
           ...this.getIndexPageTableAndFilters({
@@ -1787,41 +1880,47 @@ module.exports = {
   getIndexPageTableAndFilters({
     langCode = 'zh-TW',
     modelName,
-    include,
-    includeColumns,
-    excludeColumns,
+    include = [],
+    includeColumns = [],
+    excludeColumns = [],
   }) {
     try {
       // 取出全部的 table 欄位
-      const autoIncludeColumns = include ? _.flattenDeep(include.map((e) => {
-        // Console.log('autoIncludeColumns e=>', e);
-        if (!_.isObject(e)) {
-          throw Error('include model must be an object.');
-        }
-        return (QueryService.getModelColumns({
-          modelName: e.model ? e.model.name : e.modelName,
-          modelPrefix: true,
-        })) || [];
-      })) : [];
+      const autoIncludeColumns = _.isEmpty(include) ?
+        [] :
+        _.flattenDeep(include.map((e) => {
+          // Console.log('autoIncludeColumns e=>', e);
+          if (!_.isObject(e)) {
+            throw Error('include model must be an object.');
+          }
+          return (QueryHelper.getModelColumns({
+            modelName: e.model ? e.model.name : e.modelName,
+            modelPrefix: true,
+          })) || [];
+        }));
+      console.log('autoIncludeColumns=>', autoIncludeColumns)
       // Console.log('includeColumns=>', includeColumns);
 
       // 取出表格欄位
-      let columns = includeColumns || this.getModelColumns({
-        modelName,
-        modelPrefix: false,
-        exclude: excludeColumns,
-        include: autoIncludeColumns,
-      });
+      let columns = _.isEmpty(includeColumns) ?
+        this.getModelColumns({
+          modelName,
+          modelPrefix: false,
+          exclude: excludeColumns,
+          include: autoIncludeColumns,
+        }) :
+        includeColumns;
+      console.log('columns=>', columns)
       if (excludeColumns) {
         columns = columns.filter(c => !(excludeColumns.some(e => e === c)));
       }
 
       // 取出表頭
-      const isAutoIncludeField = name => (autoIncludeColumns.some(col => col === name)
-        ? `model.${_.upperFirst(name)}` : `model.${_.upperFirst(modelName)}.${name}`);
+      const isAutoIncludeField = name => (autoIncludeColumns.some(col => col === name) ?
+        `model.${_.upperFirst(name)}` : `model.${_.upperFirst(modelName)}.${name}`);
 
       const headers = columns.map(col => ({
-        label: sails.__(his.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col)),
+        label: sails.__(this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col)),
         // label: sails.__({
         //   phrase:
         //     this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),
@@ -1835,9 +1934,9 @@ module.exports = {
         integer: true,
       }).map(e => ({
         label: sails.__((
-          this.isCommonField(e.key)
-            ? `model${e.key.replace(modelName, '')}`
-            : `model.${e.key}`)),
+          this.isCommonField(e.key) ?
+          `model${e.key.replace(modelName, '')}` :
+          `model.${e.key}`)),
         // label: sails.__({
         //   phrase: this.isCommonField(e.key)
         //     ? `model${e.MESSAGE.replace(modelName, '')}` : `model.${e.key}`,
@@ -1846,6 +1945,8 @@ module.exports = {
         key: e.key,
         type: e.type,
       }));
+      console.log('headers=>', headers)
+      console.log('columns=>', columns)
       return {
         table: {
           headers,
@@ -1873,13 +1974,13 @@ module.exports = {
     sails.log(`=== getPageFields modelName: "${modelName}", langCode: "${langCode}" ===`);
     try {
       // 建立全部欄位名稱
-      const fieldNames = QueryService.getModelOutputColumns({
+      const fieldNames = QueryHelper.getModelOutputColumns({
         modelPrefix: false,
         modelName,
         langCode,
       });
       // 建立空資料
-      const emptyModel = QueryService.buildEmptyModel({
+      const emptyModel = QueryHelper.buildEmptyModel({
         modelName,
       });
 
@@ -1902,48 +2003,50 @@ module.exports = {
             const associatedModelName = field.name.replace('Id', '');
             const values = associatedData[associatedModelName];
             /* eslint no-param-reassign: 0 */
-            let modelOutputPropName = null;
-            {
+            let modelOutputPropName = null; {
               // Console.log('associatedModelName=>', associatedModelName);
               // 如果有指定哪個 model 使用哪個 prop 輸出
-              const assignModelOutputField = outputFieldNamePairs
-                ? outputFieldNamePairs.filter(pair => pair.modelName === associatedModelName)[0]
-                : null;
+              const assignModelOutputField = outputFieldNamePairs ?
+                outputFieldNamePairs.filter(pair => pair.modelName === associatedModelName)[0] :
+                null;
               // Console.log('assignModelOutputField=>', assignModelOutputField);
-              modelOutputPropName = assignModelOutputField
-                ? assignModelOutputField.target
-                : null;
+              modelOutputPropName = assignModelOutputField ?
+                assignModelOutputField.target :
+                null;
               // Console.log('modelOutputPropName=>', modelOutputPropName);
             }
             // 可能要再加上一對多判斷
             field.type = 'chosen';
             field.required = true;
-            field.values = values
-              ? values
-                .concat([{ id: null }])
-                .map((v) => {
-                  let name = v[modelOutputPropName] || v.name || v.key || v.id;
-                  if (_.isFunction(modelOutputPropName)) {
-                    name = modelOutputPropName(v);
-                  }
-                  return {
-                    value: v.id,
-                    name,
-                  };
-                })
-              : [];
+            field.values = values ?
+              values
+              .concat([{
+                id: null
+              }])
+              .map((v) => {
+                let name = v[modelOutputPropName] || v.name || v.key || v.id;
+                if (_.isFunction(modelOutputPropName)) {
+                  name = modelOutputPropName(v);
+                }
+                return {
+                  value: v.id,
+                  name,
+                };
+              }) :
+              [];
           }
           return field;
         });
       }
       return {
         ..._.omit(emptyModel, exclude),
-        _fields:
-        _.differenceBy(
-          fieldNames,
-          exclude.map(e => ({ name: e })),
-          'name',
-        )
+        _fields: _.differenceBy(
+            fieldNames,
+            exclude.map(e => ({
+              name: e
+            })),
+            'name',
+          )
           .concat(include)
           .map((field) => {
             const isTarget = required.some(r => r === field.name);
