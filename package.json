@@ -34,8 +34,8 @@
     "inflection": "^1.12.0",
     "joi": "^14.3.0",
     "lodash": "^4.17.11",
-    "sails-hook-sequelize": "git+https://github.com/MoreAppio/sails-hook-sequelize.git",
-    "sails-util-micro-apps": "git+https://github.com/MoreAppio/sails-util-micro-apps.git",
+    "sails-hook-sequelize": "git@github.com:MoreAppio/sails-hook-sequelize.git",
+    "sails-util-micro-apps": "git@github.com:MoreAppio/sails-util-micro-apps.git",
     "sequelize": "^4.39.0",
     "supertest": "^3.3.0"
   },
