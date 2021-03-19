@@ -15,8 +15,12 @@ module.exports = function (sails) {
         // console.log('SequelizeConnections=>', SequelizeConnections.mysql);
         // console.log('Sequelize=>', Sequelize);
         // const sequelize = require('sequelize');
-        sails.log.warn('[!] FIXME: 需要依據 connection 自動移除 ONLY_FULL_GROUP_BY。');
-        SequelizeConnections.mysql.query("SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
+        sails.log.warn(
+          '[!] FIXME: 需要依據 connection 自動移除 ONLY_FULL_GROUP_BY。',
+        );
+        SequelizeConnections.mysql.query(
+          "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))",
+        );
       } catch (e) {
         throw e;
       }
@@ -30,13 +34,16 @@ module.exports = function (sails) {
       });
     },
     initialize(next) {
-      loader.inject({
-        // models: `${__dirname}/api/models`,
-        // helpers: `${__dirname}/api/helpers`,
-        services: `${__dirname}/api/services`,
-        // responses: `${__dirname}/api/responses`,
-        // controllers: `${__dirname}/api/controllers`,
-      }, err => next(err));
+      loader.inject(
+        {
+          // models: `${__dirname}/api/models`,
+          // helpers: `${__dirname}/api/helpers`,
+          services: `${__dirname}/api/services`,
+          // responses: `${__dirname}/api/responses`,
+          // controllers: `${__dirname}/api/controllers`,
+        },
+        (err) => next(err),
+      );
     },
   };
 };
