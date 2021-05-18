@@ -22,7 +22,7 @@ const isNumeric = (val) => !isNaN(parseFloat(val)) && isFinite(val);
 
 const Console = console;
 
-module.exports = {
+export default {
   langCode: 'zh-TW',
   log: false,
   commonFields: ['createdAt', 'updatedAt', 'deletedAt', 'id'],

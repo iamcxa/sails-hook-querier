@@ -2,7 +2,5 @@
  * Compatible Package
  */
 
-var queryHelper = require('./QueryHelper');
-
+import queryHelper from './QueryHelper';
 module.exports = queryHelper;
-
