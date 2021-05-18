@@ -1,0 +1,13 @@
+{
+	"user": {
+	  "name": "Tester",
+    "age": 21
+	},
+	"image": {
+		"url": "http://google.com"
+	},
+	"group": {
+		"name": "public",
+		"role": "USER"
+	}
+}

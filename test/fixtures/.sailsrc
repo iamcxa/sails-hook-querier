@@ -1,0 +1,15 @@
+{
+  "generators": {
+    "modules": {}
+  },
+  "hooks":{
+    "session": false,
+    "blocks": false,
+    "orm": false,
+    "pubsub": false,
+    "policies": false
+  },
+  "log": {
+    "level": "info"
+  }
+}
