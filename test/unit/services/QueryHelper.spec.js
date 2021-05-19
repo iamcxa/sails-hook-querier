@@ -1,14 +1,17 @@
-const fixtures = require('./../../fixtures/instances.json');
+const fixtures = require('../samples/instances.json');
 
-describe('about NotifierHelper operation.', () => {
+describe('about QueryHelper.create operation.', () => {
   it('create should be success', async () => {
-    const result = await QueryHelper.default.create({
-      modelName: 'User',
-      include: [],
-      input: fixtures.user,
-    }, {
-      formatCb: e => e,
-    });
+    const result = await QueryHelper.default.create(
+      {
+        modelName: 'User',
+        include: [],
+        input: fixtures.user,
+      },
+      {
+        formatCb: (e) => e,
+      },
+    );
 
     const target = {
       ...fixtures.user,
@@ -17,11 +20,15 @@ describe('about NotifierHelper operation.', () => {
       createdAt: new Date(),
     };
 
-    SpecHelper.validateEach({
-      source: result.dataValues,
-      target,
-    }, {
-      strictMode: false,
-    });
+    SpecHelper.validateEach(
+      {
+        source: result.dataValues,
+        target,
+      },
+      {
+        strictMode: false,
+        log: true,
+      },
+    );
   });
 });
