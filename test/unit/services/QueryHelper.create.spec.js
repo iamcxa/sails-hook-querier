@@ -2,7 +2,9 @@ import samples from '../samples';
 
 describe('about QueryHelper.create operation.', () => {
   it('create should be success', async () => {
-    const result = await QueryHelper.default.create(
+    console.log(QueryHelper);
+    console.log(QueryService);
+    const result = await QueryHelper.create(
       {
         modelName: 'User',
         include: [],
