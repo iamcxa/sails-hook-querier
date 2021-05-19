@@ -1,4 +1,4 @@
-const fixtures = require('../samples/instances.json');
+import samples from '../samples';
 
 describe('about QueryHelper.create operation.', () => {
   it('create should be success', async () => {
@@ -6,7 +6,7 @@ describe('about QueryHelper.create operation.', () => {
       {
         modelName: 'User',
         include: [],
-        input: fixtures.user,
+        input: samples.user.create,
       },
       {
         formatCb: (e) => e,
@@ -14,7 +14,7 @@ describe('about QueryHelper.create operation.', () => {
     );
 
     const target = {
-      ...fixtures.user,
+      ...samples.user.create,
       id: 0,
       updatedAt: new Date(),
       createdAt: new Date(),
