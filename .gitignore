@@ -44,9 +44,6 @@ config/local.js
 config/local.default.js
 api/hooks/*/config/local.js
 
-
-
-
 ################################################
 # Dependencies
 #
@@ -71,9 +68,6 @@ api/hooks/*/config/local.js
 node_modules
 bower_components
 
-
-
-
 ################################################
 # Sails.js / Waterline / Grunt
 #
@@ -81,10 +75,6 @@ bower_components
 # tasks and adapters.
 ################################################d
 dump.rdb
-
-
-
-
 
 ################################################
 # Node.js / NPM
@@ -98,9 +88,6 @@ lib-cov
 *.out
 *.pid
 npm-debug.log
-
-
-
 
 ################################################
 # Miscellaneous
@@ -132,6 +119,8 @@ test/stress/output_serverMemory.xls
 test/stress/*.txt
 test/stress/*.xls
 .c9
+
+local.js
 
 assets/css/importer.css
 assets/css/importer.css.map

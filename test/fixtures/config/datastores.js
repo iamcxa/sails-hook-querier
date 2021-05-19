@@ -19,21 +19,24 @@
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.connections.html
  */
 
-module.exports.datastores = {
-    default: {
-        user: "root",
-        password: "toor",
-        database: "demo",
-        dialect: "mysql",
-        options: {
-            dialect: "mysql",
-            host: "localhost",
-            port: 3306,
-            logging: "verbose",
-        },
-    },
+const local = require('../../../local');
 
-    memory: {
-        adapter: "sails-memory",
+module.exports.datastores = {
+  default: (local && local.default.url && local.default) || {
+    url: 'mysql://root:toor@localhost:3306/demo',
+    user: 'root',
+    password: 'toor',
+    database: 'demo',
+    dialect: 'mysql',
+    options: {
+      dialect: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      logging: console.log,
     },
+  },
+
+  memory: {
+    adapter: 'sails-memory',
+  },
 };
