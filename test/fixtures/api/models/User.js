@@ -6,21 +6,19 @@
 module.exports = {
   attributes: {
     name: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     age: {
-      type: Sequelize.INTEGER
-    }
+      type: Sequelize.INTEGER,
+    },
   },
-  associations: function () {
-  },
+  associations: function () {},
   defaultScope: function () {
-    return {
-    };
+    return {};
   },
   options: {
     freezeTableName: false,
-    tableName: 'user',
+    tableName: 'User',
     schema: 'sails',
     classMethods: {
       oneUniqueClassMethod: function () {
@@ -32,7 +30,7 @@ module.exports = {
         const obj = this.get();
         obj.ageString = '' + obj.age + ' years';
         return obj;
-      }
+      },
     },
     hooks: {},
   },
