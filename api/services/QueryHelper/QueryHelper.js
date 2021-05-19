@@ -1,5 +1,4 @@
-export { default as utils } from './QueryHelper.utils';
-export { create } from './QueryHelper.create';
+export { default as create } from './QueryHelper.create';
 
 /**
  * @module QueryHelper

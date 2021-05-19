@@ -29,7 +29,7 @@
  */
 
 import _ from 'lodash';
-export async function create(
+export default async function create(
   {
     langCode = this.langCode,
     modelName = undefined,
