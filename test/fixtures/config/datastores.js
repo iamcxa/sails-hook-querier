@@ -22,7 +22,7 @@
 const local = require('../../../local');
 
 module.exports.datastores = {
-  default: (local && local.default.url && local.default) || {
+  default: (local && local.default && local.default.url) || {
     url: 'mysql://root:toor@localhost:3306/demo',
     user: 'root',
     password: 'toor',
