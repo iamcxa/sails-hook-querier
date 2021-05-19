@@ -20,34 +20,31 @@
   },
   "devDependencies": {
     "@sailshq/eslint": "^4.19.3",
-    "chai": "^4.2.0",
-    "chai-datetime": "^1.5.0",
+    "chai": "^4.3.4",
+    "chai-datetime": "^1.8.0",
     "chalk": "^4.1.1",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.2",
     "esm": "^3.0.84",
-    "flattenjs": "^1.0.4",
     "istanbul": "^1.1.0-alpha.1",
-    "jsdoc": "^3.5.5",
+    "jsdoc": "^3.6.7",
     "jsdoc-strip-async-await": "^0.1.0",
     "mocha": "^5.2.0",
-    "passport": "^0.4.0",
-    "passport-local": "^1.0.0",
     "sails": "^1.4.2",
     "sails-hook-blocks": "^0.1.11",
-    "sinon": "^6.3.5",
-    "tracer": "^0.9.1",
-    "supertest": "^3.3.0"
-  },
-  "dependencies": {
-    "inflection": "^1.12.0",
-    "joi": "^14.3.0",
-    "lodash": "^4.17.11",
+    "sinon": "^10.0.0",
+    "supertest": "^6.1.3",
+    "tracer": "^1.1.4",
+    "lodash": "^4.17.21",
     "mysql2": "^2.2.5",
-    "sails-hook-sequelize": "git@github.com:MoreAppio/sails-hook-sequelize.git",
-    "sails-util-micro-apps": "git@github.com:MoreAppio/sails-util-micro-apps.git",
     "sequelize": "^4.39.0",
     "sqlite3": "^5.0.2"
+  },
+  "dependencies": {
+    "inflection": "^1.13.1",
+    "joi": "^14.3.1",
+    "sails-hook-sequelize": "git@github.com:MoreAppio/sails-hook-sequelize.git",
+    "sails-util-micro-apps": "^1.1.1"
   },
   "engines": {
     "node": "^8.9.1"
@@ -58,6 +55,7 @@
     "prepublishOnly": "",
     "doc": "",
     "test": "NODE_ENV=test node -r esm ./node_modules/.bin/istanbul cover _mocha",
+    "pretest": "touch local.js",
     "jsdoc": "jsdoc api/services/*.js --destination ./docs --readme README.md --access all --configure ./jsdoc.conf.json"
   },
   "sails": {
