@@ -10,7 +10,7 @@ module.exports = {
     },
   },
   associations: function () {
-    User.hasOne(Image);
+    User.hasOne(Image, { onDelete: 'cascade' });
     Image.belongsTo(User);
   },
   options: {
