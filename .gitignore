@@ -120,7 +120,7 @@ test/stress/*.txt
 test/stress/*.xls
 .c9
 
-local.js
+config/local.js
 
 assets/css/importer.css
 assets/css/importer.css.map
