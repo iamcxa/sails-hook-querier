@@ -6,39 +6,34 @@
 module.exports = {
   attributes: {
     name: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     age: {
-      type: Sequelize.INTEGER
-    }
+      type: Sequelize.INTEGER,
+    },
   },
-  associations: function () {
-    User.hasMany(Image);
-    User.belongsTo(Group);
-  },
+  associations: function () {},
   defaultScope: function () {
     return {
-      include: [
-        { model: Image }
-      ]
+      include: [{ model: Image }],
     };
   },
   options: {
-    freezeTableName : false,
+    freezeTableName: false,
     tableName: 'user',
     schema: 'sails',
     classMethods: {
       oneUniqueClassMethod: function () {
         return 'User class method';
-      }
+      },
     },
-    instanceMethods : {
+    instanceMethods: {
       toJSON: function () {
         let obj = this.get();
         obj.ageString = '' + obj.age + ' years';
         return obj;
-      }
+      },
     },
-    hooks: {}
-  }
+    hooks: {},
+  },
 };

@@ -6,28 +6,27 @@
 module.exports = {
   attributes: {
     name: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     role: {
-      type: Sequelize.ENUM('USER', 'ADMIN')
-      }
+      type: Sequelize.ENUM('USER', 'ADMIN'),
+    },
   },
   associations: function () {
     Group.hasMany(User);
+    User.belongsTo(Group);
   },
   defaultScope: function () {
     return {
-      include: [
-        { model: User }
-      ]
+      include: [{ model: User }],
     };
   },
   options: {
-    freezeTableName : false,
+    freezeTableName: false,
     tableName: 'group',
     schema: 'sails',
     classMethods: {},
     instanceMethods: {},
-    hooks: {}
-  }
+    hooks: {},
+  },
 };

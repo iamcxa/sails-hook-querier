@@ -6,10 +6,11 @@
 module.exports = {
   attributes: {
     url: {
-      type: Sequelize.STRING
-    }
+      type: Sequelize.STRING,
+    },
   },
   associations: function () {
+    User.hasOne(Image);
     Image.belongsTo(User);
   },
   options: {
@@ -18,6 +19,6 @@ module.exports = {
     schema: 'sails',
     classMethods: {},
     instanceMethods: {},
-    hooks: {}
-  }
+    hooks: {},
+  },
 };
