@@ -94,14 +94,12 @@ export default async function create(
                 //   modelPrefix: association.name,
                 // }),
                 // console.log('associationLevel2 association=>', association);
-
                 const associationLevel2 = this.getAssociations(
                   association.singular,
                   {
                     raw: true,
                   },
                 );
-                console.log('associationLevel2=>', associationLevel2);
 
                 if (!_.isEmpty(associationLevel2)) {
                   return _.flatten(

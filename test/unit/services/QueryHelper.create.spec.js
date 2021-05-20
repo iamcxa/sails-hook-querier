@@ -4,12 +4,10 @@ describe('about QueryHelper.create operation.', () => {
   it('create and use include models should be success', async () => {
     const input = {
       ...samples.user.create.group,
-      Users: [
-        {
-          ...samples.user.create.user,
-          Image: samples.user.create.image,
-        },
-      ],
+      Users: {
+        ...samples.user.create.user,
+        Image: samples.user.create.image,
+      },
     };
     const result = await QueryHelper.create(
       {
