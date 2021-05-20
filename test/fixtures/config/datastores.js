@@ -19,10 +19,12 @@
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.connections.html
  */
 
-const local = require('../../../local');
+const _ = require('lodash');
+const local = require('../../../config/local');
 
 module.exports.datastores = {
-  default: (local && local.default && local.default.url) || {
+  default: (_.has(local, 'datastores.default') &&
+    _.get(local, 'datastores.default')) || {
     url: 'mysql://root:toor@localhost:3306/demo',
     user: 'root',
     password: 'toor',
