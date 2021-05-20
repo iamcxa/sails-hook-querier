@@ -7,7 +7,7 @@
     "url": "http://google.com"
   },
   "group": {
-    "name": "public",
+    "name": "public group",
     "role": "USER"
   }
 }

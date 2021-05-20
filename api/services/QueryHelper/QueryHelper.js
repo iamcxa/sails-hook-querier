@@ -22,17 +22,13 @@ const getDate = (date, format) => {
 const isDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/g;
 const isNumeric = (val) => !isNaN(parseFloat(val)) && isFinite(val);
 
-const Console = console;
+global.Console = console;
 
 const langCode = 'zh-TW';
 const log = false;
 const commonFields = ['createdAt', 'updatedAt', 'deletedAt', 'id'];
 
-export {
-  langCode,
-  log,
-  commonFields,
-}
+export { langCode, log, commonFields };
 
 export function validate({ value, schema, options, callback }) {
   return Joi.validate(
@@ -510,7 +506,12 @@ export async function update(
  * // [1, 1, 1, 0]
  * @returns {Array} 包含是否完成的陣列
  */
-export async function destroy({ modelName = null, include = null, force = false, ids = [] }) {
+export async function destroy({
+  modelName = null,
+  include = null,
+  force = false,
+  ids = [],
+}) {
   try {
     const inputHasNull = ValidatorHelper.checkNull({
       modelName,
@@ -524,9 +525,7 @@ export async function destroy({ modelName = null, include = null, force = false,
       );
     }
     if (!_.isArray(ids)) {
-      throw Error(
-        MESSAGE.BAD_REQUEST.CHECK_INPUT_PARAMETER_TYPE('ids', Array),
-      );
+      throw Error(MESSAGE.BAD_REQUEST.CHECK_INPUT_PARAMETER_TYPE('ids', Array));
     }
     const model = this.getModelByName(modelName);
     const results = [];
@@ -551,14 +550,13 @@ export async function destroy({ modelName = null, include = null, force = false,
           if (associatedId) {
             const includedModelInstance =
               sails.models[includeModelName.toLowerCase()];
-            const deletedAssociatedModelId = await includedModelInstance.destroy(
-              {
+            const deletedAssociatedModelId =
+              await includedModelInstance.destroy({
                 where: {
                   id: associatedId,
                 },
                 force,
-              },
-            );
+              });
             const message = `[!] Delete  "${modelName}"'s associated model "${includeModelName}" with id "${associatedId}" (?=${deletedAssociatedModelId})`;
 
             if (deletedAssociatedModelId) {
@@ -567,9 +565,7 @@ export async function destroy({ modelName = null, include = null, force = false,
               sails.log.debug(`${message} failed.`);
             }
           } else {
-            throw Error(
-              `${modelName} has no associated with ${includeModel}.`,
-            );
+            throw Error(`${modelName} has no associated with ${includeModel}.`);
           }
         }
       }
@@ -831,9 +827,7 @@ export async function getDetail(
           one2One: true,
         });
         for (const target of associatedModels) {
-          const modelData = await sails.models[
-            target.toLowerCase()
-          ].findAll();
+          const modelData = await sails.models[target.toLowerCase()].findAll();
           // Console.log('modelData=>', modelData);
           associatedData[target] = modelData;
         }
@@ -1121,7 +1115,11 @@ export function getModelOutputColumns({
  * // }
  * @returns {Object} 空的 model 欄位格式 JSON。
  */
-export function buildEmptyModel({ modelName = null, exclude = [], include = [] } = {}) {
+export function buildEmptyModel({
+  modelName = null,
+  exclude = [],
+  include = [],
+} = {}) {
   try {
     const model = {};
     this.getModelColumns({
@@ -1747,6 +1745,10 @@ export function getAssociations(
       const singularName = association[key].name.singular;
       const pluralName = association[key].name.plural;
       if (associations[key].options.constraints !== false) {
+        // // Console.log('associations[key]=>');
+        // // Console.dir(associations[key]);
+        // Console.log('associations[key].HasMany=>', associations[key].hasMany);
+        // Console.dir(associations[key].target);
         if (singular) {
           result.push(singularName);
         } else if (plural) {
@@ -1760,6 +1762,9 @@ export function getAssociations(
             name: key,
             singular: singularName,
             plural: pluralName,
+
+            options: associations[key].options,
+            rawName: association[key].name,
           });
         } else {
           result.push(key);
@@ -1773,9 +1778,7 @@ export function getAssociations(
 export function modelAssociationsToArray(model) {
   const result = [];
   if (typeof model !== 'object' || typeof model.associations !== 'object') {
-    throw Error(
-      "Model should be an object with the 'associations' property.",
-    );
+    throw Error("Model should be an object with the 'associations' property.");
   }
   Object.keys(model.associations).forEach((key) => {
     const association = {};
@@ -1953,8 +1956,7 @@ export async function getDetailPageFieldWithAssociations({
                   },
                 ])
                 .map((v) => {
-                  let name =
-                    v[modelOutputPropName] || v.name || v.key || v.id;
+                  let name = v[modelOutputPropName] || v.name || v.key || v.id;
                   if (_.isFunction(modelOutputPropName)) {
                     name = modelOutputPropName(v);
                   }

@@ -88,17 +88,42 @@ export default async function create(
           ? _.flatten(
               this.getAssociations(modelName, {
                 raw: true,
-              }).map((association) =>
-                this.getModelColumns({
-                  modelName: association.singular,
-                  modelPrefix: association.name,
-                }),
-              ),
+              }).map((association) => {
+                // this.getModelColumns({
+                //   modelName: association.singular,
+                //   modelPrefix: association.name,
+                // }),
+                // console.log('associationLevel2 association=>', association);
+
+                const associationLevel2 = this.getAssociations(
+                  association.singular,
+                  {
+                    raw: true,
+                  },
+                );
+                console.log('associationLevel2=>', associationLevel2);
+
+                if (!_.isEmpty(associationLevel2)) {
+                  return _.flatten(
+                    associationLevel2.map((association2) =>
+                      this.getModelColumns({
+                        modelName: association2.singular,
+                        modelPrefix: `${association.name}.${association2.name}`,
+                      }),
+                    ),
+                  );
+                } else {
+                  return this.getModelColumns({
+                    modelName: association.singular,
+                    modelPrefix: association.name,
+                  });
+                }
+              }),
             )
           : null,
       });
-      // Console.log('format==============>');
-      // Console.dir(format);
+      Console.log('format==============>');
+      Console.dir(format);
     }
     const data = this.formatInput({
       modelName,
@@ -109,8 +134,8 @@ export default async function create(
       }),
       rawData: input,
     });
-    // Console.log('data==============>');
-    // Console.dir(data);
+    Console.log('data==============>');
+    Console.dir(data);
     // const cretaeBuild = await model.build(data, { include });
     // Console.log('build==============>');
     // Console.dir(cretaeBuild);
