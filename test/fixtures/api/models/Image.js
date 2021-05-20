@@ -16,7 +16,6 @@ module.exports = {
   options: {
     freezeTableName: false,
     tableName: 'image',
-    schema: 'sails',
     classMethods: {},
     instanceMethods: {},
     hooks: {},

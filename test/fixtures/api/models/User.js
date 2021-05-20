@@ -21,7 +21,6 @@ module.exports = {
   options: {
     freezeTableName: false,
     tableName: 'user',
-    schema: 'sails',
     classMethods: {
       oneUniqueClassMethod: function () {
         return 'User class method';

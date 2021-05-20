@@ -1,14 +1,54 @@
 import samples from '../samples';
 
 describe('about QueryHelper.create operation.', () => {
+  const validateFormater = (target) => {
+    return {
+      ...target,
+      id: 0,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    }
+  }
+
+  it('create should be success', async () => {
+    const input = {
+      ...samples.create.User,
+    }
+
+    const result = await QueryHelper.create(
+      {
+        modelName: 'User',
+        input,
+      },
+      {
+        formatCb: (e) => e,
+        toJSON: true,
+      },
+    );
+
+    const target = validateFormater(samples.create.User);
+
+    SpecHelper.validateEach(
+      {
+        source: result,
+        target,
+      },
+      {
+        strictMode: false,
+        log: true,
+      },
+    );
+  });
+
   it('create and use include models should be success', async () => {
     const input = {
-      ...samples.user.create.group,
+      ...samples.create.Group,
       Users: {
-        ...samples.user.create.user,
-        Image: samples.user.create.image,
+        ...samples.create.User,
+        Image: samples.create.Image,
       },
     };
+
     const result = await QueryHelper.create(
       {
         modelName: 'Group',
@@ -22,41 +62,53 @@ describe('about QueryHelper.create operation.', () => {
       },
       {
         toJSON: true,
+        formatCb: (e) => e,
       },
     );
 
     const target = {
-      ...samples.user.create.image,
-      id: 0,
-      updatedAt: new Date(),
-      createdAt: new Date(),
-      UserId: 0,
-      User: {
-        ...samples.user.create.user,
-        id: 0,
-        updatedAt: new Date(),
-        createdAt: new Date(),
-        // FIXME: group 因 formatInput 關係未能正常建立
-        // GroupId: 0,
-        // Group: {
-        // ...samples.user.create.group,
-        // id: 0,
-        // updatedAt: new Date(),
-        // createdAt: new Date(),
-        // }
-      },
+      ...validateFormater(samples.create.Group),
+      Users: [{
+        ...validateFormater(samples.create.User),
+        Images: [{
+          ...validateFormater(samples.create.Image),
+        }]
+      }]
     };
-    console.log('result=>', result);
 
     SpecHelper.validateEach(
       {
-        source: input,
-        target: result,
+        source: result,
+        target,
       },
       {
         strictMode: false,
         log: true,
       },
     );
+  });
+
+  it('create wrong modelName should be fail', async () => {
+    const input = {
+      ...samples.create.User,
+    }
+    const chai = require('chai');
+    chai.should();
+
+    try {
+      const result = await QueryHelper.create(
+        {
+          modelName: 'test',
+          input,
+        },
+        {
+          formatCb: (e) => e,
+        },
+      );
+    } catch (err) {
+      err.message.should.equal(
+        JSON.stringify({"message":"BadRequest.Target.Model.Not.Exits","code":400,"extra":{"modelName":"test"}})
+      );
+    }
   });
 });

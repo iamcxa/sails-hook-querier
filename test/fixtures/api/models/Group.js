@@ -24,7 +24,6 @@ module.exports = {
   options: {
     freezeTableName: false,
     tableName: 'group',
-    schema: 'sails',
     classMethods: {},
     instanceMethods: {},
     hooks: {},

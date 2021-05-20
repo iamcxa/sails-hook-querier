@@ -1,7 +1,6 @@
-import create from './instances.json';
+import instances from './instances.json';
 
 export default {
-  user: {
-    create,
-  },
+  create: instances,
+  update: instances,
 };
