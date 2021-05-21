@@ -8,6 +8,7 @@ global.SpecHelper = require('../node_modules/sails-hook-blocks/api/services/help
 before(function (done) {
   // Hook will timeout in 10 seconds
   this.timeout(11000);
+  chai.should();
 
   const Sequelize = require('sequelize');
   const connInfo = require('./fixtures/config/datastores').datastores.default;

@@ -6,7 +6,6 @@
     "blueprints": false,
     "grunt": false,
     "sockets": false,
-    "i18n": false,
     "session": false,
     "blocks": false,
     "orm": false,

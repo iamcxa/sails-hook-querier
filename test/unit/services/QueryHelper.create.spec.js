@@ -26,12 +26,12 @@ describe('about QueryHelper.create operation.', () => {
       },
     );
 
-    const target = validateFormater(samples.create.User);
+    const source = validateFormater(samples.create.User);
 
     SpecHelper.validateEach(
       {
-        source: result,
-        target,
+        source,
+        target: result,
       },
       {
         strictMode: false,
@@ -66,7 +66,7 @@ describe('about QueryHelper.create operation.', () => {
       },
     );
 
-    const target = {
+    const source = {
       ...validateFormater(samples.create.Group),
       Users: [{
         ...validateFormater(samples.create.User),
@@ -78,8 +78,8 @@ describe('about QueryHelper.create operation.', () => {
 
     SpecHelper.validateEach(
       {
-        source: result,
-        target,
+        source,
+        target: result,
       },
       {
         strictMode: false,
@@ -92,8 +92,6 @@ describe('about QueryHelper.create operation.', () => {
     const input = {
       ...samples.create.User,
     }
-    const chai = require('chai');
-    chai.should();
 
     try {
       const result = await QueryHelper.create(

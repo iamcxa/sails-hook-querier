@@ -12,7 +12,7 @@ describe('about QueryHelper.update operation.', () => {
 
   it('update should be success', async () => {
     const input = {
-      ...samples.create.User,
+      ...samples.update.User,
     }
 
     const user = await QueryHelper.create(
@@ -39,30 +39,30 @@ describe('about QueryHelper.update operation.', () => {
       },
     );
 
-    const result = await User.findOne(
+    const result = await QueryHelper.getDetail(
       {
+        modelName: 'User',
+        include: [],
         where: {
           id: user.id,
         },
-        raw: true,
-        nest: true,
-      }
+      },
+      {
+        // log: true,
+      },
     );
 
-    // FIXME: getDetail 有錯誤
-    const target = {
-      ...validateFormater(samples.create.User),
+    const source = {
+      ...validateFormater(samples.update.User),
       GroupId: null,
-      Image: validateFormater({
-        url: null,
-        UserId: null,
-      }),
+      Image: null,
+      ageString: 'string',
     };
 
     SpecHelper.validateEach(
       {
-        source: result,
-        target,
+        source,
+        target: result,
       },
       {
         strictMode: false,
@@ -72,8 +72,111 @@ describe('about QueryHelper.update operation.', () => {
   });
 
   it('update and use include models should be success', async () => {
+    const input = {
+      ...samples.update.User,
+      Image: samples.update.Image,
+    };
+
+    sails.log(input)
+
+    const user = await QueryHelper.create(
+      {
+        modelName: 'User',
+        include: [Image],
+        input,
+      },
+      {
+        formatCb: (e) => e,
+        toJSON: true,
+      },
+    );
+
+    const url = 'http://goo.gl'
+    await QueryHelper.update(
+      {
+        modelName: 'User',
+        include: [Image],
+        input: {
+          Image: {
+            url,
+          }
+        },
+        where: {
+          id: user.id,
+        }
+      },
+      {
+        formatCb: (e) => e,
+      },
+    );
+
+    const result = await QueryHelper.getDetail(
+      {
+        modelName: 'User',
+        include: [{
+          model: Image,
+        }],
+        where: {
+          id: user.id,
+        },
+      },
+      {
+        // log: true,
+      },
+    );
+
+    const source = {
+      ...validateFormater(samples.update.User),
+      Image: validateFormater({
+        url,
+      }),
+    };
+
+    SpecHelper.validateEach(
+      {
+        source,
+        target: result,
+      },
+      {
+        strictMode: false,
+        log: true,
+      },
+    );
   });
 
   it('update wrong modelName should be fail', async () => {
+    const input = {
+      ...samples.update.User,
+    }
+
+    const user = await QueryHelper.create(
+      {
+        modelName: 'User',
+        input: {},
+      },
+      {
+        formatCb: (e) => e,
+        toJSON: true,
+      },
+    );
+
+    try {
+      await QueryHelper.update(
+        {
+          modelName: 'test',
+          input,
+          where: {
+            id: user.id,
+          }
+        },
+        {
+          formatCb: (e) => e,
+        },
+      );
+    } catch (err) {
+      err.message.should.equal(
+        JSON.stringify({"message":"BadRequest.Target.Model.Not.Exits","code":400,"extra":{"modelName":"test"}})
+      );
+    }
   });
 });
