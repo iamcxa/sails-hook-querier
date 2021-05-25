@@ -23,8 +23,8 @@ const _ = require('lodash');
 const local = require('../../../config/local');
 
 module.exports.datastores = {
-  default: (_.has(local, 'datastores.default') &&
-    _.get(local, 'datastores.default')) || {
+  default: (_.has(local, 'datastores.default')
+    && _.get(local, 'datastores.default')) || {
     url: 'mysql://root:toor@localhost:3306/demo',
     user: 'root',
     password: 'toor',

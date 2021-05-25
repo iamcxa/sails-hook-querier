@@ -12,8 +12,8 @@ module.exports = {
       type: Sequelize.INTEGER,
     },
   },
-  associations: function () {},
-  defaultScope: function () {
+  associations() {},
+  defaultScope() {
     return {
       include: [{ model: Image }],
     };
@@ -22,14 +22,14 @@ module.exports = {
     freezeTableName: false,
     tableName: 'user',
     classMethods: {
-      oneUniqueClassMethod: function () {
+      oneUniqueClassMethod() {
         return 'User class method';
       },
     },
     instanceMethods: {
-      toJSON: function () {
-        let obj = this.get();
-        obj.ageString = '' + obj.age + ' years';
+      toJSON() {
+        const obj = this.get();
+        obj.ageString = `${obj.age} years`;
         return obj;
       },
     },

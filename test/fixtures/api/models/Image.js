@@ -9,7 +9,7 @@ module.exports = {
       type: Sequelize.STRING,
     },
   },
-  associations: function () {
+  associations() {
     User.hasOne(Image, { onDelete: 'cascade' });
     Image.belongsTo(User);
   },

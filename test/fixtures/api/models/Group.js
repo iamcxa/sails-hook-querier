@@ -12,11 +12,11 @@ module.exports = {
       type: Sequelize.ENUM('USER', 'ADMIN'),
     },
   },
-  associations: function () {
+  associations() {
     Group.hasMany(User);
     User.belongsTo(Group);
   },
-  defaultScope: function () {
+  defaultScope() {
     return {
       include: [{ model: User }],
     };

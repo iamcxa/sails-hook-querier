@@ -1,4 +1,4 @@
 module.exports.sequelize = {
-  "clsNamespace": "querier",
-  "exposeToGlobal": true,
+  clsNamespace: 'querier',
+  exposeToGlobal: true,
 };
