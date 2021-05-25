@@ -38,7 +38,7 @@ describe('about QueryHelper.create operation.', () => {
     );
   });
 
-  it.only('create and use include models should be success', async () => {
+  it('create and use include models should be success', async () => {
     const input = {
       ...samples.create.Group,
       Users: {
