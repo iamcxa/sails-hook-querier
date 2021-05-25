@@ -4,6 +4,7 @@ chai.use(require('chai-datetime'));
 global.should = chai.should();
 global.sinon = require('sinon');
 global.SpecHelper = require('../node_modules/sails-hook-blocks/api/services/helpers/SpecHelper');
+global.ValidatorHelper = require('../node_modules/sails-hook-blocks/api/services/helpers/VerifyHelper');
 
 before(function (done) {
   // Hook will timeout in 10 seconds
