@@ -33,7 +33,5 @@ before(function (done) {
           sails = _sails;
           return done(err, sails);
         });
-      }),
-    ),
-  );
+      })));
 });

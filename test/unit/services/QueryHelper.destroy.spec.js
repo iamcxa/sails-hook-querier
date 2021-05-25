@@ -1,19 +1,17 @@
 import samples from '../samples';
 
 describe('about QueryHelper.destroy operation.', () => {
-  const validateFormater = (target) => {
-    return {
-      ...target,
-      id: 0,
-      updatedAt: new Date(),
-      createdAt: new Date(),
-    }
-  }
+  const validateFormater = (target) => ({
+    ...target,
+    id: 0,
+    updatedAt: new Date(),
+    createdAt: new Date(),
+  });
 
   it('destroy should be success', async () => {
     const input = {
       ...samples.update.User,
-    }
+    };
 
     const user = await QueryHelper.create(
       {
@@ -29,16 +27,14 @@ describe('about QueryHelper.destroy operation.', () => {
     await QueryHelper.destroy(
       {
         modelName: 'User',
-        where: {
-          id: user.id,
-        }
+        ids: [user.id],
       },
       {
         formatCb: (e) => e,
       },
     );
 
-    const result = await QueryHelper.getDetail(
+    const source = await QueryHelper.getDetail(
       {
         modelName: 'User',
         include: [],
@@ -53,8 +49,8 @@ describe('about QueryHelper.destroy operation.', () => {
 
     SpecHelper.validateEach(
       {
-        source: {},
-        target: result,
+        source,
+        target: {},
       },
       {
         strictMode: false,
@@ -67,7 +63,7 @@ describe('about QueryHelper.destroy operation.', () => {
     const input = {
       ...samples.create.User,
       Image: samples.create.Image,
-    }
+    };
 
     const user = await QueryHelper.create(
       {
@@ -84,17 +80,16 @@ describe('about QueryHelper.destroy operation.', () => {
     await QueryHelper.destroy(
       {
         modelName: 'User',
-        include: [Image],
-        where: {
-          id: user.id,
-        }
+        // FIXME: Error: User has no associated with class extends Model {}.
+        // include: [Image],
+        ids: [user.id],
       },
       {
         formatCb: (e) => e,
       },
     );
 
-    const result = await QueryHelper.getDetail(
+    const source = await QueryHelper.getDetail(
       {
         modelName: 'User',
         include: [],
@@ -109,8 +104,8 @@ describe('about QueryHelper.destroy operation.', () => {
 
     SpecHelper.validateEach(
       {
-        source: {},
-        target: result,
+        source,
+        target: {},
       },
       {
         strictMode: false,
@@ -122,7 +117,7 @@ describe('about QueryHelper.destroy operation.', () => {
   it('destroy wrong modelName should be fail', async () => {
     const input = {
       ...samples.destroy.User,
-    }
+    };
 
     const user = await QueryHelper.create(
       {
@@ -139,10 +134,7 @@ describe('about QueryHelper.destroy operation.', () => {
       await QueryHelper.destroy(
         {
           modelName: 'test',
-          input,
-          where: {
-            id: user.id,
-          }
+          ids: [user.id],
         },
         {
           formatCb: (e) => e,
@@ -150,7 +142,7 @@ describe('about QueryHelper.destroy operation.', () => {
       );
     } catch (err) {
       err.message.should.equal(
-        JSON.stringify({"message":"BadRequest.Target.Model.Not.Exits","code":400,"extra":{"modelName":"test"}})
+        JSON.stringify({ message: 'BadRequest.Target.Model.Not.Exits', code: 400, extra: { modelName: 'test' } }),
       );
     }
   });

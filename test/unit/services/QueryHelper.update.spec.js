@@ -1,19 +1,17 @@
 import samples from '../samples';
 
 describe('about QueryHelper.update operation.', () => {
-  const validateFormater = (target) => {
-    return {
-      ...target,
-      id: 0,
-      updatedAt: new Date(),
-      createdAt: new Date(),
-    }
-  }
+  const validateFormater = (target) => ({
+    ...target,
+    id: 0,
+    updatedAt: new Date(),
+    createdAt: new Date(),
+  });
 
   it('update should be success', async () => {
     const input = {
       ...samples.update.User,
-    }
+    };
 
     const user = await QueryHelper.create(
       {
@@ -32,14 +30,14 @@ describe('about QueryHelper.update operation.', () => {
         input,
         where: {
           id: user.id,
-        }
+        },
       },
       {
         formatCb: (e) => e,
       },
     );
 
-    const result = await QueryHelper.getDetail(
+    const source = await QueryHelper.getDetail(
       {
         modelName: 'User',
         include: [],
@@ -52,7 +50,7 @@ describe('about QueryHelper.update operation.', () => {
       },
     );
 
-    const source = {
+    const target = {
       ...validateFormater(samples.update.User),
       GroupId: null,
       Image: null,
@@ -62,7 +60,7 @@ describe('about QueryHelper.update operation.', () => {
     SpecHelper.validateEach(
       {
         source,
-        target: result,
+        target,
       },
       {
         strictMode: false,
@@ -77,8 +75,6 @@ describe('about QueryHelper.update operation.', () => {
       Image: samples.update.Image,
     };
 
-    sails.log(input)
-
     const user = await QueryHelper.create(
       {
         modelName: 'User',
@@ -91,7 +87,7 @@ describe('about QueryHelper.update operation.', () => {
       },
     );
 
-    const url = 'http://goo.gl'
+    const url = 'http://goo.gl';
     await QueryHelper.update(
       {
         modelName: 'User',
@@ -99,18 +95,18 @@ describe('about QueryHelper.update operation.', () => {
         input: {
           Image: {
             url,
-          }
+          },
         },
         where: {
           id: user.id,
-        }
+        },
       },
       {
         formatCb: (e) => e,
       },
     );
 
-    const result = await QueryHelper.getDetail(
+    const source = await QueryHelper.getDetail(
       {
         modelName: 'User',
         include: [{
@@ -125,17 +121,21 @@ describe('about QueryHelper.update operation.', () => {
       },
     );
 
-    const source = {
+    const target = {
       ...validateFormater(samples.update.User),
       Image: validateFormater({
         url,
       }),
     };
 
+    sails.log(user)
+    sails.log(source)
+    sails.log(target)
+
     SpecHelper.validateEach(
       {
         source,
-        target: result,
+        target,
       },
       {
         strictMode: false,
@@ -147,7 +147,7 @@ describe('about QueryHelper.update operation.', () => {
   it('update wrong modelName should be fail', async () => {
     const input = {
       ...samples.update.User,
-    }
+    };
 
     const user = await QueryHelper.create(
       {
@@ -167,7 +167,7 @@ describe('about QueryHelper.update operation.', () => {
           input,
           where: {
             id: user.id,
-          }
+          },
         },
         {
           formatCb: (e) => e,
@@ -175,7 +175,7 @@ describe('about QueryHelper.update operation.', () => {
       );
     } catch (err) {
       err.message.should.equal(
-        JSON.stringify({"message":"BadRequest.Target.Model.Not.Exits","code":400,"extra":{"modelName":"test"}})
+        JSON.stringify({ message: 'BadRequest.Target.Model.Not.Exits', code: 400, extra: { modelName: 'test' } }),
       );
     }
   });

@@ -1,19 +1,17 @@
 import samples from '../samples';
 
 describe('about QueryHelper.getDetail operation.', () => {
-  const validateFormater = (target) => {
-    return {
-      ...target,
-      id: 0,
-      updatedAt: new Date(),
-      createdAt: new Date(),
-    }
-  }
+  const validateFormater = (target) => ({
+    ...target,
+    id: 0,
+    updatedAt: new Date(),
+    createdAt: new Date(),
+  });
 
   it('getDetail should be success', async () => {
     const input = {
       ...samples.create.User,
-    }
+    };
 
     const user = await QueryHelper.create(
       {
@@ -26,7 +24,7 @@ describe('about QueryHelper.getDetail operation.', () => {
       },
     );
 
-    const result = await QueryHelper.getDetail(
+    const source = await QueryHelper.getDetail(
       {
         modelName: 'User',
         include: [],
@@ -39,12 +37,15 @@ describe('about QueryHelper.getDetail operation.', () => {
       },
     );
 
-    const source = validateFormater(samples.create.User);
+    const target = validateFormater({
+      ...samples.getDetail.User,
+      ageString: 'string',
+    });
 
     SpecHelper.validateEach(
       {
         source,
-        target: result,
+        target,
       },
       {
         strictMode: false,
@@ -79,17 +80,17 @@ describe('about QueryHelper.getDetail operation.', () => {
       },
     );
 
-    const source = {
+    const target = {
       ...validateFormater(samples.create.Group),
       Users: [{
         ...validateFormater(samples.create.User),
         Images: [{
           ...validateFormater(samples.create.Image),
-        }]
-      }]
+        }],
+      }],
     };
 
-    const result = await QueryHelper.getDetail(
+    const source = await QueryHelper.getDetail(
       {
         modelName: 'Group',
         include: [
@@ -110,7 +111,7 @@ describe('about QueryHelper.getDetail operation.', () => {
     SpecHelper.validateEach(
       {
         source,
-        target: result,
+        target,
       },
       {
         strictMode: false,
@@ -122,7 +123,7 @@ describe('about QueryHelper.getDetail operation.', () => {
   it('update wrong modelName should be fail', async () => {
     const input = {
       ...samples.destroy.User,
-    }
+    };
 
     const user = await QueryHelper.create(
       {
@@ -142,7 +143,7 @@ describe('about QueryHelper.getDetail operation.', () => {
           input,
           where: {
             id: user.id,
-          }
+          },
         },
         {
           formatCb: (e) => e,
@@ -150,7 +151,7 @@ describe('about QueryHelper.getDetail operation.', () => {
       );
     } catch (err) {
       err.message.should.equal(
-        JSON.stringify({"message":"BadRequest.Target.Model.Not.Exits","code":400,"extra":{"modelName":"test"}})
+        JSON.stringify({ message: 'BadRequest.Target.Model.Not.Exits', code: 400, extra: { modelName: 'test' } }),
       );
     }
   });
