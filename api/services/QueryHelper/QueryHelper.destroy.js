@@ -53,8 +53,13 @@ export default async function destroy({
             includeModelName = includeModel.name;
           }
 
-          const target = await model.findById(id);
+          // FIXME: destroy image
+          const target = await model.findByPk(id);
           const associatedId = target[`${_.upperFirst(includeModelName)}Id`];
+
+          sails.log(`${_.upperFirst(includeModelName)}Id`)
+          sails.log(target)
+          sails.log(associatedId)
 
           if (associatedId) {
             const includedModelInstance =
