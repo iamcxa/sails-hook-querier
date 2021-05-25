@@ -1,10 +1,3 @@
-export { default as getDetail } from './QueryHelper.getDetail';
-export { default as create } from './QueryHelper.create';
-export { default as update } from './QueryHelper.update';
-export { default as destroy } from './QueryHelper.destroy';
-export * from './QueryHelper.format';
-export * from './QueryHelper.view';
-
 /**
  * @module QueryHelper
  * @author Kent Chen<iamcxa@gmail.com>
@@ -16,6 +9,13 @@ import moment from 'moment-timezone';
 import inflection from 'inflection';
 import Joi from 'joi';
 
+export { default as getDetail } from './QueryHelper.getDetail';
+export { default as create } from './QueryHelper.create';
+export { default as update } from './QueryHelper.update';
+export { default as destroy } from './QueryHelper.destroy';
+export * from './QueryHelper.format';
+export * from './QueryHelper.view';
+
 const TAG = 'QueryHelper';
 
 global.Console = console;
@@ -24,9 +24,13 @@ const langCode = 'zh-TW';
 const log = false;
 const commonFields = ['createdAt', 'updatedAt', 'deletedAt', 'id'];
 
-export { langCode, log, commonFields };
+export {
+  langCode, log, commonFields, TAG,
+};
 
-export function validate({ value, schema, options, callback }) {
+export function validate({
+  value, schema, options, callback,
+}) {
   return Joi.validate(
     value,
     _.isFunction(schema) ? Joi.object().keys(schema(Joi)) : schema,
@@ -145,11 +149,11 @@ export function getModelSearchableColumns(
     // eslint-disable-next-line
     for (const key in model.rawAttributes) {
       if (
-        model.rawAttributes[key].type.key === 'STRING' ||
-        model.rawAttributes[key].type.key === 'TEXT' ||
-        model.rawAttributes[key].type.key === 'JSON' ||
-        model.rawAttributes[key].type.key === 'UUID' ||
-        model.rawAttributes[key].type.key === 'ENUM'
+        model.rawAttributes[key].type.key === 'STRING'
+        || model.rawAttributes[key].type.key === 'TEXT'
+        || model.rawAttributes[key].type.key === 'JSON'
+        || model.rawAttributes[key].type.key === 'UUID'
+        || model.rawAttributes[key].type.key === 'ENUM'
       ) {
         targets.push({
           key: `${modelName}.${key}`,
@@ -157,9 +161,9 @@ export function getModelSearchableColumns(
         });
       }
       if (
-        date &&
-        (model.rawAttributes[key].type.key === 'DATE' ||
-          model.rawAttributes[key].type.key === 'DATEONLY')
+        date
+        && (model.rawAttributes[key].type.key === 'DATE'
+          || model.rawAttributes[key].type.key === 'DATEONLY')
       ) {
         targets.push({
           key: `${modelName}.${key}`,
@@ -198,7 +202,7 @@ export function getEnumValues(modelName = null, columnName = null) {
       throw Error('Missing required parameter: `modelName` is required.');
     }
     const model = this.getModelByName(modelName);
-    const values = model.rawAttributes[columnName].values;
+    const { values } = model.rawAttributes[columnName];
     return _.isArray(values) ? values : null;
   } catch (e) {
     sails.log.error(e);
@@ -288,11 +292,9 @@ export function getModelOutputColumns({
     return fields
       .filter((e) => !this.commonFields.some((ex) => e.name === ex))
       .filter((e) =>
-        !_.isEmpty(include) ? include.some((inc) => e.name === inc) : e,
-      )
+        (!_.isEmpty(include) ? include.some((inc) => e.name === inc) : e))
       .filter((e) =>
-        !_.isEmpty(exclude) ? !exclude.some((ex) => e.name === ex) : e,
-      )
+        (!_.isEmpty(exclude) ? !exclude.some((ex) => e.name === ex) : e))
       .map((field) => ({
         ...field,
         label: sails.__(getPhrase(field.name)),
@@ -491,7 +493,7 @@ export function getAssociations(
   } = {},
 ) {
   const model = this.getModelByName(modelName);
-  const associations = model.associations;
+  const { associations } = model;
   const result = [];
   Object.keys(associations).forEach((key) => {
     const association = {};
@@ -559,30 +561,30 @@ export function getIndexPageTableAndFilters({
     const autoIncludeColumns = _.isEmpty(include)
       ? []
       : _.flattenDeep(
-          include.map((e) => {
-            // Console.log('autoIncludeColumns e=>', e);
-            if (!_.isObject(e)) {
-              throw Error('include model must be an object.');
-            }
-            return (
-              QueryHelper.getModelColumns({
-                modelName: e.model ? e.model.name : e.modelName,
-                modelPrefix: true,
-              }) || []
-            );
-          }),
-        );
+        include.map((e) => {
+          // Console.log('autoIncludeColumns e=>', e);
+          if (!_.isObject(e)) {
+            throw Error('include model must be an object.');
+          }
+          return (
+            QueryHelper.getModelColumns({
+              modelName: e.model ? e.model.name : e.modelName,
+              modelPrefix: true,
+            }) || []
+          );
+        }),
+      );
     // console.log('autoIncludeColumns=>', autoIncludeColumns)
     // Console.log('includeColumns=>', includeColumns);
 
     // 取出表格欄位
     let columns = _.isEmpty(includeColumns)
       ? this.getModelColumns({
-          modelName,
-          modelPrefix: false,
-          exclude: excludeColumns,
-          include: autoIncludeColumns,
-        })
+        modelName,
+        modelPrefix: false,
+        exclude: excludeColumns,
+        include: autoIncludeColumns,
+      })
       : includeColumns;
     // console.log('columns=>', columns)
     if (excludeColumns) {
@@ -591,9 +593,9 @@ export function getIndexPageTableAndFilters({
 
     // 取出表頭
     const isAutoIncludeField = (name) =>
-      autoIncludeColumns.some((col) => col === name)
+      (autoIncludeColumns.some((col) => col === name)
         ? `model.${_.upperFirst(name)}`
-        : `model.${_.upperFirst(modelName)}.${name}`;
+        : `model.${_.upperFirst(modelName)}.${name}`);
 
     const headers = columns.map((col) => ({
       label: sails.__(
@@ -692,8 +694,8 @@ export async function getDetailPageFieldWithAssociations({
             // 如果有指定哪個 model 使用哪個 prop 輸出
             const assignModelOutputField = outputFieldNamePairs
               ? outputFieldNamePairs.filter(
-                  (pair) => pair.modelName === associatedModelName,
-                )[0]
+                (pair) => pair.modelName === associatedModelName,
+              )[0]
               : null;
             // Console.log('assignModelOutputField=>', assignModelOutputField);
             modelOutputPropName = assignModelOutputField
@@ -706,21 +708,21 @@ export async function getDetailPageFieldWithAssociations({
           field.required = true;
           field.values = values
             ? values
-                .concat([
-                  {
-                    id: null,
-                  },
-                ])
-                .map((v) => {
-                  let name = v[modelOutputPropName] || v.name || v.key || v.id;
-                  if (_.isFunction(modelOutputPropName)) {
-                    name = modelOutputPropName(v);
-                  }
-                  return {
-                    value: v.id,
-                    name,
-                  };
-                })
+              .concat([
+                {
+                  id: null,
+                },
+              ])
+              .map((v) => {
+                let name = v[modelOutputPropName] || v.name || v.key || v.id;
+                if (_.isFunction(modelOutputPropName)) {
+                  name = modelOutputPropName(v);
+                }
+                return {
+                  value: v.id,
+                  name,
+                };
+              })
             : [];
         }
         return field;

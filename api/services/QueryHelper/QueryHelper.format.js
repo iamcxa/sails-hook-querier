@@ -1,13 +1,7 @@
 import _ from 'lodash';
-const getDate = (date, format) => {
-  if (!format) {
-    // eslint-disable-next-line no-param-reassign
-    format = 'YYYY-MM-DD';
-  }
-  return date ? moment(date).tz('Asia/Taipei').format(format) : null;
-};
+
 const isDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/g;
-const isNumeric = (val) => !isNaN(parseFloat(val)) && isFinite(val);
+const isNumeric = (val) => !Number.isNaN(parseFloat(val)) && Number.isFinite(val);
 
 /**
  * 依據輸入的 format 物件來格式化輸出，將 data 與 format 合併並保留 format 作為預設值。
@@ -47,8 +41,7 @@ const isNumeric = (val) => !isNaN(parseFloat(val)) && isFinite(val);
  */
 export function matchFormat({ format = null, data = null }) {
   try {
-    const body = Object.assign({}, format);
-    // eslint-disable-next-line guard-for-in
+    const body = { ...format };
     for (const prop in format) {
       if (typeof data[prop] !== 'undefined' && data[prop] !== null) {
         if (_.has(data, prop)) {
@@ -107,11 +100,11 @@ export function formatInput({
           // Console.log('_.get(rawData, path)=>', _.get(rawData, path));
           const value = _.get(rawData, path);
           if (
-            _.isNil(value) ||
-            (!isNumeric(value) &&
-              _.isEmpty(value) &&
-              !_.isBoolean(value) &&
-              !_.isFunction(value))
+            _.isNil(value)
+            || (!isNumeric(value)
+              && _.isEmpty(value)
+              && !_.isBoolean(value)
+              && !_.isFunction(value))
           ) {
             _.set(source, path, null);
           } else if (_.isString(value) && value.match(isDate) !== null) {
@@ -121,7 +114,7 @@ export function formatInput({
               _.set(source, path, valueAsDate);
             } catch (e) {
               sails.log.warn(
-                `[!] ${TAG}.formatInput: Parse Value "${value}" into Date type failed(${e}). this may not be an issue, will fallback to it origin String type value.`,
+                `[!] ${this.TAG}.formatInput: Parse Value "${value}" into Date type failed(${e}). this may not be an issue, will fallback to it origin String type value.`,
               );
               _.set(source, path, value);
             }
@@ -197,7 +190,6 @@ export function formatOutput({
     }
     // 檢查並輸出前端要顯示的欄位與類型
     if (view && fields) {
-      // eslint-disable-next-line no-underscore-dangle
       result._fields = fields.map((field) => {
         // 如果已經有 required 與 readonly 欄位則不修改
         if (_.has(field, 'required') && _.has(field, 'readonly')) {
@@ -254,7 +246,8 @@ export function formatFieldQueryWithOrCondition(fields) {
       }
     });
     return fieldsOrCommand;
-  } catch (err) {
-    throw err;
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
   }
 }
