@@ -5,6 +5,7 @@
     "_": true,
     "async": true,
     "QueryService": true,
+    "MESSAGE": true,
     "QueryHelper": true
   }
 }
