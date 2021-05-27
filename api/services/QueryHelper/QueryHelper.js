@@ -16,14 +16,18 @@ export * from './QueryHelper.format';
 export * from './QueryHelper.view';
 
 const TAG = 'QueryHelper';
+const { log } = sails.config.queryhelper;
 
-global.Console = console;
-
+const fakeConsole = {};
+for (const key of Object.keys(console)) {
+  fakeConsole[key] = () => {};
+}
 const langCode = 'zh-TW';
-const log = false;
 const commonFields = ['createdAt', 'updatedAt', 'deletedAt', 'id'];
 const isNumeric = (val) => !Number.isNaN(parseFloat(val)) && Number.isFinite(val);
 const isDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/g;
+
+global.Console = log ? console : fakeConsole;
 
 export {
   langCode, log, commonFields, TAG, isNumeric, isDate,
