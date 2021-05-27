@@ -15,6 +15,7 @@
  */
 
 import _ from 'lodash';
+
 export default async function destroy({
   modelName = null,
   include = null,
@@ -53,24 +54,17 @@ export default async function destroy({
             includeModelName = includeModel.name;
           }
 
-          // FIXME: destroy image
           const target = await model.findByPk(id);
           const associatedId = target[`${_.upperFirst(includeModelName)}Id`];
 
-          sails.log(`${_.upperFirst(includeModelName)}Id`)
-          sails.log(target)
-          sails.log(associatedId)
-
           if (associatedId) {
-            const includedModelInstance =
-              sails.models[includeModelName.toLowerCase()];
-            const deletedAssociatedModelId =
-              await includedModelInstance.destroy({
-                where: {
-                  id: associatedId,
-                },
-                force,
-              });
+            const includedModelInstance = sails.models[includeModelName.toLowerCase()];
+            const deletedAssociatedModelId = await includedModelInstance.destroy({
+              where: {
+                id: associatedId,
+              },
+              force,
+            });
             const message = `[!] Delete  "${modelName}"'s associated model "${includeModelName}" with id "${associatedId}" (?=${deletedAssociatedModelId})`;
 
             if (deletedAssociatedModelId) {
@@ -97,6 +91,7 @@ export default async function destroy({
     // Console.log('results=>', results);
     return results;
   } catch (e) {
+    sails.log.error(e);
     throw e;
   }
 }

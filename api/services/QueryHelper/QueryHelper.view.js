@@ -151,7 +151,7 @@ export function formatQuery({
       fields.forEach((field) => {
         console.log('QueryHelper field=>', field);
         // 檢查是否有 $or 條件
-        const $or = field['$or'];
+        const { $or } = field;
         if (!_.isNil($or) && _.isArray($or)) {
           const condition = {
             $or: [],
@@ -235,8 +235,7 @@ export function formatQuery({
 
       // 推入搜尋目標
       query.where.$or = targets.map((e) =>
-        Sequelize.where(Sequelize.col(e), 'like', `%${kw}%`),
-      );
+        Sequelize.where(Sequelize.col(e), 'like', `%${kw}%`));
 
       // 額外目標欄位
       if (filter.search.extra) {
@@ -431,10 +430,8 @@ export async function findBy(
         formatCb,
         data: e ? e.toJSON() : null,
         view,
-      }),
-    );
-    const total =
-      typeof data.count === 'number' ? data.count : data.count.length;
+      }));
+    const total = typeof data.count === 'number' ? data.count : data.count.length;
     if (view) {
       extra = {
         ...this.getIndexPageTableAndFilters({

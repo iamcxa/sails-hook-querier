@@ -28,7 +28,6 @@
  * @returns {Object} created item
  */
 
-import _ from 'lodash';
 export default async function create(
   {
     langCode = this.langCode,
@@ -85,40 +84,10 @@ export default async function create(
         modelName,
         modelPrefix: false,
         include: include
-          ? _.flatten(
-              this.getAssociations(modelName, {
-                raw: true,
-              }).map((association) => {
-                // this.getModelColumns({
-                //   modelName: association.singular,
-                //   modelPrefix: association.name,
-                // }),
-                // console.log('associationLevel2 association=>', association);
-                const associationLevel2 = this.getAssociations(
-                  association.singular,
-                  {
-                    raw: true,
-                  },
-                );
-
-                if (!_.isEmpty(associationLevel2)) {
-                  return _.flatten(
-                    associationLevel2.map((association2) =>
-                      this.getModelColumns({
-                        modelName: association2.singular,
-                        modelPrefix: `${association.name}.${association2.name}`,
-                      }),
-                    ),
-                  );
-                } else {
-                  return this.getModelColumns({
-                    modelName: association.singular,
-                    modelPrefix: association.name,
-                  });
-                }
-              }),
-            )
-          : null,
+          ? this.getIncludeModelColumns({
+            modelName,
+            include,
+          }) : null,
       });
       Console.log('format==============>');
       Console.dir(format);
@@ -152,8 +121,8 @@ export default async function create(
     }
     return toJSON
       ? createdItem.get({
-          plain: true,
-        })
+        plain: true,
+      })
       : createdItem;
   } catch (e) {
     sails.log.error(e);

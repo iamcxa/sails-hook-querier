@@ -68,6 +68,7 @@
  * @returns {Object} 屬於某個 ID 的資料。
  */
 import _ from 'lodash';
+
 export default async function getDetail(
   {
     langCode = 'zh-TW',
@@ -205,6 +206,7 @@ export default async function getDetail(
           one2One: true,
         });
         for (const target of associatedModels) {
+          /* eslint no-await-in-loop: 0 */
           const modelData = await sails.models[target.toLowerCase()].findAll();
           // Console.log('modelData=>', modelData);
           associatedData[target] = modelData;
@@ -224,8 +226,8 @@ export default async function getDetail(
               // 如果有指定哪個 model 使用哪個 prop 輸出
               const assignModelOutputField = outputFieldNamePairs
                 ? outputFieldNamePairs.filter(
-                    (pair) => pair.modelName === associatedModelName,
-                  )[0]
+                  (pair) => pair.modelName === associatedModelName,
+                )[0]
                 : null;
               // Console.log('assignModelOutputField=>', assignModelOutputField);
               modelOutputPropName = assignModelOutputField
@@ -238,22 +240,21 @@ export default async function getDetail(
             field.required = true;
             field.values = values
               ? values
-                  .concat([
-                    {
-                      id: null,
-                    },
-                  ])
-                  .map((v) => {
-                    let name =
-                      v[modelOutputPropName] || v.name || v.key || v.id;
-                    if (_.isFunction(modelOutputPropName)) {
-                      name = modelOutputPropName(v);
-                    }
-                    return {
-                      value: v.id,
-                      name,
-                    };
-                  })
+                .concat([
+                  {
+                    id: null,
+                  },
+                ])
+                .map((v) => {
+                  let name = v[modelOutputPropName] || v.name || v.key || v.id;
+                  if (_.isFunction(modelOutputPropName)) {
+                    name = modelOutputPropName(v);
+                  }
+                  return {
+                    value: v.id,
+                    name,
+                  };
+                })
               : [];
           }
           return field;

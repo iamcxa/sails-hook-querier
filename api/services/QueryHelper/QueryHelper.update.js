@@ -32,6 +32,7 @@
  * @returns {Object} updated item
  */
 import _ from 'lodash';
+
 export default async function update(
   {
     langCode = this.langCode,
@@ -93,24 +94,16 @@ export default async function update(
       );
     }
     if (!format) {
-      const associations = this.getAssociations(modelName);
       // Console.log('associations=>', associations);
       // eslint-disable-next-line
       format = this.getModelColumns({
         modelName,
         modelPrefix: false,
         include: include
-          ? _.flatten(
-              this.getAssociations(modelName, {
-                raw: true,
-              }).map((association) =>
-                this.getModelColumns({
-                  modelName: association.singular,
-                  modelPrefix: association.name,
-                }),
-              ),
-            )
-          : null,
+          ? this.getIncludeModelColumns({
+            modelName,
+            include,
+          }) : null,
       });
       // Console.log('update format==============>');
       // Console.dir(format);
@@ -137,8 +130,7 @@ export default async function update(
         updateIncludeObject.push(target[item].save());
       }
     });
-    let result =
-      (await Promise.all(updateIncludeObject)) && (await target.save());
+    const result = (await Promise.all(updateIncludeObject)) && (await target.save());
     return result;
   } catch (e) {
     sails.log.error(e);
