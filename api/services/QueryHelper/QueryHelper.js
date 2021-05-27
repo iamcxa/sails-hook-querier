@@ -5,7 +5,6 @@
 /* eslint no-underscore-dangle: 0 */
 // import moment from 'moment';
 import _ from 'lodash';
-import moment from 'moment-timezone';
 import inflection from 'inflection';
 import Joi from 'joi';
 
@@ -85,6 +84,7 @@ export function getModelByName(modelName) {
     }
     return model;
   } catch (e) {
+    sails.log.error(e);
     throw e;
   }
 }
@@ -108,7 +108,7 @@ export function getIncludeModelByObject(includeModelObject) {
         model = sails.models[includeModelObject.model.name.toLowerCase()];
         // 如果是 { modelName: ModelClass } 形式
       } else if (includeModelObject.modelName) {
-        model = sails.models[modelName.toLowerCase()];
+        model = sails.models[includeModelObject.modelName.toLowerCase()];
         // 如果是 ModelClass {} 形式
       } else if (includeModelObject.name) {
         model = includeModelObject;
@@ -124,6 +124,7 @@ export function getIncludeModelByObject(includeModelObject) {
     }
     return model;
   } catch (e) {
+    sails.log.error(e);
     throw e;
   }
 }
@@ -218,7 +219,7 @@ export function getEnumValues(modelName = null, columnName = null) {
  * @returns
  */
 export function getModelOutputColumns({
-  langCode = null,
+  // langCode = null,
   modelName = null,
   modelPrefix = false,
   readonly = null,
@@ -237,14 +238,17 @@ export function getModelOutputColumns({
     const fields = [];
     for (const name of _.keys(model.rawAttributes)) {
       const modelAttr = model.rawAttributes[name];
+      let fieldName;
+
+      if (modelPrefix && !this.isCommonField(name)) {
+        fieldName = `${prefix}${name}`;
+      } else {
+        fieldName = name;
+      }
+
       const field = {
         values: null,
-        // FIXME: 找出更好的取字串方式，不要用巢狀三元
-        name: modelPrefix
-          ? this.isCommonField(name)
-            ? name
-            : `${prefix}${name}`
-          : name,
+        name: fieldName,
       };
       // 自動依據資料庫轉型 input
       switch (modelAttr.type.key) {
@@ -533,6 +537,53 @@ export function getAssociations(
   return result;
 }
 
+/**
+ * 取得給予 ModelName 之關聯 ModelName 的欄位名稱，可透過 include 參數指定複數關聯 Model 的欄位名稱。
+ * @param {*} modelName
+ * @param {*} include
+ * @param {*} prefix
+ * @returns [String...]
+ */
+export function getIncludeModelColumns({
+  modelName,
+  include,
+  prefix,
+}) {
+  const modelAssociations = this.getAssociations(modelName, {
+    raw: true,
+  });
+  const namePool = modelAssociations.map((association) => association.name);
+  const singularPool = modelAssociations.map((association) => association.singular);
+
+  let result = [];
+  for (const model of include) {
+    const modelItem = this.getIncludeModelByObject(model);
+    const index = singularPool.indexOf(modelItem.name);
+
+    if (index !== -1) {
+      const modelPrefix = prefix ? `${prefix}.${namePool[index]}` : namePool[index];
+      const columns = this.getModelColumns({
+        modelName: modelItem.name,
+        modelPrefix,
+      });
+
+      result = result.concat(columns);
+
+      if (model.include && Array.isArray(model.include)) {
+        result = result.concat(this.getIncludeModelColumns({
+          modelName: modelItem.name,
+          include: model.include,
+          prefix: modelPrefix,
+        }));
+      }
+    }
+  }
+
+  Console.log('result========>');
+  Console.log(result);
+  return result;
+}
+
 export function modelAssociationsToArray(model) {
   const result = [];
   if (typeof model !== 'object' || typeof model.associations !== 'object') {
@@ -550,7 +601,7 @@ export function modelAssociationsToArray(model) {
 }
 
 export function getIndexPageTableAndFilters({
-  langCode = 'zh-TW',
+  // langCode = 'zh-TW',
   modelName,
   include = [],
   includeColumns = [],
@@ -636,6 +687,7 @@ export function getIndexPageTableAndFilters({
       searchable,
     };
   } catch (e) {
+    sails.log.error(e);
     throw e;
   }
 }
@@ -646,11 +698,11 @@ export async function getDetailPageFieldWithAssociations({
   outputFieldNamePairs = null,
   // [{ modelName: 'User', displayField: 'username' }]
   // [{ modelName: 'User', displayField: 'username' }]
-  autoInclude = false,
+  // autoInclude = false,
   exclude = [],
   include = [],
   required = [],
-  readonly = [],
+  // readonly = [],
 }) {
   sails.log(
     `=== getPageFields modelName: "${modelName}", langCode: "${langCode}" ===`,
@@ -675,6 +727,7 @@ export async function getDetailPageFieldWithAssociations({
         one2One: true,
       });
       for (const target of associatedModels) {
+        /* eslint no-await-in-loop: 0 */
         const modelData = await sails.models[target.toLowerCase()].findAll();
         // Console.log('modelData=>', modelData);
         associatedData[target] = modelData;
@@ -747,6 +800,7 @@ export async function getDetailPageFieldWithAssociations({
         }),
     };
   } catch (e) {
+    sails.log.error(e);
     throw e;
   }
 }
