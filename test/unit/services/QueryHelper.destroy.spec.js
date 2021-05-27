@@ -46,17 +46,6 @@ describe('about QueryHelper.destroy operation.', () => {
         log: true,
       },
     );
-
-    SpecHelper.validateEach(
-      {
-        source,
-        target: {},
-      },
-      {
-        strictMode: false,
-        log: true,
-      },
-    );
   });
 
   it('destroy and use include models should be success', async () => {
@@ -72,13 +61,12 @@ describe('about QueryHelper.destroy operation.', () => {
     await QueryHelper.destroy(
       {
         modelName: 'User',
-        // FIXME: Error: User has no associated with class extends Model {}.
         include: [Image],
         ids: [user.id],
       },
     );
 
-    const source = await QueryHelper.getDetail(
+    const source1 = await QueryHelper.getDetail(
       {
         modelName: 'User',
         include: [],
@@ -87,13 +75,36 @@ describe('about QueryHelper.destroy operation.', () => {
         },
       },
       {
-        // log: true,
+        toJSON: true,
+      },
+    );
+
+    const source2 = await QueryHelper.getDetail(
+      {
+        modelName: 'Image',
+        include: [],
+        where: {
+          id: user.Image.id,
+        },
+      },
+      {
+        toJSON: true,
       },
     );
 
     SpecHelper.validateEach(
       {
-        source,
+        source: source1,
+        target: {},
+      },
+      {
+        strictMode: false,
+        log: true,
+      },
+    );
+    SpecHelper.validateEach(
+      {
+        source: source2,
         target: {},
       },
       {

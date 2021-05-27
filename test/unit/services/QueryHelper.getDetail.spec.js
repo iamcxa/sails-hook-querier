@@ -73,7 +73,7 @@ describe('about QueryHelper.getDetail operation.', () => {
         },
       },
       {
-        // log: true,
+        toJSON: true,
       },
     );
 
@@ -109,7 +109,7 @@ describe('about QueryHelper.getDetail operation.', () => {
     );
   });
 
-  it('update wrong modelName should be fail', async () => {
+  it('getDetail wrong modelName should be fail', async () => {
     const input = {
       ...samples.user,
     };
@@ -133,5 +133,78 @@ describe('about QueryHelper.getDetail operation.', () => {
         JSON.stringify({ message: 'BadRequest.Target.Model.Not.Exits', code: 400, extra: { modelName: 'test' } }),
       );
     }
+  });
+
+  it('getDetail with options should be success', async () => {
+    const input = {
+      ...samples.group,
+      Users: {
+        ...samples.user,
+        Image: samples.image,
+      },
+    };
+
+    const group = await Group.create(input, {
+      include: [
+        {
+          model: User,
+          include: [Image],
+        },
+      ],
+    });
+
+    const result = await QueryHelper.getDetail(
+      {
+        modelName: 'Group',
+        include: [
+          {
+            model: User,
+            include: [Image],
+          },
+        ],
+        where: {
+          id: group.id,
+        },
+        attributes: ['name'],
+      },
+      {
+        view: true,
+        toJSON: true,
+        log: true,
+      },
+    );
+
+    const source = {
+      ...result,
+      Users: {
+        ...result.Users[0],
+        Image: {
+          ...result.Users[0].Image,
+        },
+      },
+    };
+
+    const target = {
+      name: 'string',
+      Users: {
+        ...samples.builder('user'),
+        Image: {
+          ...samples.builder('Image'),
+        },
+      },
+      _fields: [],
+      _associations: [],
+    };
+
+    SpecHelper.validateEach(
+      {
+        source,
+        target,
+      },
+      {
+        strictMode: false,
+        log: true,
+      },
+    );
   });
 });
