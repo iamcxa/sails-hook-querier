@@ -1,36 +1,19 @@
 import samples from '../samples';
 
 describe('about QueryHelper.destroy operation.', () => {
-  const validateFormater = (target) => ({
-    ...target,
-    id: 0,
-    updatedAt: new Date(),
-    createdAt: new Date(),
-  });
-
   it('destroy should be success', async () => {
     const input = {
-      ...samples.update.User,
+      ...samples.user,
     };
 
-    const user = await QueryHelper.create(
-      {
-        modelName: 'User',
-        input,
-      },
-      {
-        formatCb: (e) => e,
-        toJSON: true,
-      },
-    );
+    const user = await User.create(input, {
+      include: [],
+    });
 
     await QueryHelper.destroy(
       {
         modelName: 'User',
         ids: [user.id],
-      },
-      {
-        formatCb: (e) => e,
       },
     );
 
@@ -43,7 +26,24 @@ describe('about QueryHelper.destroy operation.', () => {
         },
       },
       {
-        // log: true,
+        toJSON: true,
+      },
+    );
+
+    const target = {
+      ...samples.builder('user'),
+      GroupId: null,
+      Image: null,
+    };
+
+    SpecHelper.validateEach(
+      {
+        source,
+        target,
+      },
+      {
+        strictMode: false,
+        log: true,
       },
     );
 
@@ -61,31 +61,20 @@ describe('about QueryHelper.destroy operation.', () => {
 
   it('destroy and use include models should be success', async () => {
     const input = {
-      ...samples.create.User,
-      Image: samples.create.Image,
+      ...samples.user,
+      Image: samples.image,
     };
 
-    const user = await QueryHelper.create(
-      {
-        modelName: 'User',
-        include: [Image],
-        input,
-      },
-      {
-        formatCb: (e) => e,
-        toJSON: true,
-      },
-    );
+    const user = await User.create(input, {
+      include: [Image],
+    });
 
     await QueryHelper.destroy(
       {
         modelName: 'User',
         // FIXME: Error: User has no associated with class extends Model {}.
-        // include: [Image],
+        include: [Image],
         ids: [user.id],
-      },
-      {
-        formatCb: (e) => e,
       },
     );
 
@@ -116,28 +105,18 @@ describe('about QueryHelper.destroy operation.', () => {
 
   it('destroy wrong modelName should be fail', async () => {
     const input = {
-      ...samples.destroy.User,
+      ...samples.user,
     };
 
-    const user = await QueryHelper.create(
-      {
-        modelName: 'User',
-        input: {},
-      },
-      {
-        formatCb: (e) => e,
-        toJSON: true,
-      },
-    );
+    const user = await User.create(input, {
+      include: [],
+    });
 
     try {
       await QueryHelper.destroy(
         {
           modelName: 'test',
           ids: [user.id],
-        },
-        {
-          formatCb: (e) => e,
         },
       );
     } catch (err) {

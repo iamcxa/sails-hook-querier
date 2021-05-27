@@ -1,30 +1,23 @@
 import samples from '../samples';
 
 describe('about QueryHelper.create operation.', () => {
-  const validateFormater = (target) => ({
-    ...target,
-    id: 0,
-    updatedAt: new Date(),
-    createdAt: new Date(),
-  });
-
   it('create should be success', async () => {
     const input = {
-      ...samples.create.User,
+      ...samples.user,
     };
 
     const source = await QueryHelper.create(
       {
         modelName: 'User',
+        include: [],
         input,
       },
       {
-        formatCb: (e) => e,
         toJSON: true,
       },
     );
 
-    const target = validateFormater(samples.create.User);
+    const target = samples.builder('user');
 
     SpecHelper.validateEach(
       {
@@ -40,14 +33,14 @@ describe('about QueryHelper.create operation.', () => {
 
   it('create and use include models should be success', async () => {
     const input = {
-      ...samples.create.Group,
+      ...samples.group,
       Users: {
-        ...samples.create.User,
-        Image: samples.create.Image,
+        ...samples.user,
+        Image: samples.iamge,
       },
     };
 
-    const source = await QueryHelper.create(
+    const result = await QueryHelper.create(
       {
         modelName: 'Group',
         include: [
@@ -60,26 +53,33 @@ describe('about QueryHelper.create operation.', () => {
       },
       {
         toJSON: true,
-        formatCb: (e) => e,
       },
     );
 
-    const target = {
-      ...validateFormater(samples.create.Group),
-      Users: [{
-        ...validateFormater(samples.create.User),
+    const source = {
+      ...result,
+      Users: {
+        ...result.Users[0],
         Image: {
-          ...validateFormater(samples.create.Image),
+          ...result.Users[0].Image,
         },
-      }],
+      },
+    };
+
+    const target = {
+      ...samples.builder('group'),
+      Users: {
+        ...samples.builder('user'),
+        Image: {
+          ...samples.builder('Image'),
+        },
+      },
     };
 
     SpecHelper.validateEach(
       {
-        // source: source.Users[0],
-        // target: target.Users[0],
-        source: source,
-        target: target,
+        source,
+        target,
       },
       {
         strictMode: false,
@@ -90,7 +90,7 @@ describe('about QueryHelper.create operation.', () => {
 
   it('create wrong modelName should be fail', async () => {
     const input = {
-      ...samples.create.User,
+      ...samples.user,
     };
 
     try {
@@ -98,9 +98,6 @@ describe('about QueryHelper.create operation.', () => {
         {
           modelName: 'test',
           input,
-        },
-        {
-          formatCb: (e) => e,
         },
       );
     } catch (err) {

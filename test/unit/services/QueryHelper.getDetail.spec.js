@@ -1,28 +1,14 @@
 import samples from '../samples';
 
 describe('about QueryHelper.getDetail operation.', () => {
-  const validateFormater = (target) => ({
-    ...target,
-    id: 0,
-    updatedAt: new Date(),
-    createdAt: new Date(),
-  });
-
   it('getDetail should be success', async () => {
     const input = {
-      ...samples.create.User,
+      ...samples.user,
     };
 
-    const user = await QueryHelper.create(
-      {
-        modelName: 'User',
-        input,
-      },
-      {
-        formatCb: (e) => e,
-        toJSON: true,
-      },
-    );
+    const user = await User.create(input, {
+      include: [],
+    });
 
     const source = await QueryHelper.getDetail(
       {
@@ -33,14 +19,15 @@ describe('about QueryHelper.getDetail operation.', () => {
         },
       },
       {
-        // log: true,
+        toJSON: true,
       },
     );
 
-    const target = validateFormater({
-      ...samples.getDetail.User,
-      ageString: 'string',
-    });
+    const target = {
+      ...samples.builder('user'),
+      GroupId: null,
+      Image: null,
+    };
 
     SpecHelper.validateEach(
       {
@@ -56,41 +43,23 @@ describe('about QueryHelper.getDetail operation.', () => {
 
   it('getDetail and use include models should be success', async () => {
     const input = {
-      ...samples.create.Group,
+      ...samples.group,
       Users: {
-        ...samples.create.User,
-        Image: samples.create.Image,
+        ...samples.user,
+        Image: samples.image,
       },
     };
 
-    const group = await QueryHelper.create(
-      {
-        modelName: 'Group',
-        include: [
-          {
-            model: User,
-            include: [Image],
-          },
-        ],
-        input,
-      },
-      {
-        toJSON: true,
-        formatCb: (e) => e,
-      },
-    );
+    const group = await Group.create(input, {
+      include: [
+        {
+          model: User,
+          include: [Image],
+        },
+      ],
+    });
 
-    const target = {
-      ...validateFormater(samples.create.Group),
-      Users: [{
-        ...validateFormater(samples.create.User),
-        Images: [{
-          ...validateFormater(samples.create.Image),
-        }],
-      }],
-    };
-
-    const source = await QueryHelper.getDetail(
+    const result = await QueryHelper.getDetail(
       {
         modelName: 'Group',
         include: [
@@ -108,6 +77,26 @@ describe('about QueryHelper.getDetail operation.', () => {
       },
     );
 
+    const source = {
+      ...result,
+      Users: {
+        ...result.Users[0],
+        Image: {
+          ...result.Users[0].Image,
+        },
+      },
+    };
+
+    const target = {
+      ...samples.builder('group'),
+      Users: {
+        ...samples.builder('user'),
+        Image: {
+          ...samples.builder('Image'),
+        },
+      },
+    };
+
     SpecHelper.validateEach(
       {
         source,
@@ -122,19 +111,12 @@ describe('about QueryHelper.getDetail operation.', () => {
 
   it('update wrong modelName should be fail', async () => {
     const input = {
-      ...samples.destroy.User,
+      ...samples.user,
     };
 
-    const user = await QueryHelper.create(
-      {
-        modelName: 'User',
-        input: {},
-      },
-      {
-        formatCb: (e) => e,
-        toJSON: true,
-      },
-    );
+    const user = await User.create(input, {
+      include: [],
+    });
 
     try {
       await QueryHelper.getDetail(
@@ -144,9 +126,6 @@ describe('about QueryHelper.getDetail operation.', () => {
           where: {
             id: user.id,
           },
-        },
-        {
-          formatCb: (e) => e,
         },
       );
     } catch (err) {
