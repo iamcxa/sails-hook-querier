@@ -55,7 +55,7 @@ export default async function destroy({
           }
 
           const target = await model.findByPk(id);
-          const associatedId = target[`${_.upperFirst(includeModelName)}Id`];
+          const associatedId = target[_.upperFirst(includeModelName)].dataValues.id;
 
           if (associatedId) {
             const includedModelInstance = sails.models[includeModelName.toLowerCase()];
