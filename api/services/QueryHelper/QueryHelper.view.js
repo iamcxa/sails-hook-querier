@@ -1,4 +1,5 @@
 import _ from 'lodash';
+
 /**
  * 依據輸入資料格式化查詢 query
  * @version 1.0
@@ -137,7 +138,7 @@ export function formatQuery({
         fields = JSON.parse(decodeURIComponent(fields));
       } catch (e) {
         sails.log.warn(
-          `[!] ${TAG}.formatQuery Parse "filter.fields" into Json-Array type failed.(${e})) this may not be an issue, please check what is actually be input by frontend.`,
+          `[!] ${this.TAG}.formatQuery Parse "filter.fields" into Json-Array type failed.(${e})) this may not be an issue, please check what is actually be input by frontend.`,
         );
         fields = filter.fields;
       }
@@ -149,7 +150,7 @@ export function formatQuery({
       }
 
       fields.forEach((field) => {
-        console.log('QueryHelper field=>', field);
+        Console.log('QueryHelper field=>', field);
         // 檢查是否有 $or 條件
         const { $or } = field;
         if (!_.isNil($or) && _.isArray($or)) {
@@ -158,10 +159,11 @@ export function formatQuery({
           };
           $or.forEach((item) => {
             // 轉型
-            const isNumber = isNumeric(item.value);
+            // FIXME: item is not defined
+            const isNumber = this.isNumeric(item.value);
             let value = isNumber ? parseInt(item.value, 10) : item.value;
             value = _.isDate(value) ? new Date(value) : value;
-            if (isNumeric) {
+            if (this.isNumeric) {
               condition.$or.push({
                 [`$${item.key}$`]: {
                   $eq: value,
@@ -187,7 +189,7 @@ export function formatQuery({
           // console.log('query.where.$and=>', query.where.$and);
         } else {
           // 轉型
-          const isNumber = isNumeric(item.value);
+          const isNumber = this.isNumeric(item.value);
           let value = isNumber ? parseInt(field.value, 10) : field.value;
           value = _.isDate(value) ? new Date(value) : value;
           if (isNumber) {
@@ -461,6 +463,211 @@ export async function findBy(
     };
   } catch (e) {
     // Console.timeEnd(tag);
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+export function getIndexPageTableAndFilters({
+  // langCode = 'zh-TW',
+  modelName,
+  include = [],
+  includeColumns = [],
+  excludeColumns = [],
+}) {
+  try {
+    // 取出全部的 table 欄位
+    const autoIncludeColumns = _.isEmpty(include)
+      ? []
+      : _.flattenDeep(
+        include.map((e) => {
+          // Console.log('autoIncludeColumns e=>', e);
+          if (!_.isObject(e)) {
+            throw Error('include model must be an object.');
+          }
+          return (
+            QueryHelper.getModelColumns({
+              modelName: e.model ? e.model.name : e.modelName,
+              modelPrefix: true,
+            }) || []
+          );
+        }),
+      );
+    // console.log('autoIncludeColumns=>', autoIncludeColumns)
+    // Console.log('includeColumns=>', includeColumns);
+
+    // 取出表格欄位
+    let columns = _.isEmpty(includeColumns)
+      ? this.getModelColumns({
+        modelName,
+        modelPrefix: false,
+        exclude: excludeColumns,
+        include: autoIncludeColumns,
+      })
+      : includeColumns;
+    // console.log('columns=>', columns)
+    if (excludeColumns) {
+      columns = columns.filter((c) => !excludeColumns.some((e) => e === c));
+    }
+
+    // 取出表頭
+    const isAutoIncludeField = (name) =>
+      (autoIncludeColumns.some((col) => col === name)
+        ? `model.${_.upperFirst(name)}`
+        : `model.${_.upperFirst(modelName)}.${name}`);
+
+    const headers = columns.map((col) => ({
+      label: sails.__(
+        this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),
+      ),
+      // label: sails.__({
+      //   phrase:
+      //     this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),
+      //   locale: langCode,
+      // }),
+      key: `${_.upperFirst(modelName)}.${col}`,
+    }));
+    // 取出可搜尋欄位
+    const searchable = this.getModelSearchableColumns(modelName, {
+      date: true,
+      integer: true,
+    }).map((e) => ({
+      label: sails.__(
+        this.isCommonField(e.key)
+          ? `model${e.key.replace(modelName, '')}`
+          : `model.${e.key}`,
+      ),
+      // label: sails.__({
+      //   phrase: this.isCommonField(e.key)
+      //     ? `model${e.MESSAGE.replace(modelName, '')}` : `model.${e.key}`,
+      //   locale: langCode,
+      // }),
+      key: e.key,
+      type: e.type,
+    }));
+    // console.log('headers=>', headers)
+    // console.log('columns=>', columns)
+    return {
+      table: {
+        headers,
+        columns,
+      },
+      searchable,
+    };
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+export async function getDetailPageFieldWithAssociations({
+  modelName,
+  langCode = 'zh-TW',
+  outputFieldNamePairs = null,
+  // [{ modelName: 'User', displayField: 'username' }]
+  // [{ modelName: 'User', displayField: 'username' }]
+  // autoInclude = false,
+  exclude = [],
+  include = [],
+  required = [],
+  // readonly = [],
+}) {
+  sails.log(
+    `=== getPageFields modelName: "${modelName}", langCode: "${langCode}" ===`,
+  );
+  try {
+    // 建立全部欄位名稱
+    const fieldNames = QueryHelper.getModelOutputColumns({
+      modelPrefix: false,
+      modelName,
+      langCode,
+    });
+    // 建立空資料
+    const emptyModel = QueryHelper.buildEmptyModel({
+      modelName,
+    });
+
+    // 自動取出關聯的資料欄位
+    {
+      const associatedData = {};
+      // 只取出 1v1 的關聯，即當下 model 中的 AbcId 欄位的 model Abc
+      const associatedModels = this.getAssociations(modelName, {
+        one2One: true,
+      });
+      for (const target of associatedModels) {
+        /* eslint no-await-in-loop: 0 */
+        const modelData = await sails.models[target.toLowerCase()].findAll();
+        // Console.log('modelData=>', modelData);
+        associatedData[target] = modelData;
+      }
+      fieldNames.map((field) => {
+        const isThisFieldAssociated = associatedModels.some(
+          (ass) => field.name === `${ass}Id`,
+        );
+        // Console.log('isThisFieldAssociated=>', isThisFieldAssociated);
+        if (isThisFieldAssociated) {
+          const associatedModelName = field.name.replace('Id', '');
+          const values = associatedData[associatedModelName];
+          /* eslint no-param-reassign: 0 */
+          let modelOutputPropName = null;
+          {
+            // Console.log('associatedModelName=>', associatedModelName);
+            // 如果有指定哪個 model 使用哪個 prop 輸出
+            const assignModelOutputField = outputFieldNamePairs
+              ? outputFieldNamePairs.filter(
+                (pair) => pair.modelName === associatedModelName,
+              )[0]
+              : null;
+            // Console.log('assignModelOutputField=>', assignModelOutputField);
+            modelOutputPropName = assignModelOutputField
+              ? assignModelOutputField.target
+              : null;
+            // Console.log('modelOutputPropName=>', modelOutputPropName);
+          }
+          // 可能要再加上一對多判斷
+          field.type = 'chosen';
+          field.required = true;
+          field.values = values
+            ? values
+              .concat([
+                {
+                  id: null,
+                },
+              ])
+              .map((v) => {
+                let name = v[modelOutputPropName] || v.name || v.key || v.id;
+                if (_.isFunction(modelOutputPropName)) {
+                  name = modelOutputPropName(v);
+                }
+                return {
+                  value: v.id,
+                  name,
+                };
+              })
+            : [];
+        }
+        return field;
+      });
+    }
+    return {
+      ..._.omit(emptyModel, exclude),
+      _fields: _.differenceBy(
+        fieldNames,
+        exclude.map((e) => ({
+          name: e,
+        })),
+        'name',
+      )
+        .concat(include)
+        .map((field) => {
+          const isTarget = required.some((r) => r === field.name);
+          if (isTarget) {
+            field.required = true;
+          }
+          return field;
+        }),
+    };
+  } catch (e) {
     sails.log.error(e);
     throw e;
   }

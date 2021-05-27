@@ -22,9 +22,11 @@ global.Console = console;
 const langCode = 'zh-TW';
 const log = false;
 const commonFields = ['createdAt', 'updatedAt', 'deletedAt', 'id'];
+const isNumeric = (val) => !Number.isNaN(parseFloat(val)) && Number.isFinite(val);
+const isDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/g;
 
 export {
-  langCode, log, commonFields, TAG,
+  langCode, log, commonFields, TAG, isNumeric, isDate,
 };
 
 export function validate({
@@ -586,7 +588,7 @@ export function getIncludeModelColumns({
 
 export function modelAssociationsToArray(model) {
   const result = [];
-  if (typeof model !== 'object' || typeof model.associations !== 'object') {
+  if (typeof model !== 'function' || typeof model.associations !== 'object') {
     throw Error("Model should be an object with the 'associations' property.");
   }
   Object.keys(model.associations).forEach((key) => {
@@ -598,211 +600,6 @@ export function modelAssociationsToArray(model) {
     result.push(association);
   });
   return result;
-}
-
-export function getIndexPageTableAndFilters({
-  // langCode = 'zh-TW',
-  modelName,
-  include = [],
-  includeColumns = [],
-  excludeColumns = [],
-}) {
-  try {
-    // 取出全部的 table 欄位
-    const autoIncludeColumns = _.isEmpty(include)
-      ? []
-      : _.flattenDeep(
-        include.map((e) => {
-          // Console.log('autoIncludeColumns e=>', e);
-          if (!_.isObject(e)) {
-            throw Error('include model must be an object.');
-          }
-          return (
-            QueryHelper.getModelColumns({
-              modelName: e.model ? e.model.name : e.modelName,
-              modelPrefix: true,
-            }) || []
-          );
-        }),
-      );
-    // console.log('autoIncludeColumns=>', autoIncludeColumns)
-    // Console.log('includeColumns=>', includeColumns);
-
-    // 取出表格欄位
-    let columns = _.isEmpty(includeColumns)
-      ? this.getModelColumns({
-        modelName,
-        modelPrefix: false,
-        exclude: excludeColumns,
-        include: autoIncludeColumns,
-      })
-      : includeColumns;
-    // console.log('columns=>', columns)
-    if (excludeColumns) {
-      columns = columns.filter((c) => !excludeColumns.some((e) => e === c));
-    }
-
-    // 取出表頭
-    const isAutoIncludeField = (name) =>
-      (autoIncludeColumns.some((col) => col === name)
-        ? `model.${_.upperFirst(name)}`
-        : `model.${_.upperFirst(modelName)}.${name}`);
-
-    const headers = columns.map((col) => ({
-      label: sails.__(
-        this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),
-      ),
-      // label: sails.__({
-      //   phrase:
-      //     this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),
-      //   locale: langCode,
-      // }),
-      key: `${_.upperFirst(modelName)}.${col}`,
-    }));
-    // 取出可搜尋欄位
-    const searchable = this.getModelSearchableColumns(modelName, {
-      date: true,
-      integer: true,
-    }).map((e) => ({
-      label: sails.__(
-        this.isCommonField(e.key)
-          ? `model${e.key.replace(modelName, '')}`
-          : `model.${e.key}`,
-      ),
-      // label: sails.__({
-      //   phrase: this.isCommonField(e.key)
-      //     ? `model${e.MESSAGE.replace(modelName, '')}` : `model.${e.key}`,
-      //   locale: langCode,
-      // }),
-      key: e.key,
-      type: e.type,
-    }));
-    // console.log('headers=>', headers)
-    // console.log('columns=>', columns)
-    return {
-      table: {
-        headers,
-        columns,
-      },
-      searchable,
-    };
-  } catch (e) {
-    sails.log.error(e);
-    throw e;
-  }
-}
-
-export async function getDetailPageFieldWithAssociations({
-  modelName,
-  langCode = 'zh-TW',
-  outputFieldNamePairs = null,
-  // [{ modelName: 'User', displayField: 'username' }]
-  // [{ modelName: 'User', displayField: 'username' }]
-  // autoInclude = false,
-  exclude = [],
-  include = [],
-  required = [],
-  // readonly = [],
-}) {
-  sails.log(
-    `=== getPageFields modelName: "${modelName}", langCode: "${langCode}" ===`,
-  );
-  try {
-    // 建立全部欄位名稱
-    const fieldNames = QueryHelper.getModelOutputColumns({
-      modelPrefix: false,
-      modelName,
-      langCode,
-    });
-    // 建立空資料
-    const emptyModel = QueryHelper.buildEmptyModel({
-      modelName,
-    });
-
-    // 自動取出關聯的資料欄位
-    {
-      const associatedData = {};
-      // 只取出 1v1 的關聯，即當下 model 中的 AbcId 欄位的 model Abc
-      const associatedModels = this.getAssociations(modelName, {
-        one2One: true,
-      });
-      for (const target of associatedModels) {
-        /* eslint no-await-in-loop: 0 */
-        const modelData = await sails.models[target.toLowerCase()].findAll();
-        // Console.log('modelData=>', modelData);
-        associatedData[target] = modelData;
-      }
-      fieldNames.map((field) => {
-        const isThisFieldAssociated = associatedModels.some(
-          (ass) => field.name === `${ass}Id`,
-        );
-        // Console.log('isThisFieldAssociated=>', isThisFieldAssociated);
-        if (isThisFieldAssociated) {
-          const associatedModelName = field.name.replace('Id', '');
-          const values = associatedData[associatedModelName];
-          /* eslint no-param-reassign: 0 */
-          let modelOutputPropName = null;
-          {
-            // Console.log('associatedModelName=>', associatedModelName);
-            // 如果有指定哪個 model 使用哪個 prop 輸出
-            const assignModelOutputField = outputFieldNamePairs
-              ? outputFieldNamePairs.filter(
-                (pair) => pair.modelName === associatedModelName,
-              )[0]
-              : null;
-            // Console.log('assignModelOutputField=>', assignModelOutputField);
-            modelOutputPropName = assignModelOutputField
-              ? assignModelOutputField.target
-              : null;
-            // Console.log('modelOutputPropName=>', modelOutputPropName);
-          }
-          // 可能要再加上一對多判斷
-          field.type = 'chosen';
-          field.required = true;
-          field.values = values
-            ? values
-              .concat([
-                {
-                  id: null,
-                },
-              ])
-              .map((v) => {
-                let name = v[modelOutputPropName] || v.name || v.key || v.id;
-                if (_.isFunction(modelOutputPropName)) {
-                  name = modelOutputPropName(v);
-                }
-                return {
-                  value: v.id,
-                  name,
-                };
-              })
-            : [];
-        }
-        return field;
-      });
-    }
-    return {
-      ..._.omit(emptyModel, exclude),
-      _fields: _.differenceBy(
-        fieldNames,
-        exclude.map((e) => ({
-          name: e,
-        })),
-        'name',
-      )
-        .concat(include)
-        .map((field) => {
-          const isTarget = required.some((r) => r === field.name);
-          if (isTarget) {
-            field.required = true;
-          }
-          return field;
-        }),
-    };
-  } catch (e) {
-    sails.log.error(e);
-    throw e;
-  }
 }
 
 export default {};

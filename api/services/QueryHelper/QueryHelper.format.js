@@ -1,8 +1,5 @@
 import _ from 'lodash';
 
-const isDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/g;
-const isNumeric = (val) => !Number.isNaN(parseFloat(val)) && Number.isFinite(val);
-
 /**
  * 依據輸入的 format 物件來格式化輸出，將 data 與 format 合併並保留 format 作為預設值。
  * @version 20180310
@@ -101,13 +98,13 @@ export function formatInput({
           const value = _.get(rawData, path);
           if (
             _.isNil(value)
-            || (!isNumeric(value)
+            || (!this.isNumeric(value)
               && _.isEmpty(value)
               && !_.isBoolean(value)
               && !_.isFunction(value))
           ) {
             _.set(source, path, null);
-          } else if (_.isString(value) && value.match(isDate) !== null) {
+          } else if (_.isString(value) && value.match(this.isDate) !== null) {
             // 檢查輸入是否包含日期
             try {
               const valueAsDate = new Date(value);
@@ -178,7 +175,7 @@ export function formatOutput({
           if (_.isEmpty(value)) {
             _.set(result, path, null);
             // 檢查輸入是否包含日期
-          } else if (value.match(isDate) !== null) {
+          } else if (value.match(this.isDate) !== null) {
             _.set(result, path, new Date(value));
           } else {
             _.set(result, path, value);
