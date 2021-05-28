@@ -1,0 +1,63 @@
+{
+  "coverage": "50%",
+  "expectCount": 32,
+  "actualCount": 16,
+  "files": {
+    "QueryHelper/QueryHelper.create.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "QueryHelper/QueryHelper.destroy.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        19
+      ]
+    },
+    "QueryHelper/QueryHelper.format.js": {
+      "expectCount": 4,
+      "actualCount": 4,
+      "undocumentLines": []
+    },
+    "QueryHelper/QueryHelper.getDetail.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        72
+      ]
+    },
+    "QueryHelper/QueryHelper.js": {
+      "expectCount": 20,
+      "actualCount": 9,
+      "undocumentLines": [
+        19,
+        21,
+        36,
+        71,
+        98,
+        593,
+        25,
+        26,
+        18,
+        27,
+        28
+      ]
+    },
+    "QueryHelper/QueryHelper.update.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        36
+      ]
+    },
+    "QueryHelper/QueryHelper.view.js": {
+      "expectCount": 4,
+      "actualCount": 2,
+      "undocumentLines": [
+        471,
+        563
+      ]
+    }
+  }
+}

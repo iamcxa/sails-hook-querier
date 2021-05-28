@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">QueryHelper/QueryHelper.create.js | sails-hook-sequelize-querier</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Hook to add powerful customize sequelize querier for sails application"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="sails-hook-sequelize-querier"><meta property="twitter:description" content="Hook to add powerful customize sequelize querier for sails application"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/iamcxa/sails-hook-querier"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-create">create</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-destroy">destroy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatFieldQueryWithOrCondition">formatFieldQueryWithOrCondition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatInput">formatInput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatOutput">formatOutput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matchFormat">matchFormat</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetail">getDetail</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-buildEmptyModel">buildEmptyModel</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAssociations">getAssociations</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEnumValues">getEnumValues</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelByObject">getIncludeModelByObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelColumns">getIncludeModelColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelByName">getModelByName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelColumnType">getModelColumnType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelColumns">getModelColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelOutputColumns">getModelOutputColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelSearchableColumns">getModelSearchableColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isCommonField">isCommonField</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNumeric">isNumeric</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelAssociationsToArray">modelAssociationsToArray</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validate">validate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-update">update</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-findBy">findBy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatQuery">formatQuery</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetailPageFieldWithAssociations">getDetailPageFieldWithAssociations</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIndexPageTableAndFilters">getIndexPageTableAndFilters</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-TAG">TAG</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-commonFields">commonFields</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isDate">isDate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-langCode">langCode</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">QueryHelper/QueryHelper.create.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * @module QueryHelper.create
+ *
+ * &#x4F9D;&#x64DA;&#x7D66;&#x4E88;&#x7684;&#x8CC7;&#x6599;&#x5EFA;&#x7ACB;
+ * @version 1.0
+ * @param Required {Object} {
+ *     langCode{String} = &apos;zh-TW&apos;,   &#x8981;&#x65B0;&#x589E;&#x7684;&#x8CC7;&#x6599;&#x8A9E;&#x7CFB;&#x3002;
+ *     modelName{String} = null,     &#x8981;&#x65B0;&#x589E;&#x7684;&#x76EE;&#x6A19; Sequelize Model &#x540D;&#x7A31;&#x3002;
+ *     include{Object|Array} = null, &#x984D;&#x5916;&#x7D66;&#x4E88;&#x7684; Sequelize include Query&#x3002;
+ *     input{Object} = null,         &#x8981;&#x65B0;&#x589E;&#x7684;&#x539F;&#x59CB;&#x8CC7;&#x6599;&#x3002;
+ *   }
+ * @param Optional {Object} {
+ *     format{Object} = null,        &#x539F;&#x59CB;&#x8CC7;&#x6599;&#x7684;&#x683C;&#x5F0F;&#x5316;&#x6A23;&#x677F;&#x3002;
+ *     formatCb{Object} = null,      &#x539F;&#x59CB;&#x8CC7;&#x6599;&#x7684;&#x683C;&#x5F0F;&#x5316; callback&#x3002;
+ *   }
+ * @example &#x4F9D;&#x64DA; input &#x5EFA;&#x7ACB;&#x4E00;&#x7B46; User &#x7684;&#x65B0;&#x8CC7;&#x6599;&#xFF0C;&#x4E26;&#x4E14;&#x5305;&#x542B;&#x5EFA;&#x7ACB; Parent &#x8207; Passport&#xFF0C;&#x540C;&#x6642;&#x9644;&#x6709;&#x5EFA;&#x7ACB;&#x8CC7;&#x6599;&#x524D;&#x7684; formatCb&#x3002;
+ * QueryHelper.create({
+ *    modelName: &apos;User&apos;,
+ *    include: [Parent, Passport],
+ *    input: rawData,
+ *  }, {
+ *    format,
+ *    formatCb: e =&gt; ({
+ *      ...e,
+ *     username: rawData.Parent.idNumber,
+ *    }),
+ * });
+ * @returns {Object} created item
+ */
+
+export default async function create(
+  {
+    langCode = this.langCode,
+    modelName = undefined,
+    include = undefined,
+    input = undefined,
+  } = {},
+  { toJSON = undefined, format = undefined, formatCb = undefined } = {},
+) {
+  try {
+    const { error, value } = this.validate({
+      value: {
+        langCode,
+        modelName,
+        include,
+        input,
+        format,
+        formatCb,
+        toJSON,
+      },
+      schema: (j) =&gt; ({
+        modelName: j.string().required(),
+        input: j.object().required(),
+        langCode: j.string(),
+        include: j.array().items(j.any()),
+        format: j.array().items(j.string()).allow(null),
+        formatCb: j.func().allow(null),
+        toJSON: j.boolean(),
+      }),
+    });
+    if (error) {
+      throw Error(
+        MESSAGE.BAD_REQUEST.PARAMETER_FORMAT_INVALID({
+          error,
+          value,
+        }),
+      );
+    }
+    const model = this.getModelByName(modelName);
+    if (langCode) {
+      // TODO: &#x8A9E;&#x7CFB;&#x7BE9;&#x9078;
+    }
+    // Console.log(&apos;modelName=&gt;&apos;, modelName);
+    // Console.log(&apos;include=&gt;&apos;, include);
+    // Console.log(&apos;input==============&gt;&apos;);
+    // Console.dir(input);
+    // Console.log(&apos;source==============&gt;&apos;);
+    // Console.dir(this.buildEmptyModel({
+    //   modelName,
+    // }));
+    if (!format) {
+      // eslint-disable-next-line
+      format = this.getModelColumns({
+        modelName,
+        modelPrefix: false,
+        include: include
+          ? this.getIncludeModelColumns({
+            modelName,
+            include,
+          }) : null,
+      });
+      Console.log(&apos;format==============&gt;&apos;);
+      Console.dir(format);
+    }
+    const data = this.formatInput({
+      modelName,
+      format,
+      formatCb,
+      source: this.buildEmptyModel({
+        modelName,
+      }),
+      rawData: input,
+    });
+    Console.log(&apos;data==============&gt;&apos;);
+    Console.dir(data);
+    // const cretaeBuild = await model.build(data, { include });
+    // Console.log(&apos;build==============&gt;&apos;);
+    // Console.dir(cretaeBuild);
+    // const errors = await cretaeBuild.validate().catch((e) =&gt; {
+    //   Console.log(&quot;!!!!!!catch&quot;);
+    //   Console.log(e);
+    //   throw e;
+    // });
+    // Console.log(errors);
+    // return await cretaeBuild.save();
+    const createdItem = await model.create(data, {
+      include,
+    });
+    if (!createdItem) {
+      throw Error(&apos;QueryHelper.Create.Failed.Null.Created.Item&apos;);
+    }
+    return toJSON
+      ? createdItem.get({
+        plain: true,
+      })
+      : createdItem;
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

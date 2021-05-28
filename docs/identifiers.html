@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl">
+  <title data-ice="title">Reference | sails-hook-sequelize-querier</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Hook to add powerful customize sequelize querier for sails application"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="sails-hook-sequelize-querier"><meta property="twitter:description" content="Hook to add powerful customize sequelize querier for sails application"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/iamcxa/sails-hook-querier"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-create">create</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-destroy">destroy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatFieldQueryWithOrCondition">formatFieldQueryWithOrCondition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatInput">formatInput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatOutput">formatOutput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matchFormat">matchFormat</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetail">getDetail</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-buildEmptyModel">buildEmptyModel</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAssociations">getAssociations</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEnumValues">getEnumValues</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelByObject">getIncludeModelByObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelColumns">getIncludeModelColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelByName">getModelByName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelColumnType">getModelColumnType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelColumns">getModelColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelOutputColumns">getModelOutputColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelSearchableColumns">getModelSearchableColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isCommonField">isCommonField</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNumeric">isNumeric</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelAssociationsToArray">modelAssociationsToArray</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validate">validate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-update">update</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-findBy">findBy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatQuery">formatQuery</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetailPageFieldWithAssociations">getDetailPageFieldWithAssociations</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIndexPageTableAndFilters">getIndexPageTableAndFilters</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-TAG">TAG</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-commonFields">commonFields</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isDate">isDate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-langCode">langCode</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1>References</h1>
+
+<div class="identifiers-wrap">
+  <div>
+    
+  <div data-ice="dirSummaryWrap">
+      
+      <div data-ice="dirSummary"><table class="summary" data-ice="summary">
+  <thead><tr><td data-ice="title" colspan="3">summary</td></tr></thead>
+  <tbody>
+  
+  <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          <span data-ice="async">async</span>
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-create">create</a></span></span><span class="code" data-ice="signature">(Required: <span>*</span>, Optional: <span>*</span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      <span class="version" data-ice="version">version 1.0</span>
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          <span data-ice="async">async</span>
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-destroy">destroy</a></span></span><span class="code" data-ice="signature">(objectPattern: {&quot;modelName&quot;: <span>*</span>, &quot;include&quot;: <span>*</span>, &quot;force&quot;: <span>*</span>, &quot;ids&quot;: <span>*</span>}): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-formatFieldQueryWithOrCondition">formatFieldQueryWithOrCondition</a></span></span><span class="code" data-ice="signature">(fields: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x66FF; fields &#x52A0;&#x5165; or &#x689D;&#x4EF6;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-formatInput">formatInput</a></span></span><span class="code" data-ice="signature">(Required: <span>*</span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x4F9D;&#x64DA;&#x5B9A;&#x7FA9;&#x597D;&#x7684;&#x6B04;&#x4F4D;&#x6BD4;&#x5C0D;&#x4E26;&#x540C;&#x6B65;&#x8F38;&#x5165;&#x8207;&#x76EE;&#x6A19;&#x7269;&#x4EF6;&#x3002;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      <span class="version" data-ice="version">version 1.0</span>
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-formatOutput">formatOutput</a></span></span><span class="code" data-ice="signature">(Required: <span>*</span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x683C;&#x5F0F;&#x5316;&#x4F86;&#x81EA; Sequelize Query &#x7684;&#x8F38;&#x51FA;&#x7269;&#x4EF6;&#xFF0C;&#x4E26;&#x8996;&#x8F38;&#x5165;&#x4F86;&#x8F38;&#x51FA;&#x8A72; Model &#x7684;&#x6B04;&#x4F4D;&#x5B9A;&#x7FA9;&#x7D66;&#x524D;&#x7AEF;&#x3002;
+&#x5982;&#x679C;&#x6709;&#x7D66;&#x4E88; fields&#xFF0C;&#x53EF;&#x4EE5;&#x4F9D;&#x64DA; required &#x8207; readonly &#x53C3;&#x6578;&#xFF0C;&#x7D66;&#x4E88;&#x524D;&#x7AEF;&#x53EF;&#x4EE5;&#x81EA;&#x52D5;&#x7522;&#x751F;&#x8868;&#x683C;&#x7684;&#x8CC7;&#x6599;&#x3002;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      <span class="version" data-ice="version">version 1.0</span>
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-matchFormat">matchFormat</a></span></span><span class="code" data-ice="signature">(Required: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x4F9D;&#x64DA;&#x8F38;&#x5165;&#x7684; format &#x7269;&#x4EF6;&#x4F86;&#x683C;&#x5F0F;&#x5316;&#x8F38;&#x51FA;&#xFF0C;&#x5C07; data &#x8207; format &#x5408;&#x4F75;&#x4E26;&#x4FDD;&#x7559; format &#x4F5C;&#x70BA;&#x9810;&#x8A2D;&#x503C;&#x3002;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      <span class="version" data-ice="version">version 20180310</span>
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          <span data-ice="async">async</span>
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getDetail">getDetail</a></span></span><span class="code" data-ice="signature">(objectPattern: {&quot;langCode&quot;: <span>*</span>, &quot;modelName&quot;: <span>*</span>, &quot;where&quot;: <span>*</span>, &quot;include&quot;: <span>*</span>, &quot;attributes&quot;: <span>*</span>}, objectPattern1: {&quot;log&quot;: <span>*</span>, &quot;raw&quot;: <span>*</span>, &quot;required&quot;: <span>*</span>, &quot;readonly&quot;: <span>*</span>, &quot;view&quot;: <span>*</span>, &quot;outputFieldNamePairs&quot;: <span>*</span>, &quot;viewExclude&quot;: <span>*</span>, &quot;viewInclude&quot;: <span>*</span>, &quot;format&quot;: <span>*</span>, &quot;formatCb&quot;: <span>*</span>}): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-buildEmptyModel">buildEmptyModel</a></span></span><span class="code" data-ice="signature">({: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x4F9D;&#x64DA;&#x7D66;&#x4E88;&#x7684; Sequelize Model &#x540D;&#x7A31;&#xFF0C;&#x7522;&#x751F;&#x7A7A;&#x767D;&#x7684;&#x6B04;&#x4F4D;&#x683C;&#x5F0F; JSON&#xFF0C;&#x4E26;&#x4EE5; null &#x586B;&#x5145;&#x3002;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      <span class="version" data-ice="version">version 20180310</span>
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getAssociations">getAssociations</a></span></span><span class="code" data-ice="signature">(modelName: <span>*</span>, {: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x53D6;&#x5F97;&#x7D66;&#x4E88; ModelName &#x4E4B;&#x95DC;&#x806F; ModelName&#xFF0C;&#x53EF;&#x900F;&#x904E;&#x53C3;&#x6578;&#x6307;&#x5B9A;&#x53D6;&#x5F97;&#x55AE;&#x6578;&#x6216;&#x8907;&#x6578;&#x540D;&#x7A31;&#x3002;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getEnumValues">getEnumValues</a></span></span><span class="code" data-ice="signature">(modelName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span>, columnName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x53D6;&#x5F97;&#x50B3;&#x5165;&#x7684; model column ENUM &#x7684;&#x503C;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      <span class="version" data-ice="version">version 1.0</span>
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelByObject">getIncludeModelByObject</a></span></span><span class="code" data-ice="signature">(includeModelObject: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelColumns">getIncludeModelColumns</a></span></span><span class="code" data-ice="signature">(modelName: <span>*</span>, include: <span>*</span>, prefix: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x53D6;&#x5F97;&#x7D66;&#x4E88; ModelName &#x4E4B;&#x95DC;&#x806F; ModelName &#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#xFF0C;&#x53EF;&#x900F;&#x904E; include &#x53C3;&#x6578;&#x6307;&#x5B9A;&#x8907;&#x6578;&#x95DC;&#x806F; Model &#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#x3002;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getModelByName">getModelByName</a></span></span><span class="code" data-ice="signature">(modelName: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getModelColumnType">getModelColumnType</a></span></span><span class="code" data-ice="signature">({: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span> | <span>Null</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x53D6;&#x5F97;&#x7279;&#x5B9A; model &#x5167; column &#x7684;&#x985E;&#x578B;&#xFF0C;&#x56DE;&#x50B3;&#x503C;&#x70BA; Sequelize &#x7684; type &#x5B57;&#x4E32;&#x3002;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      <span class="version" data-ice="version">version 20180331</span>
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getModelColumns">getModelColumns</a></span></span><span class="code" data-ice="signature">({: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x53D6;&#x5F97;&#x67D0;&#x500B; Sequelize Model &#x7684;&#x6240;&#x6709;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#x3002;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      <span class="version" data-ice="version">version 20180310</span>
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getModelOutputColumns">getModelOutputColumns</a></span></span><span class="code" data-ice="signature">({: <span>any</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x7522;&#x751F; VUE form &#x9700;&#x8981;&#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#x8207;&#x985E;&#x578B;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getModelSearchableColumns">getModelSearchableColumns</a></span></span><span class="code" data-ice="signature">(modelName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x53D6;&#x51FA;&#x76EE;&#x6A19; Model &#x5168;&#x90E8;&#x662F;&#x6587;&#x5B57;&#x985E;&#x578B;&#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      <span class="version" data-ice="version">version 1.0</span>
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-isCommonField">isCommonField</a></span></span><span class="code" data-ice="signature">(name: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x5B9A;&#x7FA9;&#x5171;&#x901A;&#x8CC7;&#x6599;&#x6B04;&#x4F4D;&#xFF0C;&#x7528;&#x4F86;&#x5C07; Model Name &#x53BB;&#x9664;&#xFF0C;&#x4EE5;&#x4FBF;&#x4F7F;&#x7528;&#x540C;&#x4E00;&#x7D44; i18n&#x3002;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-isNumeric">isNumeric</a></span></span><span class="code" data-ice="signature">(val: <span>*</span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-modelAssociationsToArray">modelAssociationsToArray</a></span></span><span class="code" data-ice="signature">(model: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-validate">validate</a></span></span><span class="code" data-ice="signature">(objectPattern: {&quot;value&quot;: <span>*</span>, &quot;schema&quot;: <span>*</span>, &quot;options&quot;: <span>*</span>, &quot;callback&quot;: <span>*</span>}): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          <span data-ice="async">async</span>
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-update">update</a></span></span><span class="code" data-ice="signature">(objectPattern: {&quot;langCode&quot;: <span>*</span>, &quot;modelName&quot;: <span>*</span>, &quot;include&quot;: <span>*</span>, &quot;input&quot;: <span>*</span>, &quot;where&quot;: <span>*</span>}, objectPattern1: {&quot;format&quot;: <span>*</span>, &quot;formatCb&quot;: <span>*</span>}): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          <span data-ice="async">async</span>
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-findBy">findBy</a></span></span><span class="code" data-ice="signature">({: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, {: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, {: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x4F9D;&#x64DA;&#x8F38;&#x5165;&#x8CC7;&#x6599;&#x56DE;&#x50B3;&#x5206;&#x9801;&#x8CC7;&#x6599;</p>
+</div>
+      </div>
+    </td>
+    <td>
+      <span class="version" data-ice="version">version 1.0</span>
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-formatQuery">formatQuery</a></span></span><span class="code" data-ice="signature">({: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>&#x4F9D;&#x64DA;&#x8F38;&#x5165;&#x8CC7;&#x6599;&#x683C;&#x5F0F;&#x5316;&#x67E5;&#x8A62; query</p>
+</div>
+      </div>
+    </td>
+    <td>
+      <span class="version" data-ice="version">version 1.0</span>
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          <span data-ice="async">async</span>
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getDetailPageFieldWithAssociations">getDetailPageFieldWithAssociations</a></span></span><span class="code" data-ice="signature">(objectPattern: {&quot;modelName&quot;: <span>*</span>, &quot;langCode&quot;: <span>*</span>, &quot;outputFieldNamePairs&quot;: <span>*</span>, &quot;exclude&quot;: <span>*</span>, &quot;include&quot;: <span>*</span>, &quot;required&quot;: <span>*</span>}): {...undefined: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, &quot;_fields&quot;: <span>*</span>}</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-function">F</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getIndexPageTableAndFilters">getIndexPageTableAndFilters</a></span></span><span class="code" data-ice="signature">(objectPattern: {&quot;modelName&quot;: <span>*</span>, &quot;include&quot;: <span>*</span>, &quot;includeColumns&quot;: <span>*</span>, &quot;excludeColumns&quot;: <span>*</span>}): {&quot;table&quot;: <span>*</span>, &quot;searchable&quot;: <span>*</span>}</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-variable">V</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-TAG">TAG</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-variable">V</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-commonFields">commonFields</a></span></span><span class="code" data-ice="signature">: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span><span>[]</span></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-variable">V</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-isDate">isDate</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="kind-icon" class="kind-variable">V</span>
+          
+          
+          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-langCode">langCode</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+</tbody>
+</table>
+</div>
+    </div>
+</div>
+
+  
+</div>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

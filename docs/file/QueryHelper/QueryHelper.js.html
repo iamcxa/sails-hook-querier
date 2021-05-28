@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">QueryHelper/QueryHelper.js | sails-hook-sequelize-querier</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Hook to add powerful customize sequelize querier for sails application"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="sails-hook-sequelize-querier"><meta property="twitter:description" content="Hook to add powerful customize sequelize querier for sails application"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/iamcxa/sails-hook-querier"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-create">create</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-destroy">destroy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatFieldQueryWithOrCondition">formatFieldQueryWithOrCondition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatInput">formatInput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatOutput">formatOutput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matchFormat">matchFormat</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetail">getDetail</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-buildEmptyModel">buildEmptyModel</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAssociations">getAssociations</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEnumValues">getEnumValues</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelByObject">getIncludeModelByObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelColumns">getIncludeModelColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelByName">getModelByName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelColumnType">getModelColumnType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelColumns">getModelColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelOutputColumns">getModelOutputColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelSearchableColumns">getModelSearchableColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isCommonField">isCommonField</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNumeric">isNumeric</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelAssociationsToArray">modelAssociationsToArray</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validate">validate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-update">update</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-findBy">findBy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatQuery">formatQuery</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetailPageFieldWithAssociations">getDetailPageFieldWithAssociations</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIndexPageTableAndFilters">getIndexPageTableAndFilters</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-TAG">TAG</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-commonFields">commonFields</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isDate">isDate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-langCode">langCode</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">QueryHelper/QueryHelper.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * @module QueryHelper
+ * @author Kent Chen&lt;iamcxa@gmail.com&gt;
+ */
+/* eslint no-underscore-dangle: 0 */
+// import moment from &apos;moment&apos;;
+import _ from &apos;lodash&apos;;
+import inflection from &apos;inflection&apos;;
+import Joi from &apos;joi&apos;;
+
+export { default as getDetail } from &apos;./QueryHelper.getDetail&apos;;
+export { default as create } from &apos;./QueryHelper.create&apos;;
+export { default as update } from &apos;./QueryHelper.update&apos;;
+export { default as destroy } from &apos;./QueryHelper.destroy&apos;;
+export * from &apos;./QueryHelper.format&apos;;
+export * from &apos;./QueryHelper.view&apos;;
+
+const TAG = &apos;QueryHelper&apos;;
+const { log } = sails.config.queryhelper;
+
+const fakeConsole = {};
+for (const key of Object.keys(console)) {
+  fakeConsole[key] = () =&gt; {};
+}
+const langCode = &apos;zh-TW&apos;;
+const commonFields = [&apos;createdAt&apos;, &apos;updatedAt&apos;, &apos;deletedAt&apos;, &apos;id&apos;];
+const isNumeric = (val) =&gt; !Number.isNaN(parseFloat(val)) &amp;&amp; Number.isFinite(val);
+const isDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/g;
+
+global.Console = log ? console : fakeConsole;
+
+export {
+  langCode, log, commonFields, TAG, isNumeric, isDate,
+};
+
+export function validate({
+  value, schema, options, callback,
+}) {
+  return Joi.validate(
+    value,
+    _.isFunction(schema) ? Joi.object().keys(schema(Joi)) : schema,
+    options,
+    callback,
+  );
+}
+
+/**
+ * &#x5B9A;&#x7FA9;&#x5171;&#x901A;&#x8CC7;&#x6599;&#x6B04;&#x4F4D;&#xFF0C;&#x7528;&#x4F86;&#x5C07; Model Name &#x53BB;&#x9664;&#xFF0C;&#x4EE5;&#x4FBF;&#x4F7F;&#x7528;&#x540C;&#x4E00;&#x7D44; i18n&#x3002;
+ * @example model.User.createdAt ==&gt; model.createdAt
+ * @param {*} name
+ */
+export function isCommonField(name) {
+  try {
+    return this.commonFields
+      .concat([
+        &apos;isValid&apos;,
+        &apos;index&apos;,
+        &apos;isActive&apos;,
+        &apos;isActivated&apos;,
+        &apos;isConfirmed&apos;,
+        &apos;activatedAt&apos;,
+        &apos;confirmedAt&apos;,
+      ])
+      .some((e) =&gt; name.indexOf(e) !== -1);
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+export function getModelByName(modelName) {
+  try {
+    if (!modelName) {
+      throw Error(
+        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({
+          modelName,
+        }),
+      );
+    }
+    let model = null;
+    if (_.isString(modelName)) {
+      model = sails.models[modelName.toLowerCase()];
+    }
+    if (!model || !_.isObject(model)) {
+      throw Error(
+        MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({
+          modelName,
+        }),
+      );
+    }
+    return model;
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+export function getIncludeModelByObject(includeModelObject) {
+  try {
+    // Console.log(&apos;includeModelObject=&gt;&apos;, includeModelObject);
+    // Console.log(&apos;includeModelObject=&gt;&apos;, includeModelObject.model);
+    // Console.log(&apos;includeModelObject=&gt;&apos;, includeModelObject.model.name);
+    if (!includeModelObject) {
+      throw Error(
+        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({
+          includeModelObject,
+        }),
+      );
+    }
+    let model = null;
+    if (_.isObject(includeModelObject)) {
+      // &#x5982;&#x679C;&#x662F; { model: ModelClass } &#x5F62;&#x5F0F;
+      if (includeModelObject.model &amp;&amp; includeModelObject.model.name) {
+        model = sails.models[includeModelObject.model.name.toLowerCase()];
+        // &#x5982;&#x679C;&#x662F; { modelName: ModelClass } &#x5F62;&#x5F0F;
+      } else if (includeModelObject.modelName) {
+        model = sails.models[includeModelObject.modelName.toLowerCase()];
+        // &#x5982;&#x679C;&#x662F; ModelClass {} &#x5F62;&#x5F0F;
+      } else if (includeModelObject.name) {
+        model = includeModelObject;
+      }
+    }
+    // Console.log(&apos;model=&gt;&apos;, model);
+    if (!model) {
+      throw Error(
+        MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({
+          includeModelObject,
+        }),
+      );
+    }
+    return model;
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+/**
+ * &#x53D6;&#x51FA;&#x76EE;&#x6A19; Model &#x5168;&#x90E8;&#x662F;&#x6587;&#x5B57;&#x985E;&#x578B;&#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;
+ * @version 1.0
+ * @param {String} modelName = null &#x8981;&#x67E5;&#x8A62;&#x7684;&#x76EE;&#x6A19; Sequelize Model &#x540D;&#x7A31;&#x3002;
+ * @example &#x53D6;&#x51FA; Parent &#x4E2D;&#xFF0C;&#x5168;&#x90E8;&#x5C6C;&#x6027;&#x70BA;&#x6587;&#x5B57;&#x985E;&#x578B;&#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#x3002;
+ * QueryHelper.getModelSearchableColumns(&apos;Parent&apos;);
+ * // *  [{ key: &apos;Parent.education&apos;, type: &apos;String&apos; }
+ * // *   { key: &apos;Parent.password&apos;, type: &apos;String&apos; }]
+ * @returns {Array} Object contains field and type
+ */
+export function getModelSearchableColumns(
+  modelName = null,
+  { date = false, integer = false } = {},
+) {
+  try {
+    const model = this.getModelByName(modelName);
+    // &#x53D6;&#x51FA;&#x5168;&#x90E8;&#x7684; model field
+    const targets = [];
+    // eslint-disable-next-line
+    for (const key in model.rawAttributes) {
+      if (
+        model.rawAttributes[key].type.key === &apos;STRING&apos;
+        || model.rawAttributes[key].type.key === &apos;TEXT&apos;
+        || model.rawAttributes[key].type.key === &apos;JSON&apos;
+        || model.rawAttributes[key].type.key === &apos;UUID&apos;
+        || model.rawAttributes[key].type.key === &apos;ENUM&apos;
+      ) {
+        targets.push({
+          key: `${modelName}.${key}`,
+          type: &apos;STRING&apos;,
+        });
+      }
+      if (
+        date
+        &amp;&amp; (model.rawAttributes[key].type.key === &apos;DATE&apos;
+          || model.rawAttributes[key].type.key === &apos;DATEONLY&apos;)
+      ) {
+        targets.push({
+          key: `${modelName}.${key}`,
+          type: &apos;DATE&apos;,
+        });
+      }
+      if (integer &amp;&amp; model.rawAttributes[key].type.key === &apos;INTEGER&apos;) {
+        targets.push({
+          key: `${modelName}.${key}`,
+          type: &apos;NUMBER&apos;,
+        });
+      }
+    }
+    // &#x79FB;&#x9664;&#x4E0D;&#x5FC5;&#x8981;&#x7684;&#x5C6C;&#x6027;
+    const exclude = [&apos;createdAt&apos;, &apos;updatedAt&apos;];
+    return targets.filter((e) =&gt; !exclude.some((ex) =&gt; ex === e));
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+/**
+ * &#x53D6;&#x5F97;&#x50B3;&#x5165;&#x7684; model column ENUM &#x7684;&#x503C;
+ * @version 1.0
+ * @param {String} [modelName=null]
+ * @param {String} [columnName=null]
+ * @example &#x53D6;&#x51FA; Parent &#x4E2D; ENUM &#x6B04;&#x4F4D; union &#x7684;&#x5168;&#x90E8;&#x503C;&#x3002;
+ * QueryHelper.getEnumValues(&apos;Parent&apos;, &apos;union&apos;);
+ * // * [ &apos;&#x975E;&#x6703;&#x54E1;&apos;, &apos;&#x500B;&#x4EBA;&#x6703;&#x54E1;&apos;, &apos;&#x5B78;&#x751F;&#x6703;&#x54E1;&apos;, &apos;&#x76F8;&#x95DC;&#x6703;&#x54E1;&apos;, &apos;&#x7406;&#x4E8B;&apos;, &apos;&#x76E3;&#x4E8B;&apos;, &apos;&#x7406;&#x4E8B;&#x9577;&apos;, &apos;&#x5E38;&#x52D9;&#x7406;&#x4E8B;&apos;, &apos;&#x5E38;&#x52D9;&#x76E3;&#x4E8B;&apos; ]
+ * @returns {Array} column&apos;s ENUM values.
+ */
+export function getEnumValues(modelName = null, columnName = null) {
+  try {
+    if (!modelName || !columnName) {
+      throw Error(&apos;Missing required parameter: `modelName` is required.&apos;);
+    }
+    const model = this.getModelByName(modelName);
+    const { values } = model.rawAttributes[columnName];
+    return _.isArray(values) ? values : null;
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+/**
+ * &#x7522;&#x751F; VUE form &#x9700;&#x8981;&#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#x8207;&#x985E;&#x578B;
+ * @param {any} {
+ *     modelName = null,
+ * }
+ * @returns
+ */
+export function getModelOutputColumns({
+  // langCode = null,
+  modelName = null,
+  modelPrefix = false,
+  readonly = null,
+  required = null,
+  exclude = null,
+  include = null,
+}) {
+  try {
+    let prefix = &apos;&apos;;
+    if (_.isBoolean(modelPrefix)) {
+      prefix = modelPrefix ? `${modelName}.` : &apos;&apos;;
+    } else if (_.isString(modelPrefix)) {
+      prefix = `${modelPrefix}.`;
+    }
+    const model = this.getModelByName(modelName);
+    const fields = [];
+    for (const name of _.keys(model.rawAttributes)) {
+      const modelAttr = model.rawAttributes[name];
+      let fieldName;
+
+      if (modelPrefix &amp;&amp; !this.isCommonField(name)) {
+        fieldName = `${prefix}${name}`;
+      } else {
+        fieldName = name;
+      }
+
+      const field = {
+        values: null,
+        name: fieldName,
+      };
+      // &#x81EA;&#x52D5;&#x4F9D;&#x64DA;&#x8CC7;&#x6599;&#x5EAB;&#x8F49;&#x578B; input
+      switch (modelAttr.type.key) {
+        case &apos;ENUM&apos;:
+          field.type = &apos;chosen&apos;;
+          field.values = modelAttr.values.map((e) =&gt; ({
+            value: e,
+            name: e,
+          }));
+          break;
+        case &apos;DOUBLE PRECISION&apos;:
+        case &apos;INTEGER&apos;:
+          field.type = &apos;number&apos;;
+          break;
+        case &apos;DATEONLY&apos;:
+          field.type = &apos;date&apos;;
+          break;
+        default: {
+          // eslint-disable-next-line no-underscore-dangle
+          const length = modelAttr.type._length;
+          if (length) {
+            field.limit = length - 1;
+          }
+          field.type = modelAttr.type.key.toLowerCase();
+          break;
+        }
+      }
+      fields.push(field);
+    }
+    const autoReadonly = [&apos;createdAt&apos;, &apos;updatedAt&apos;, &apos;deletedAt&apos;, &apos;id&apos;].concat(
+      readonly || [],
+    );
+    const autoRequired = this.getModelColumns({
+      modelName,
+      exclude: autoReadonly,
+      required: true,
+    }).concat(required || []);
+
+    const getPhrase = (name) =&gt; {
+      const output = modelPrefix
+        ? `model.${_.upperFirst(name)}`
+        : `model.${_.upperFirst(modelName)}.${name}`;
+      return this.isCommonField(name) ? `model.${name}` : output;
+    };
+    return fields
+      .filter((e) =&gt; !this.commonFields.some((ex) =&gt; e.name === ex))
+      .filter((e) =&gt;
+        (!_.isEmpty(include) ? include.some((inc) =&gt; e.name === inc) : e))
+      .filter((e) =&gt;
+        (!_.isEmpty(exclude) ? !exclude.some((ex) =&gt; e.name === ex) : e))
+      .map((field) =&gt; ({
+        ...field,
+        label: sails.__(getPhrase(field.name)),
+        // label: sails.__({
+        //   phrase: getPhrase(field.name),
+        //   locale: langCode || &apos;zh-TW&apos;,
+        // }),
+        required: autoRequired.some((r) =&gt; r === field.name),
+        readonly: autoReadonly.some((r) =&gt; r === field.name),
+      }));
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+/**
+ * &#x4F9D;&#x64DA;&#x7D66;&#x4E88;&#x7684; Sequelize Model &#x540D;&#x7A31;&#xFF0C;&#x7522;&#x751F;&#x7A7A;&#x767D;&#x7684;&#x6B04;&#x4F4D;&#x683C;&#x5F0F; JSON&#xFF0C;&#x4E26;&#x4EE5; null &#x586B;&#x5145;&#x3002;
+ * @version 20180310
+ * @param {Object} {
+ *     modelName{String} = null, &#x76EE;&#x6A19; Model &#x540D;&#x7A31;&#x3002;
+ *     exclude{Array} = [], &#x8981;&#x6392;&#x9664;&#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#x3002;
+ *     include{Array} = [], &#x8981;&#x984D;&#x5916;&#x52A0;&#x5165;&#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#x3002;
+ * }
+ * @example
+ * QueryHelper.buildEmptyModel({
+ *    modelName: &apos;User&apos;,
+ *    exclude: [&apos;id&apos;],
+ * }),
+ * // {
+ * //  locale: null,
+ * //  weights: null,
+ * //  gender: null,
+ * //  resetPasswordTokenExpire: null,
+ * //  username: null,
+ * //  avatar: null,
+ * //  avatarThumb: null,
+ * //  score: null,
+ * //  isActived: null,
+ * //  resetPasswordToken: null,
+ * //  verificationEmailToken: null,
+ * //  isEmailVerified: null,
+ * //  createdAt: null,
+ * //  updatedAt: null,
+ * //  deletedAt: null,
+ * // }
+ * @returns {Object} &#x7A7A;&#x7684; model &#x6B04;&#x4F4D;&#x683C;&#x5F0F; JSON&#x3002;
+ */
+export function buildEmptyModel({
+  modelName = null,
+  exclude = [],
+  include = [],
+} = {}) {
+  try {
+    const model = {};
+    this.getModelColumns({
+      modelName,
+      exclude,
+      include,
+    }).forEach((e) =&gt; {
+      model[e.replace(`${modelName}.`, &apos;&apos;)] = null;
+    });
+    return model;
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+/**
+ * &#x53D6;&#x5F97;&#x67D0;&#x500B; Sequelize Model &#x7684;&#x6240;&#x6709;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#x3002;
+ * @version 20180310
+ * @param {Object} {
+ *     modelPrefix = false,
+ *     modelName = null,
+ *     exclude = [],
+ *     include = [],
+ *   }
+ * @example &#x53D6;&#x5F97; Parent &#x7684;&#x6B04;&#x4F4D;&#xFF0C;&#x540C;&#x6642;&#x52A0;&#x4E0A; email/nameTW/nameEN &#x4E09;&#x500B;&#x984D;&#x5916;&#x6B04;&#x4F4D;&#x3001;&#x6392;&#x9664;
+ * id/UserId/createdAt/updatedAt &#x56DB;&#x500B;&#x6B04;&#x4F4D;&#xFF0C;&#x4E26;&#x4E14;&#x5728;&#x67E5;&#x8A62;&#x5F97;&#x5230;&#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#x524D;&#x52A0;&#x4E0A; `Parent` prefix&#x3002;
+ * QueryHelper.getModelColumns({
+ *    modelName: &apos;Parent&apos;,
+ *    modelPrefix: true,
+ *    exclude: [&apos;id&apos;, &apos;UserId&apos;, &apos;createdAt&apos;, &apos;updatedAt&apos;],
+ *    include: [&apos;email&apos;, &apos;nameTW&apos;, &apos;nameEN&apos;],
+ *  });
+ * // [ &apos;Parent.education&apos;,
+ * //   &apos;Parent.union&apos;,
+ * //   &apos;Parent.phone&apos;,
+ * //   &apos;Parent.fax&apos;,
+ * //   &apos;Parent.app&apos;,
+ * //   &apos;Parent.comment&apos;,
+ * //   &apos;Parent.address&apos;,
+ * //   &apos;Parent.passportName&apos;,
+ * //   &apos;Parent.profession&apos;,
+ * //   &apos;Parent.birthday&apos;,
+ * //   &apos;Parent.idNumber&apos;,
+ * //   &apos;Parent.mobile&apos;,
+ * //   &apos;Parent.city&apos;,
+ * //   &apos;Parent.password&apos;,
+ * //   &apos;Parent.studentNames&apos;,
+ * //   &apos;email&apos;,
+ * //   &apos;nameTW&apos;,
+ * //   &apos;nameEN&apos; ]
+ * @returns {Array} Sequelize Model column names
+ * @see {@link https://lodash.com/docs/4.17.5#keys}
+ */
+export function getModelColumns({
+  modelPrefix = false,
+  isPrefixPlural = false,
+  modelName = null,
+  exclude = [],
+  include = [],
+  required = false,
+}) {
+  try {
+    // &#x53D6;&#x5F97; model
+    const model = this.getModelByName(modelName);
+    // &#x53D6;&#x5F97;&#x55AE;&#x8907;&#x6578; model name
+    const outputModelName = isPrefixPlural
+      ? inflection.pluralize(model.name)
+      : model.name;
+    // &#x7D44;&#x5408;
+    let prefix = &apos;&apos;;
+    if (_.isBoolean(modelPrefix)) {
+      prefix = modelPrefix ? `${outputModelName}.` : &apos;&apos;;
+    } else if (_.isString(modelPrefix)) {
+      prefix = `${modelPrefix}.`;
+    }
+    // &#x81EA;&#x52D5;&#x53D6;&#x5F97;&#x6240;&#x6709;&#x6B04;&#x4F4D;
+    const attributes = _.keys(model.rawAttributes)
+      .filter((column) =&gt; !exclude.some((ex) =&gt; column === ex))
+      .filter((column) =&gt; !this.commonFields.some((ex) =&gt; column === ex))
+      .filter((column) =&gt; {
+        if (required) {
+          const target = model.rawAttributes[column];
+          // Console.log(&apos;target=&gt;&apos;, target);
+          return target.allowNull !== true &amp;&amp; target.primaryKey !== true;
+        }
+        return true;
+      })
+      .map((e) =&gt; `${_.upperFirst(prefix)}${e}`)
+      .concat(include);
+    return attributes;
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+/**
+ * &#x53D6;&#x5F97;&#x7279;&#x5B9A; model &#x5167; column &#x7684;&#x985E;&#x578B;&#xFF0C;&#x56DE;&#x50B3;&#x503C;&#x70BA; Sequelize &#x7684; type &#x5B57;&#x4E32;&#x3002;
+ * @version 20180331
+ * @param {Object} {
+ *     modelName{String} = null,
+ *     columnName{String} = null,
+ *  }
+ * @example &#x53D6;&#x5F97; User &#x7684; email &#x6B04;&#x4F4D;&#x985E;&#x578B;
+ * getModelColumnType({
+ *    modelName = &apos;User&apos;,
+ *    columnName = &apos;email&apos;,
+ * });
+ * // &apos;String&apos;
+ * @returns {String|Null} column type
+ * @see {@link http://docs.sequelizejs.com/manual/tutorial/models-definition.html}
+ */
+export function getModelColumnType({ modelName = null, columnName = null }) {
+  try {
+    const model = this.getModelByName(modelName);
+    // &#x81EA;&#x52D5;&#x53D6;&#x5F97;&#x6240;&#x6709;&#x6B04;&#x4F4D;
+    const column = model.rawAttributes[columnName];
+    if (!_.isNil(column)) {
+      return column.type.key;
+    }
+    return null;
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+/**
+ * &#x53D6;&#x5F97;&#x7D66;&#x4E88; ModelName &#x4E4B;&#x95DC;&#x806F; ModelName&#xFF0C;&#x53EF;&#x900F;&#x904E;&#x53C3;&#x6578;&#x6307;&#x5B9A;&#x53D6;&#x5F97;&#x55AE;&#x6578;&#x6216;&#x8907;&#x6578;&#x540D;&#x7A31;&#x3002;
+ * @param {*} modelName
+ * @param {*} { singular = false, plural = false }
+ * @returns [String...]
+ */
+export function getAssociations(
+  modelName,
+  {
+    singular = false,
+    plural = false,
+    one2One = false,
+    one2Many = false,
+    raw = false,
+  } = {},
+) {
+  const model = this.getModelByName(modelName);
+  const { associations } = model;
+  const result = [];
+  Object.keys(associations).forEach((key) =&gt; {
+    const association = {};
+    // all needed information in the &apos;options&apos; object
+    if (_.has(associations[key], &apos;options&apos;)) {
+      association[key] = associations[key].options;
+      const singularName = association[key].name.singular;
+      const pluralName = association[key].name.plural;
+      if (associations[key].options.constraints !== false) {
+        // // Console.log(&apos;associations[key]=&gt;&apos;);
+        // // Console.dir(associations[key]);
+        // Console.log(&apos;associations[key].HasMany=&gt;&apos;, associations[key].hasMany);
+        // Console.dir(associations[key].target);
+        if (singular) {
+          result.push(singularName);
+        } else if (plural) {
+          result.push(pluralName);
+        } else if (one2One) {
+          if (key === singularName) result.push(key);
+        } else if (one2Many) {
+          if (key === pluralName) result.push(key);
+        } else if (raw) {
+          result.push({
+            name: key,
+            singular: singularName,
+            plural: pluralName,
+
+            options: associations[key].options,
+            rawName: association[key].name,
+          });
+        } else {
+          result.push(key);
+        }
+      }
+    }
+  });
+  return result;
+}
+
+/**
+ * &#x53D6;&#x5F97;&#x7D66;&#x4E88; ModelName &#x4E4B;&#x95DC;&#x806F; ModelName &#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#xFF0C;&#x53EF;&#x900F;&#x904E; include &#x53C3;&#x6578;&#x6307;&#x5B9A;&#x8907;&#x6578;&#x95DC;&#x806F; Model &#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#x3002;
+ * @param {*} modelName
+ * @param {*} include
+ * @param {*} prefix
+ * @returns [String...]
+ */
+export function getIncludeModelColumns({
+  modelName,
+  include,
+  prefix,
+}) {
+  const modelAssociations = this.getAssociations(modelName, {
+    raw: true,
+  });
+  const namePool = modelAssociations.map((association) =&gt; association.name);
+  const singularPool = modelAssociations.map((association) =&gt; association.singular);
+
+  let result = [];
+  for (const model of include) {
+    const modelItem = this.getIncludeModelByObject(model);
+    const index = singularPool.indexOf(modelItem.name);
+
+    if (index !== -1) {
+      const modelPrefix = prefix ? `${prefix}.${namePool[index]}` : namePool[index];
+      const columns = this.getModelColumns({
+        modelName: modelItem.name,
+        modelPrefix,
+      });
+
+      result = result.concat(columns);
+
+      if (model.include &amp;&amp; Array.isArray(model.include)) {
+        result = result.concat(this.getIncludeModelColumns({
+          modelName: modelItem.name,
+          include: model.include,
+          prefix: modelPrefix,
+        }));
+      }
+    }
+  }
+
+  Console.log(&apos;result========&gt;&apos;);
+  Console.log(result);
+  return result;
+}
+
+export function modelAssociationsToArray(model) {
+  const result = [];
+  if (typeof model !== &apos;function&apos; || typeof model.associations !== &apos;object&apos;) {
+    throw Error(&quot;Model should be an object with the &apos;associations&apos; property.&quot;);
+  }
+  Object.keys(model.associations).forEach((key) =&gt; {
+    const association = {};
+    // all needed information in the &apos;options&apos; object
+    if (_.has(model.associations[key], &apos;options&apos;)) {
+      association[key] = model.associations[key].options;
+    }
+    result.push(association);
+  });
+  return result;
+}
+
+export default {};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
