@@ -12,6 +12,6 @@
 
 module.exports = {
   models: {
-    datastore: 'mysql_travis',
+    datastore: 'travis',
   },
 };
