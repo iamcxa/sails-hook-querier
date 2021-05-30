@@ -11,8 +11,20 @@ before(function (done) {
   this.timeout(11000);
   chai.should();
 
+  console.log('===================================');
+  console.log(`NODE_ENV=>"${process.env.NODE_ENV}"`);
+  console.log('===================================');
+
+  const connInfo =
+    process.env.NODE_ENV === 'travis'
+      ? require('./fixtures/config/datastores').datastores.travis
+      : require('./fixtures/config/datastores').datastores.default;
+
+  console.log('===================================');
+  console.log(`connection=>`, connInfo);
+  console.log('===================================');
+
   const Sequelize = require('sequelize');
-  const connInfo = require('./fixtures/config/datastores').datastores.default;
   const connection = new Sequelize(connInfo.url, connInfo.options);
 
   // Drop schemas if exists
@@ -24,6 +36,7 @@ before(function (done) {
         const config = rc('sails');
         config.hooks.sequelize = require('../node_modules/sails-hook-sequelize/index');
         config.hooks.querier = require('../index');
+        console.log('config=>', config);
 
         // Attempt to lift sails
         Sails().lift(config, (err, _sails) => {
@@ -33,5 +46,7 @@ before(function (done) {
           sails = _sails;
           return done(err, sails);
         });
-      })));
+      }),
+    ),
+  );
 });
