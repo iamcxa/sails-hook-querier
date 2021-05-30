@@ -47,7 +47,7 @@
     "inflection": "^1.13.1",
     "joi": "^14.3.1",
     "mocha": "^8.4.0",
-    "sails-hook-sequelize": "git@github.com:MoreAppio/sails-hook-sequelize.git",
+    "sails-hook-sequelize": "https://github.com/udea-io/sails-hook-sequelize",
     "sails-util-micro-apps": "^1.1.1",
     "sequelize": "^5.22.4"
   },
