@@ -14,16 +14,8 @@ module.exports = {
   },
   associations() {
     Group.hasMany(User);
-    User.belongsTo(Group);
-  },
-  defaultScope() {
-    return {
-      include: [{ model: User }],
-    };
   },
   options: {
-    freezeTableName: false,
-    tableName: 'group',
     classMethods: {},
     instanceMethods: {},
     hooks: {},

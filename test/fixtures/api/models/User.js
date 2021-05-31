@@ -12,15 +12,11 @@ module.exports = {
       type: Sequelize.INTEGER,
     },
   },
-  associations() {},
-  defaultScope() {
-    return {
-      include: [{ model: Image }],
-    };
+  associations() {
+    User.hasOne(Image, { onDelete: 'cascade' });
+    User.belongsTo(Group);
   },
   options: {
-    freezeTableName: false,
-    tableName: 'user',
     classMethods: {
       oneUniqueClassMethod() {
         return 'User class method';
@@ -32,6 +28,11 @@ module.exports = {
         obj.ageString = `${obj.age} years`;
         return obj;
       },
+    },
+    defaultScope() {
+      return {
+        include: [{ model: Image }],
+      };
     },
     hooks: {},
   },
