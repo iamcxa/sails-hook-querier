@@ -62,14 +62,18 @@ describe('about QueryHelper.update operation.', () => {
     };
 
     const user = await User.create(input, {
-      include: [Image],
+      include: [{
+        model: Image,
+      }],
     });
 
     const url = 'http://goo.gl';
     await QueryHelper.update(
       {
         modelName: 'User',
-        include: [Image],
+        include: [{
+          model: Image,
+        }],
         input: {
           Image: {
             url,
