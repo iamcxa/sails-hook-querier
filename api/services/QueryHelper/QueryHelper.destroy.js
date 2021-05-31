@@ -55,7 +55,19 @@ export default async function destroy({
           }
 
           const target = await model.findByPk(id);
-          const associatedId = target[_.upperFirst(includeModelName)].dataValues.id;
+
+          let associatedId;
+          if (target[_.upperFirst(includeModelName)]
+            && target[_.upperFirst(includeModelName)].dataValues) {
+            associatedId = target[_.upperFirst(includeModelName)].dataValues.id;
+          } else if (sails.models[includeModelName.toLowerCase()]) {
+            const query = { where: {} };
+            query.where[`${_.upperFirst(modelName)}Id`] = id;
+            const item = await sails.models[includeModelName.toLowerCase()].findOne(query);
+            if (item && item.dataValues) {
+              associatedId = item.dataValues.id;
+            }
+          }
 
           if (associatedId) {
             const includedModelInstance = sails.models[includeModelName.toLowerCase()];
