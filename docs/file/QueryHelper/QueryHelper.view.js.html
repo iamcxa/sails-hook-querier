@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">QueryHelper/QueryHelper.view.js | sails-hook-sequelize-querier</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Hook to add powerful customize sequelize querier for sails application"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="sails-hook-sequelize-querier"><meta property="twitter:description" content="Hook to add powerful customize sequelize querier for sails application"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/iamcxa/sails-hook-querier"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-create">create</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-destroy">destroy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatFieldQueryWithOrCondition">formatFieldQueryWithOrCondition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatInput">formatInput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatOutput">formatOutput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matchFormat">matchFormat</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetail">getDetail</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-buildEmptyModel">buildEmptyModel</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAssociations">getAssociations</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEnumValues">getEnumValues</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelByObject">getIncludeModelByObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelColumns">getIncludeModelColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelByName">getModelByName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelColumnType">getModelColumnType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelColumns">getModelColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelOutputColumns">getModelOutputColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelSearchableColumns">getModelSearchableColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isCommonField">isCommonField</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNumeric">isNumeric</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelAssociationsToArray">modelAssociationsToArray</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validate">validate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-update">update</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-findBy">findBy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatQuery">formatQuery</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetailPageFieldWithAssociations">getDetailPageFieldWithAssociations</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIndexPageTableAndFilters">getIndexPageTableAndFilters</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-TAG">TAG</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-commonFields">commonFields</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isDate">isDate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-langCode">langCode</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">QueryHelper/QueryHelper.view.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import _ from &apos;lodash&apos;;
+
+/**
+ * &#x4F9D;&#x64DA;&#x8F38;&#x5165;&#x8CC7;&#x6599;&#x683C;&#x5F0F;&#x5316;&#x67E5;&#x8A62; query
+ * @version 1.0
+ * @param {Object} {
+ *     langCode{String} = &apos;zh-TW&apos;,      &#x8981;&#x67E5;&#x8A62;&#x7684;&#x8CC7;&#x6599;&#x8A9E;&#x7CFB;&#x3002;
+ *     modelName{String} = null,        &#x8981;&#x67E5;&#x8A62;&#x7684;&#x76EE;&#x6A19; Sequelize Model &#x540D;&#x7A31;&#x3002;
+ *     filter = null,
+ *     include{Object|Array} = null, &#x984D;&#x5916;&#x7D66;&#x4E88;&#x7684; Sequelize include Query&#x3002;
+ *     curPage = 1,
+ *     perPage = 30,
+ *     sort = &apos;DESC&apos;,
+ *     order = null,
+ *   }
+ * @example
+ * @returns {Object}
+ */
+export function formatQuery({
+  attributes = undefined,
+  langCode = &apos;zh-TW&apos;,
+  modelName = undefined,
+  filter = undefined,
+  include = undefined,
+  curPage = 1,
+  perPage = 30,
+  paging = true,
+  sort = &apos;DESC&apos;,
+  sortBy = undefined,
+  order = undefined,
+  group = undefined,
+  subQuery = undefined,
+  duplicating = undefined,
+  collate = undefined,
+  log = false,
+  condition = &apos;$and&apos;,
+}) {
+  let sortByColumn = null;
+  try {
+    let mOrder = order;
+    let intPage = Number(curPage);
+    let intLimit = Number(perPage);
+    if (_.isNaN(intPage)) intPage = 1;
+    if (_.isNaN(intLimit)) intLimit = 10;
+    // sails.log(&apos;filter=&gt;&apos;, filter);
+
+    if (langCode) {
+      // TODO: &#x8A9E;&#x7CFB;&#x7BE9;&#x9078;
+    }
+    const model = this.getModelByName(modelName);
+    const columns = _.keys(model.rawAttributes);
+    // console.log(&apos;columns=&gt;&apos;, columns);
+    if (sortBy) {
+      sortByColumn = sortBy;
+    } else if (columns.some((c) =&gt; c === &apos;createdAt&apos;)) {
+      sortByColumn = &apos;createdAt&apos;;
+    } else if (columns.some((c) =&gt; c === &apos;id&apos;)) {
+      sortByColumn = &apos;id&apos;;
+    }
+    if (sortByColumn &amp;&amp; !mOrder) {
+      mOrder = [[Sequelize.col(sortByColumn), sort]];
+    }
+
+    // &#x7D44;&#x5408;&#x641C;&#x5C0B; query
+    let query = {
+      where: {},
+      order: mOrder,
+    };
+    if (paging) {
+      query = {
+        ...query,
+        limit: intLimit,
+        offset: (intPage - 1) * intLimit,
+      };
+    }
+
+    if (include &amp;&amp; _.isArray(include)) {
+      query.include = [];
+      include.forEach((e) =&gt; {
+        const inc = {
+          model: e.model ? e.model : this.getModelByName(e.modelName),
+        };
+        if (e.as) {
+          inc.as = e.as;
+        }
+        if (e.limit) {
+          inc.limit = e.limit;
+        }
+        if (e.where) {
+          inc.where = e.where;
+        }
+        if (e.include) {
+          inc.include = e.include;
+        }
+        if (e.through) {
+          inc.through = e.through;
+        }
+        if (e.required) {
+          inc.required = e.required;
+        }
+        if (e.attributes) {
+          inc.attributes = e.attributes;
+        }
+        query.include.push(inc);
+      });
+    }
+
+    if (attributes) {
+      query.attributes = attributes;
+    }
+
+    // &#x5982;&#x679C;&#x6709;&#x6307;&#x5B9A;&#x5B8C;&#x5168;&#x7B26;&#x5408;&#x6B04;&#x4F4D;
+    if (filter.where) {
+      if (!query.where[condition]) {
+        query.where[condition] = [];
+      }
+      if (_.isArray(filter.where)) {
+        // eslint-disable-next-line guard-for-in
+        for (const field of filter.where) {
+          // Console.log(&apos;field=&gt;&apos;, field);
+          query.where[condition].push(field);
+        }
+      } else if (_.isObject(filter.where)) {
+        query.where[condition] = filter.where;
+      } else {
+        throw Error(&apos;parameter `filter.where` has to be Array or Object.&apos;);
+      }
+    }
+
+    if (filter.having) {
+      query.having = filter.having;
+    }
+
+    // &#x5982;&#x679C;&#x6709;&#x6307;&#x5B9A;&#x914D;&#x5C0D;&#x7684;&#x641C;&#x5C0B;&#x6B04;&#x4F4D;
+    let fields = _.has(filter, &apos;fields&apos;) ? filter.fields : null;
+    if (_.isString(fields)) {
+      try {
+        fields = JSON.parse(decodeURIComponent(fields));
+      } catch (e) {
+        sails.log.warn(
+          `[!] ${this.TAG}.formatQuery Parse &quot;filter.fields&quot; into Json-Array type failed.(${e})) this may not be an issue, please check what is actually be input by frontend.`,
+        );
+        fields = filter.fields;
+      }
+      // Console.log(&apos;[QueryHelper] fields=&gt;&apos;, fields);
+    }
+    if (!_.isEmpty(fields)) {
+      if (!query.where.$and) {
+        query.where.$and = [];
+      }
+
+      fields.forEach((field) =&gt; {
+        Console.log(&apos;QueryHelper field=&gt;&apos;, field);
+        // &#x6AA2;&#x67E5;&#x662F;&#x5426;&#x6709; $or &#x689D;&#x4EF6;
+        const { $or } = field;
+        if (!_.isNil($or) &amp;&amp; _.isArray($or)) {
+          const condition = {
+            $or: [],
+          };
+          $or.forEach((item) =&gt; {
+            // &#x8F49;&#x578B;
+            // FIXME: item is not defined
+            const isNumber = this.isNumeric(item.value);
+            let value = isNumber ? parseInt(item.value, 10) : item.value;
+            value = _.isDate(value) ? new Date(value) : value;
+            if (this.isNumeric) {
+              condition.$or.push({
+                [`$${item.key}$`]: {
+                  $eq: value,
+                },
+              });
+            } else {
+              condition.$or.push({
+                [`$${item.key}$`]: {
+                  $like: `%${value}%`,
+                },
+              });
+            }
+          });
+          // &#x6AA2;&#x67E5; where &#x985E;&#x578B;
+          if (_.isArray(query.where.$and)) {
+            query.where.$and.push(condition);
+          } else if (_.isPlainObject(query.where.$and)) {
+            query.where.$and = {
+              ...query.where.$and,
+              ...condition,
+            };
+          }
+          // console.log(&apos;query.where.$and=&gt;&apos;, query.where.$and);
+        } else {
+          // &#x8F49;&#x578B;
+          const isNumber = this.isNumeric(item.value);
+          let value = isNumber ? parseInt(field.value, 10) : field.value;
+          value = _.isDate(value) ? new Date(value) : value;
+          if (isNumber) {
+            query.where.$and.push(
+              Sequelize.where(Sequelize.col(`${field.key}`), &apos;eq&apos;, value),
+            );
+          } else {
+            query.where.$and.push(
+              Sequelize.where(
+                Sequelize.col(`${field.key}`),
+                &apos;like&apos;,
+                `%${value}%`,
+              ),
+            );
+          }
+        }
+      });
+    }
+
+    // &#x5168;&#x6587;&#x6AA2;&#x7D22; - &#x5982;&#x679C;&#x6709;&#x8F38;&#x5165;&#x95DC;&#x9375;&#x5B57;
+    const hasKeyword = filter.search &amp;&amp; filter.search.keyword;
+    const hasSearchText = filter.searchText; // &#x76F8;&#x5BB9;&#x820A;&#x7248;&#x5BEB;&#x6CD5;
+    if (hasKeyword || hasSearchText) {
+      let kw = &apos;&apos;;
+      let targets = null;
+
+      // &#x641C;&#x5C0B;&#x95DC;&#x9375;&#x5B57;
+      if (hasKeyword) {
+        kw = filter.search.keyword.trim();
+        targets = filter.search.fields;
+      }
+      if (hasSearchText) {
+        kw = filter.searchText.trim();
+      }
+
+      // &#x641C;&#x5C0B;&#x7684;&#x76EE;&#x6A19;&#x6B04;&#x4F4D;
+      if (!targets) {
+        targets = this.getModelSearchableColumns(modelName).map((e) =&gt; e.key);
+      }
+
+      // &#x9632;&#x932F;
+      if (!query.where.$or) {
+        query.where.$or = [];
+      }
+
+      // &#x63A8;&#x5165;&#x641C;&#x5C0B;&#x76EE;&#x6A19;
+      query.where.$or = targets.map((e) =&gt;
+        Sequelize.where(Sequelize.col(e), &apos;like&apos;, `%${kw}%`));
+
+      // &#x984D;&#x5916;&#x76EE;&#x6A19;&#x6B04;&#x4F4D;
+      if (filter.search.extra) {
+        filter.search.extra.forEach((e) =&gt; {
+          query.where.$or.push(
+            Sequelize.where(Sequelize.col(e), &apos;like&apos;, `%${kw}%`),
+          );
+        });
+      }
+    }
+
+    // &#x641C;&#x5C0B;&#x524D;&#x6700;&#x5F8C;&#x518D;&#x6574;&#x7406;&#x4E00;&#x6B21; query
+    query = {
+      ...query,
+      collate,
+      subQuery: subQuery || false,
+      duplicating: duplicating || false,
+    };
+    if (log) {
+      if (_.isObject(log)) {
+        query.logging = log;
+      }
+      query.logging = Console.log;
+    }
+    if (_.isNil(group) &amp;&amp; include) {
+      query.group = [`${modelName}.id`];
+    } else if (!_.isNil(group) &amp;&amp; group !== false) {
+      query.group = group;
+    }
+    // Console.log(&apos;query=&gt;&apos;);
+    // Console.dir(query);
+    return query;
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+/**
+ * &#x4F9D;&#x64DA;&#x8F38;&#x5165;&#x8CC7;&#x6599;&#x56DE;&#x50B3;&#x5206;&#x9801;&#x8CC7;&#x6599;
+ * @version 1.0
+ * @param {Object} {
+ *     modelName = null,
+ *     include = null,
+ *   }
+ * @param {Object} {
+ *     langCode = &apos;zh-TW&apos;,
+ *     filter = null,
+ *     curPage = 1,
+ *     perPage = 30,
+ *     sort = &apos;DESC&apos;,
+ *     log = false,
+ *   }
+ * @param {Object} {
+ *     format = null,
+ *     formatCb = null,
+ *   }
+ * @example &#x67E5;&#x8A62; User &#x5305;&#x542B; Parent
+ * QueryHelper.findBy({
+ *     modelName: &apos;User&apos;,
+ *     include: [
+ *       { model: Parent,
+ *         required: true,
+ *       },
+ *     ],
+ *   }, {
+ *     filter: {
+ *       ...mFilter,
+ *       search: {
+ *         keyword: mFilter.searchText,
+ *         extra: [
+ *           &apos;User.nameEN&apos;, &apos;User.nameTW&apos;,
+ *           ...QueryHelper.getModelSearchableColumns(&apos;Parent&apos;),
+ *         ],
+ *       },
+ *     },
+ *     curPage,
+ *     perPage,
+ *     sort,
+ *     order: [&apos;id&apos;],
+ *   }, {
+ *     format: null,
+ *     formatCb: e =&gt; ({
+ *       // &#x5148;&#x5C55;&#x958B; Parent
+ *       ...e.data.Parent,
+ *       // &#x518D;&#x5B58;&#x5165; user &#x8CC7;&#x6599;&#x907F;&#x514D;&#x91CD;&#x758A;
+ *       userId: e.data.id,
+ *       createdAt: moment(e.createdAt).format(&apos;MM/DD/YYYY&apos;),
+ *       name: {
+ *         &apos;zh-TW&apos;: e.data.nameTW,
+ *         en: e.data.nameEN,
+ *       },
+ *       isActived: e.data.isActived,
+ *       studentNames: e.data.Parent.studentNames,
+ *     }),
+ *   });
+ * @returns {Object}
+ */
+export async function findBy(
+  {
+    modelName = null,
+    scope = null,
+    include = [],
+    attributes = null,
+    includeColumns = [],
+    excludeColumns = [],
+  } = {},
+  {
+    langCode = &apos;zh-TW&apos;,
+    whereCondition = &apos;$and&apos;,
+    filter = null,
+    curPage = 1,
+    perPage = 30,
+    sort = &apos;DESC&apos;,
+    sortBy = null,
+    order = null,
+    collate = null,
+    log = false,
+    group = null,
+  } = {},
+  { view = false, format = null, formatCb = null } = {},
+) {
+  let extra = {};
+  // const now = new Date().getTime();
+  // const tag = `${modelName}-findBy-${now}`;
+  try {
+    const inputHasNull = ValidatorHelper.checkNull({
+      modelName,
+      filter,
+    });
+    if (inputHasNull) {
+      throw Error(
+        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({
+          inputHasNull,
+        }),
+      );
+    }
+    // if (sortBy) {
+    //   const getModelColumns = name =&gt; this.getModelColumns({ modelName: name });
+    //   const isByExistInModel = getModelColumns(modelName)
+    //     .some(e =&gt; e.toString() === sortBy.toString());
+
+    //   if (!isByExistInModel &amp;&amp; !_.isEmpty(include)) {
+    //     include
+    //       .forEach((inc) =&gt; {
+    //         Console.log(&apos;inc=&gt;&apos;, inc);
+    //         const incModelName = inc.modelName ? inc.modelName : inc.model.name;
+    //         const isByExistInIncludeModel = getModelColumns(incModelName)
+    //           .some(e =&gt; e.toString() === sortBy.toString());
+    //         if (isByExistInIncludeModel) {
+    //           // eslint-disable-next-line
+    //           sortBy = inc.model ? `${inc.model.name}.${sortBy}` : `${inc.modelName}.${sortBy}`;
+    //         }
+    //       });
+    //   }
+    //   Console.log(&apos;findBy order sortBy=&gt;&apos;, sortBy);
+    // }
+    // Console.time(tag);
+    const query = this.formatQuery({
+      attributes,
+      langCode,
+      curPage,
+      perPage,
+      filter,
+      condition: whereCondition,
+      sort,
+      sortBy,
+      order,
+      collate,
+      modelName,
+      include,
+      log,
+      group,
+    });
+    if (log) {
+      sails.log.debug(&apos;query=&gt;&apos;);
+      Console.dir(query);
+    }
+    const model = this.getModelByName(modelName);
+    let data = null;
+    if (scope) {
+      data = await model.scope(scope).findAndCountAll(query);
+    } else {
+      data = await model.findAndCountAll(query);
+    }
+    // Console.log(&apos;data=&gt;&apos;, data);
+
+    const items = data.rows.map((e) =&gt;
+      this.formatOutput({
+        modelName,
+        format,
+        formatCb,
+        data: e ? e.toJSON() : null,
+        view,
+      }));
+    const total = typeof data.count === &apos;number&apos; ? data.count : data.count.length;
+    if (view) {
+      extra = {
+        ...this.getIndexPageTableAndFilters({
+          modelName,
+          langCode,
+          include,
+          includeColumns,
+          excludeColumns,
+        }),
+        _associations: this.getAssociations(modelName),
+      };
+    }
+    // Console.timeEnd(tag);
+    return {
+      paging: {
+        lastPage: Math.ceil(total / perPage) || 1,
+        curPage: parseInt(curPage, 10),
+        perPage: parseInt(perPage, 10),
+        sort: sort.toUpperCase(),
+        sortBy: sortBy ? sortBy.toLowerCase() : sortBy,
+        order,
+        total,
+      },
+      filter,
+      items,
+      ...extra,
+    };
+  } catch (e) {
+    // Console.timeEnd(tag);
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+export function getIndexPageTableAndFilters({
+  // langCode = &apos;zh-TW&apos;,
+  modelName,
+  include = [],
+  includeColumns = [],
+  excludeColumns = [],
+}) {
+  try {
+    // &#x53D6;&#x51FA;&#x5168;&#x90E8;&#x7684; table &#x6B04;&#x4F4D;
+    const autoIncludeColumns = _.isEmpty(include)
+      ? []
+      : _.flattenDeep(
+        include.map((e) =&gt; {
+          // Console.log(&apos;autoIncludeColumns e=&gt;&apos;, e);
+          if (!_.isObject(e)) {
+            throw Error(&apos;include model must be an object.&apos;);
+          }
+          return (
+            QueryHelper.getModelColumns({
+              modelName: e.model ? e.model.name : e.modelName,
+              modelPrefix: true,
+            }) || []
+          );
+        }),
+      );
+    // console.log(&apos;autoIncludeColumns=&gt;&apos;, autoIncludeColumns)
+    // Console.log(&apos;includeColumns=&gt;&apos;, includeColumns);
+
+    // &#x53D6;&#x51FA;&#x8868;&#x683C;&#x6B04;&#x4F4D;
+    let columns = _.isEmpty(includeColumns)
+      ? this.getModelColumns({
+        modelName,
+        modelPrefix: false,
+        exclude: excludeColumns,
+        include: autoIncludeColumns,
+      })
+      : includeColumns;
+    // console.log(&apos;columns=&gt;&apos;, columns)
+    if (excludeColumns) {
+      columns = columns.filter((c) =&gt; !excludeColumns.some((e) =&gt; e === c));
+    }
+
+    // &#x53D6;&#x51FA;&#x8868;&#x982D;
+    const isAutoIncludeField = (name) =&gt;
+      (autoIncludeColumns.some((col) =&gt; col === name)
+        ? `model.${_.upperFirst(name)}`
+        : `model.${_.upperFirst(modelName)}.${name}`);
+
+    const headers = columns.map((col) =&gt; ({
+      label: sails.__(
+        this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),
+      ),
+      // label: sails.__({
+      //   phrase:
+      //     this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),
+      //   locale: langCode,
+      // }),
+      key: `${_.upperFirst(modelName)}.${col}`,
+    }));
+    // &#x53D6;&#x51FA;&#x53EF;&#x641C;&#x5C0B;&#x6B04;&#x4F4D;
+    const searchable = this.getModelSearchableColumns(modelName, {
+      date: true,
+      integer: true,
+    }).map((e) =&gt; ({
+      label: sails.__(
+        this.isCommonField(e.key)
+          ? `model${e.key.replace(modelName, &apos;&apos;)}`
+          : `model.${e.key}`,
+      ),
+      // label: sails.__({
+      //   phrase: this.isCommonField(e.key)
+      //     ? `model${e.MESSAGE.replace(modelName, &apos;&apos;)}` : `model.${e.key}`,
+      //   locale: langCode,
+      // }),
+      key: e.key,
+      type: e.type,
+    }));
+    // console.log(&apos;headers=&gt;&apos;, headers)
+    // console.log(&apos;columns=&gt;&apos;, columns)
+    return {
+      table: {
+        headers,
+        columns,
+      },
+      searchable,
+    };
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+export async function getDetailPageFieldWithAssociations({
+  modelName,
+  langCode = &apos;zh-TW&apos;,
+  outputFieldNamePairs = null,
+  // [{ modelName: &apos;User&apos;, displayField: &apos;username&apos; }]
+  // [{ modelName: &apos;User&apos;, displayField: &apos;username&apos; }]
+  // autoInclude = false,
+  exclude = [],
+  include = [],
+  required = [],
+  // readonly = [],
+}) {
+  sails.log(
+    `=== getPageFields modelName: &quot;${modelName}&quot;, langCode: &quot;${langCode}&quot; ===`,
+  );
+  try {
+    // &#x5EFA;&#x7ACB;&#x5168;&#x90E8;&#x6B04;&#x4F4D;&#x540D;&#x7A31;
+    const fieldNames = QueryHelper.getModelOutputColumns({
+      modelPrefix: false,
+      modelName,
+      langCode,
+    });
+    // &#x5EFA;&#x7ACB;&#x7A7A;&#x8CC7;&#x6599;
+    const emptyModel = QueryHelper.buildEmptyModel({
+      modelName,
+    });
+
+    // &#x81EA;&#x52D5;&#x53D6;&#x51FA;&#x95DC;&#x806F;&#x7684;&#x8CC7;&#x6599;&#x6B04;&#x4F4D;
+    {
+      const associatedData = {};
+      // &#x53EA;&#x53D6;&#x51FA; 1v1 &#x7684;&#x95DC;&#x806F;&#xFF0C;&#x5373;&#x7576;&#x4E0B; model &#x4E2D;&#x7684; AbcId &#x6B04;&#x4F4D;&#x7684; model Abc
+      const associatedModels = this.getAssociations(modelName, {
+        one2One: true,
+      });
+      for (const target of associatedModels) {
+        /* eslint no-await-in-loop: 0 */
+        const modelData = await sails.models[target.toLowerCase()].findAll();
+        // Console.log(&apos;modelData=&gt;&apos;, modelData);
+        associatedData[target] = modelData;
+      }
+      fieldNames.map((field) =&gt; {
+        const isThisFieldAssociated = associatedModels.some(
+          (ass) =&gt; field.name === `${ass}Id`,
+        );
+        // Console.log(&apos;isThisFieldAssociated=&gt;&apos;, isThisFieldAssociated);
+        if (isThisFieldAssociated) {
+          const associatedModelName = field.name.replace(&apos;Id&apos;, &apos;&apos;);
+          const values = associatedData[associatedModelName];
+          /* eslint no-param-reassign: 0 */
+          let modelOutputPropName = null;
+          {
+            // Console.log(&apos;associatedModelName=&gt;&apos;, associatedModelName);
+            // &#x5982;&#x679C;&#x6709;&#x6307;&#x5B9A;&#x54EA;&#x500B; model &#x4F7F;&#x7528;&#x54EA;&#x500B; prop &#x8F38;&#x51FA;
+            const assignModelOutputField = outputFieldNamePairs
+              ? outputFieldNamePairs.filter(
+                (pair) =&gt; pair.modelName === associatedModelName,
+              )[0]
+              : null;
+            // Console.log(&apos;assignModelOutputField=&gt;&apos;, assignModelOutputField);
+            modelOutputPropName = assignModelOutputField
+              ? assignModelOutputField.target
+              : null;
+            // Console.log(&apos;modelOutputPropName=&gt;&apos;, modelOutputPropName);
+          }
+          // &#x53EF;&#x80FD;&#x8981;&#x518D;&#x52A0;&#x4E0A;&#x4E00;&#x5C0D;&#x591A;&#x5224;&#x65B7;
+          field.type = &apos;chosen&apos;;
+          field.required = true;
+          field.values = values
+            ? values
+              .concat([
+                {
+                  id: null,
+                },
+              ])
+              .map((v) =&gt; {
+                let name = v[modelOutputPropName] || v.name || v.key || v.id;
+                if (_.isFunction(modelOutputPropName)) {
+                  name = modelOutputPropName(v);
+                }
+                return {
+                  value: v.id,
+                  name,
+                };
+              })
+            : [];
+        }
+        return field;
+      });
+    }
+    return {
+      ..._.omit(emptyModel, exclude),
+      _fields: _.differenceBy(
+        fieldNames,
+        exclude.map((e) =&gt; ({
+          name: e,
+        })),
+        &apos;name&apos;,
+      )
+        .concat(include)
+        .map((field) =&gt; {
+          const isTarget = required.some((r) =&gt; r === field.name);
+          if (isTarget) {
+            field.required = true;
+          }
+          return field;
+        }),
+    };
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -5,6 +5,11 @@
     "_": true,
     "async": true,
     "QueryService": true,
-    "QueryHelper": true
+    "QueryHelper": true,
+    "SpecHelper": true,
+    "ValidatorHelper": true,
+    "Console": true,
+    "Sequelize": true,
+    "MESSAGE": true
   }
 }

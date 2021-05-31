@@ -1,0 +1,105 @@
+[
+  {
+    "name": "getModelSearchableColumns",
+    "filePath": "QueryHelper/QueryHelper.js",
+    "lines": [
+      {
+        "lineNumber": 137,
+        "line": "/**"
+      },
+      {
+        "lineNumber": 138,
+        "line": " * 取出目標 Model 全部是文字類型的欄位名稱"
+      },
+      {
+        "lineNumber": 139,
+        "line": " * @version 1.0"
+      },
+      {
+        "lineNumber": 140,
+        "line": " * @param {String} modelName = null 要查詢的目標 Sequelize Model 名稱。"
+      },
+      {
+        "lineNumber": 141,
+        "line": " * @example 取出 Parent 中，全部屬性為文字類型的欄位名稱。"
+      },
+      {
+        "lineNumber": 142,
+        "line": " * QueryHelper.getModelSearchableColumns('Parent');"
+      },
+      {
+        "lineNumber": 143,
+        "line": " * // *  [{ key: 'Parent.education', type: 'String' }"
+      },
+      {
+        "lineNumber": 144,
+        "line": " * // *   { key: 'Parent.password', type: 'String' }]"
+      },
+      {
+        "lineNumber": 145,
+        "line": " * @returns {Array} Object contains field and type"
+      },
+      {
+        "lineNumber": 146,
+        "line": " */"
+      },
+      {
+        "lineNumber": 147,
+        "line": "export function getModelSearchableColumns("
+      }
+    ],
+    "codeParams": [
+      "modelName",
+      "*"
+    ],
+    "docParams": [
+      "modelName"
+    ]
+  },
+  {
+    "name": "getIncludeModelColumns",
+    "filePath": "QueryHelper/QueryHelper.js",
+    "lines": [
+      {
+        "lineNumber": 545,
+        "line": "/**"
+      },
+      {
+        "lineNumber": 546,
+        "line": " * 取得給予 ModelName 之關聯 ModelName 的欄位名稱，可透過 include 參數指定複數關聯 Model 的欄位名稱。"
+      },
+      {
+        "lineNumber": 547,
+        "line": " * @param {*} modelName"
+      },
+      {
+        "lineNumber": 548,
+        "line": " * @param {*} include"
+      },
+      {
+        "lineNumber": 549,
+        "line": " * @param {*} prefix"
+      },
+      {
+        "lineNumber": 550,
+        "line": " * @returns [String...]"
+      },
+      {
+        "lineNumber": 551,
+        "line": " */"
+      },
+      {
+        "lineNumber": 552,
+        "line": "export function getIncludeModelColumns({"
+      }
+    ],
+    "codeParams": [
+      "*"
+    ],
+    "docParams": [
+      "modelName",
+      "include",
+      "prefix"
+    ]
+  }
+]
