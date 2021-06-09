@@ -4,16 +4,17 @@ export default {
   user: instances.User,
   group: instances.Group,
   image: instances.Image,
-  builder: (type, target = {}) => ({
+  builder: (type, include, target = {}) => ({
     ...type === 'user' ? {
       ...instances.User,
-      ageString: 'string',
+      GroupId: include ? 0 : null,
     } : {},
     ...type === 'group' ? {
       ...instances.Group,
     } : {},
     ...type === 'image' ? {
       ...instances.Image,
+      UserId: include ? 0 : null,
     } : {},
     ...target,
     id: 0,

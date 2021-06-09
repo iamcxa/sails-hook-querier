@@ -32,8 +32,6 @@ describe('about QueryHelper.destroy operation.', () => {
 
     const target = {
       ...samples.builder('user'),
-      GroupId: null,
-      Image: null,
     };
 
     SpecHelper.validateEach(
