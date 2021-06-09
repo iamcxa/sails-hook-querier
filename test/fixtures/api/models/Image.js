@@ -13,9 +13,7 @@ module.exports = {
     Image.belongsTo(User);
   },
   defaultScope() {
-    return {
-      include: [{ model: User }],
-    };
+    return {};
   },
   options: {
     classMethods: {},

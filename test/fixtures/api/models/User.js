@@ -30,9 +30,7 @@ module.exports = {
       },
     },
     defaultScope() {
-      return {
-        include: [{ model: Image }],
-      };
+      return {};
     },
     hooks: {},
   },
