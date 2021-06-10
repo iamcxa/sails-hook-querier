@@ -13,6 +13,7 @@
  *     readonly{Array} = [],     要被設定為 readonly 的欄位名稱。
  *     format{Object} = null,     預先定義的資料格式。
  *     formatCb{Function} = null, 最後輸出前再次格式化資料的 callback。
+ *     raw = false,               是否輸出成 JSON。
  *   }
  * @example 依據 Parent ID 查詢 User 與 Parent，同時包含 Student。
  * QueryHelper.getDetail({
@@ -64,6 +65,7 @@
  *      },
  *      fields,
  *    }),
+ *    raw: true,
  *  });
  * @returns {Object} 屬於某個 ID 的資料。
  */
