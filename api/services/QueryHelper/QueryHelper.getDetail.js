@@ -79,7 +79,7 @@ export default async function getDetail(
   },
   {
     log = false,
-    raw = true,
+    raw = false,
     required = null,
     readonly = null,
     view = false,
@@ -111,7 +111,7 @@ export default async function getDetail(
     // 組合查詢 Query
     const query = {
       raw,
-      nest: true,
+      nest: raw,
     };
     if (where) {
       query.where = where;
