@@ -32,7 +32,7 @@ describe('about QueryHelper.update operation.', () => {
         },
       },
       {
-        toJSON: true,
+        raw: true,
       },
     );
 
@@ -79,13 +79,18 @@ describe('about QueryHelper.update operation.', () => {
       },
     );
 
-    const source = await QueryHelper.getDetail({
-      modelName: 'User',
-      include: [Image],
-      where: {
-        id: user.id,
+    const source = await QueryHelper.getDetail(
+      {
+        modelName: 'User',
+        include: [Image],
+        where: {
+          id: user.id,
+        },
       },
-    });
+      {
+        raw: true,
+      },
+    );
 
     const target = {
       ...samples.builder('user'),

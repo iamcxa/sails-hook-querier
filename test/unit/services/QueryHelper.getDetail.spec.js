@@ -19,7 +19,7 @@ describe('about QueryHelper.getDetail operation.', () => {
         },
       },
       {
-        toJSON: true,
+        raw: true,
       },
     );
 
@@ -72,7 +72,7 @@ describe('about QueryHelper.getDetail operation.', () => {
         },
       },
       {
-        toJSON: true,
+        raw: true,
       },
     );
 
@@ -157,6 +157,7 @@ describe('about QueryHelper.getDetail operation.', () => {
         attributes: ['name'],
       },
       {
+        raw: true,
         view: true,
         log: true,
       },
