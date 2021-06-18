@@ -1,0 +1,33 @@
+language: node_js
+dist: bionic
+node_js:
+    - "12"
+# Travis-CI Caching
+cache:
+  directories:
+    - node_modules
+# env
+sudo: enabled
+services:
+  - mysql
+# addons:
+#   apt:
+#     sources:
+#       - mysql-5.7
+#     packages:
+#       - mysql-server
+#       - mysql-client
+before_script:
+  - pip install --user codecov
+  # - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+  - sudo mysql_upgrade
+  - sudo service mysql restart
+  - chmod +x ./scripts/*
+  - ./scripts/travis-mysql-5.7.sh
+script:
+  - touch config/local.js
+  - npm run test-travis
+  
+after_success:
+  - codecov --file coverage/lcov.info --disable search
+  
