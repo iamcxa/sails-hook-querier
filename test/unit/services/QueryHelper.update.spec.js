@@ -23,7 +23,7 @@ describe('about QueryHelper.update operation.', () => {
       },
     );
 
-    const source = await QueryHelper.getDetail(
+    const target = await QueryHelper.getDetail(
       {
         modelName: 'User',
         include: [],
@@ -36,21 +36,21 @@ describe('about QueryHelper.update operation.', () => {
       },
     );
 
-    const target = {
+    const source = {
       ...samples.builder('user'),
     };
 
     SpecHelper.validateEach(
       {
-        source,
         target,
+        source,
       },
       {
         strictMode: false,
         log: true,
       },
     );
-    source.name.should.equal(name);
+    target.name.should.equal(name);
   });
 
   it('update and use include models should be success', async () => {
@@ -79,7 +79,7 @@ describe('about QueryHelper.update operation.', () => {
       },
     );
 
-    const source = await QueryHelper.getDetail(
+    const target = await QueryHelper.getDetail(
       {
         modelName: 'User',
         include: [Image],
@@ -92,15 +92,15 @@ describe('about QueryHelper.update operation.', () => {
       },
     );
 
-    const target = {
+    const source = {
       ...samples.builder('user'),
       Image: samples.builder('image', true),
     };
 
     SpecHelper.validateEach(
       {
-        source,
         target,
+        source,
       },
       {
         strictMode: false,
@@ -108,7 +108,7 @@ describe('about QueryHelper.update operation.', () => {
       },
     );
 
-    source.Image.url.should.equal(url);
+    target.Image.url.should.equal(url);
   });
 
   it('update wrong modelName should be fail', async () => {

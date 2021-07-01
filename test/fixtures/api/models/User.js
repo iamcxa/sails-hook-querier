@@ -13,7 +13,7 @@ module.exports = {
     },
   },
   associations() {
-    User.hasOne(Image, { onDelete: 'cascade' });
+    User.hasOne(Image);
     User.belongsTo(Group);
   },
   options: {

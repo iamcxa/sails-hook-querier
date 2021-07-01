@@ -10,7 +10,7 @@ describe('about QueryHelper.getDetail operation.', () => {
       include: [],
     });
 
-    const source = await QueryHelper.getDetail(
+    const target = await QueryHelper.getDetail(
       {
         modelName: 'User',
         include: [],
@@ -23,15 +23,15 @@ describe('about QueryHelper.getDetail operation.', () => {
       },
     );
 
-    const target = {
+    const source = {
       ...samples.builder('user'),
       Image: null,
     };
 
     SpecHelper.validateEach(
       {
-        source,
         target,
+        source,
       },
       {
         strictMode: false,
@@ -58,7 +58,7 @@ describe('about QueryHelper.getDetail operation.', () => {
       ],
     });
 
-    const source = await QueryHelper.getDetail(
+    const target = await QueryHelper.getDetail(
       {
         modelName: 'Group',
         include: [
@@ -76,7 +76,7 @@ describe('about QueryHelper.getDetail operation.', () => {
       },
     );
 
-    const target = {
+    const source = {
       ...samples.builder('group'),
       Users: {
         ...samples.builder('user', true),
@@ -88,8 +88,8 @@ describe('about QueryHelper.getDetail operation.', () => {
 
     SpecHelper.validateEach(
       {
-        source,
         target,
+        source,
       },
       {
         strictMode: false,
@@ -142,7 +142,7 @@ describe('about QueryHelper.getDetail operation.', () => {
       ],
     });
 
-    const source = await QueryHelper.getDetail(
+    const target = await QueryHelper.getDetail(
       {
         modelName: 'Group',
         include: [
@@ -163,7 +163,7 @@ describe('about QueryHelper.getDetail operation.', () => {
       },
     );
 
-    const target = {
+    const source = {
       ...samples.builder('group'),
       Users: {
         ...samples.builder('user', true),
@@ -187,8 +187,8 @@ describe('about QueryHelper.getDetail operation.', () => {
 
     SpecHelper.validateEach(
       {
-        source,
         target,
+        source,
       },
       {
         strictMode: false,
