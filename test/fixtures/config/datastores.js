@@ -43,7 +43,7 @@ module.exports.datastores = {
     url: 'mysql://root@127.0.0.1:3306/test',
     user: 'root',
     password: '',
-    database: 'test',
+    database: 'travis',
     dialect: 'mysql',
     options: {
       dialect: 'mysql',
