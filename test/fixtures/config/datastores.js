@@ -40,10 +40,10 @@ module.exports.datastores = {
 
   travis: (_.has(local, 'datastores.travis') &&
     _.get(local, 'datastores.travis')) || {
-    url: 'mysql://root@127.0.0.1:3306/test',
+    url: 'mysql://root@127.0.0.1:3306/travis_test',
     user: 'root',
     password: '',
-    database: 'travis',
+    database: 'travis_test',
     dialect: 'mysql',
     options: {
       dialect: 'mysql',
