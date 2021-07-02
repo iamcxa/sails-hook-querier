@@ -52,7 +52,7 @@ function formatQuery({
   sortBy,
   order,
   group,
-  limit = perPage,
+  limit,
   log = false,
 }) {
   let sortByColumn = null;
@@ -79,10 +79,10 @@ function formatQuery({
       collate,
       duplicating,
       ...paging ? {
-        limit: limit > perPage ? perPage : limit,
+        limit: limit && limit > perPage ? perPage : limit,
         offset: (curPage - 1) * perPage,
       } : {
-        limit,
+        ...limit ? { limit } : {},
       },
     };
 
@@ -202,8 +202,8 @@ function formatOutput({
 async function find(
   {
     model,
-    scope = null,
-    include = [],
+    scope,
+    include,
     attributes,
     searchable,
     presenter,
@@ -211,10 +211,10 @@ async function find(
       where: {},
     },
     sort = 'DESC',
-    sortBy = null,
-    order = null,
-    collate = null,
-    group = null,
+    sortBy,
+    order,
+    collate,
+    group,
     limit,
     log = false,
     paging = true,
@@ -298,6 +298,7 @@ class Chain {
       request: {},
       presenter: null,
       searchable: null,
+      keyword: null,
       useWhere: [],
     };
   }
@@ -397,6 +398,13 @@ class Chain {
     return this;
   }
 
+  useFullTextSearch(request) {
+    if (typeof request['%keyword%'] === 'string') {
+      this.data['%keyword%'] = request['%keyword%'];
+    }
+    return this;
+  }
+
   /**
    * @param {number} curPage - 當前頁面位置
    * @param {number} perPage - 每頁結果數量
@@ -489,6 +497,20 @@ class Chain {
     collate,
     limit,
   }) {
+    for (const parameter of this.data.useWhere) {
+      let where = {};
+      if (typeof parameter === 'object') {
+        where = parameter;
+      } else if (typeof parameter === 'function') {
+        where = parameter(this.data.request);
+      }
+
+      this.data.where = {
+        ...this.data.where,
+        ...where,
+      };
+    }
+
     return find({
       model: this.data.model,
       scope: this.data.scope,
