@@ -3,7 +3,7 @@ set -x
 set -e
 
 # MySQL config
-mysql -uroot -ptoor -e "
+mysql -uroot -e "
 set character_set_client      = utf8mb4;
 set character_set_connection  = utf8mb4;
 set character_set_database    = utf8mb4;
