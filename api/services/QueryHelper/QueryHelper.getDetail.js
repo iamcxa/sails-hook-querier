@@ -13,6 +13,7 @@
  *     readonly{Array} = [],     要被設定為 readonly 的欄位名稱。
  *     format{Object} = null,     預先定義的資料格式。
  *     formatCb{Function} = null, 最後輸出前再次格式化資料的 callback。
+ *     raw = false,               是否輸出成 JSON。
  *   }
  * @example 依據 Parent ID 查詢 User 與 Parent，同時包含 Student。
  * QueryHelper.getDetail({
@@ -64,6 +65,7 @@
  *      },
  *      fields,
  *    }),
+ *    raw: true,
  *  });
  * @returns {Object} 屬於某個 ID 的資料。
  */
@@ -111,6 +113,7 @@ export default async function getDetail(
     // 組合查詢 Query
     const query = {
       raw,
+      nest: raw,
     };
     if (where) {
       query.where = where;
@@ -118,7 +121,7 @@ export default async function getDetail(
     if (include && _.isArray(include)) {
       query.include = [];
       include.forEach((e) => {
-        if (!e.model && !e.modelName) {
+        if (!e.name && !e.model && !e.modelName) {
           throw Error(
             MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({
               field: 'include',
@@ -127,7 +130,15 @@ export default async function getDetail(
             }),
           );
         }
-        const thisModelName = e.model ? e.model.name : e.modelName;
+        let thisModelName;
+        if (e.name) {
+          thisModelName = e.name;
+        } else if (e.model && e.model.name) {
+          thisModelName = e.model.name;
+        } else if (e.modelName) {
+          thisModelName = e.modelName;
+        }
+
         const arr = this.getModelOutputColumns({
           modelName: thisModelName,
           as: e.as,
@@ -140,8 +151,18 @@ export default async function getDetail(
           readonly,
         });
         fields = fields.concat(arr);
+
+        let thisModel;
+        if (e.name) {
+          thisModel = e;
+        } else if (e.model && e.model.name) {
+          thisModel = e.model;
+        } else if (e.modelName) {
+          thisModel = this.getModelByName(e.modelName);
+        }
+
         const inc = {
-          model: e.model ? e.model : this.getModelByName(e.modelName),
+          model: thisModel,
         };
         if (e.as) {
           inc.as = e.as;
@@ -267,7 +288,7 @@ export default async function getDetail(
       fields,
       required,
       readonly,
-      data: data ? data.toJSON() : data,
+      data,
       extra,
       view,
     });

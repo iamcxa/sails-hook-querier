@@ -12,11 +12,6 @@ module.exports = {
   associations() {
     Image.belongsTo(User);
   },
-  defaultScope() {
-    return {
-      include: [{ model: User }],
-    };
-  },
   options: {
     classMethods: {},
     instanceMethods: {},

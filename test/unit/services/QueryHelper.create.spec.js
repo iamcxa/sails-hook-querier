@@ -40,7 +40,7 @@ describe('about QueryHelper.create operation.', () => {
       },
     };
 
-    const result = await QueryHelper.create(
+    const source = await QueryHelper.create(
       {
         modelName: 'Group',
         include: [
@@ -56,24 +56,14 @@ describe('about QueryHelper.create operation.', () => {
       },
     );
 
-    const source = {
-      ...result,
-      Users: {
-        ...result.Users[0],
-        Image: {
-          ...result.Users[0].Image,
-        },
-      },
-    };
-
     const target = {
       ...samples.builder('group'),
-      Users: {
-        ...samples.builder('user'),
+      Users: [{
+        ...samples.builder('user', true),
         Image: {
-          ...samples.builder('Image'),
+          ...samples.builder('image', true),
         },
-      },
+      }],
     };
 
     SpecHelper.validateEach(

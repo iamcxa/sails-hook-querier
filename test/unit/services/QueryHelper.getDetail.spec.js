@@ -19,13 +19,12 @@ describe('about QueryHelper.getDetail operation.', () => {
         },
       },
       {
-        toJSON: true,
+        raw: true,
       },
     );
 
     const target = {
       ...samples.builder('user'),
-      GroupId: null,
       Image: null,
     };
 
@@ -59,7 +58,7 @@ describe('about QueryHelper.getDetail operation.', () => {
       ],
     });
 
-    const result = await QueryHelper.getDetail(
+    const source = await QueryHelper.getDetail(
       {
         modelName: 'Group',
         include: [
@@ -73,26 +72,16 @@ describe('about QueryHelper.getDetail operation.', () => {
         },
       },
       {
-        toJSON: true,
+        raw: true,
       },
     );
-
-    const source = {
-      ...result,
-      Users: {
-        ...result.Users[0],
-        Image: {
-          ...result.Users[0].Image,
-        },
-      },
-    };
 
     const target = {
       ...samples.builder('group'),
       Users: {
-        ...samples.builder('user'),
+        ...samples.builder('user', true),
         Image: {
-          ...samples.builder('Image'),
+          ...samples.builder('image', true),
         },
       },
     };
@@ -153,7 +142,7 @@ describe('about QueryHelper.getDetail operation.', () => {
       ],
     });
 
-    const result = await QueryHelper.getDetail(
+    const source = await QueryHelper.getDetail(
       {
         modelName: 'Group',
         include: [
@@ -168,32 +157,32 @@ describe('about QueryHelper.getDetail operation.', () => {
         attributes: ['name'],
       },
       {
+        raw: true,
         view: true,
-        toJSON: true,
         log: true,
       },
     );
 
-    const source = {
-      ...result,
-      Users: {
-        ...result.Users[0],
-        Image: {
-          ...result.Users[0].Image,
-        },
-      },
-    };
-
     const target = {
-      name: 'string',
+      ...samples.builder('group'),
       Users: {
-        ...samples.builder('user'),
+        ...samples.builder('user', true),
         Image: {
-          ...samples.builder('Image'),
+          ...samples.builder('image', true),
         },
       },
-      _fields: [],
-      _associations: [],
+      _fields: [
+        {
+          values: null,
+          name: 'name',
+          limit: 254,
+          type: 'string',
+          label: 'model.Group.name',
+          required: true,
+          readonly: false,
+        },
+      ],
+      _associations: ['Users'],
     };
 
     SpecHelper.validateEach(

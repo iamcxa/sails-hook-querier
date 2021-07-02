@@ -1,0 +1,6 @@
+"globals": {
+  "SpecHelper": true,
+  "Image": true,
+  "User": true,
+  "Group": true
+}

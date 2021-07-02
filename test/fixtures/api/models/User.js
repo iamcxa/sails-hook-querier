@@ -17,23 +17,8 @@ module.exports = {
     User.belongsTo(Group);
   },
   options: {
-    classMethods: {
-      oneUniqueClassMethod() {
-        return 'User class method';
-      },
-    },
-    instanceMethods: {
-      toJSON() {
-        const obj = this.get();
-        obj.ageString = `${obj.age} years`;
-        return obj;
-      },
-    },
-    defaultScope() {
-      return {
-        include: [{ model: Image }],
-      };
-    },
+    classMethods: {},
+    instanceMethods: {},
     hooks: {},
   },
 };

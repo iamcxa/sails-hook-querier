@@ -32,14 +32,12 @@ describe('about QueryHelper.update operation.', () => {
         },
       },
       {
-        toJSON: true,
+        raw: true,
       },
     );
 
     const target = {
       ...samples.builder('user'),
-      GroupId: null,
-      Image: null,
     };
 
     SpecHelper.validateEach(
@@ -62,18 +60,14 @@ describe('about QueryHelper.update operation.', () => {
     };
 
     const user = await User.create(input, {
-      include: [{
-        model: Image,
-      }],
+      include: [Image],
     });
 
     const url = 'http://goo.gl';
     await QueryHelper.update(
       {
         modelName: 'User',
-        include: [{
-          model: Image,
-        }],
+        include: [Image],
         input: {
           Image: {
             url,
@@ -88,21 +82,19 @@ describe('about QueryHelper.update operation.', () => {
     const source = await QueryHelper.getDetail(
       {
         modelName: 'User',
-        include: [{
-          model: Image,
-        }],
+        include: [Image],
         where: {
           id: user.id,
         },
       },
       {
-        toJSON: true,
+        raw: true,
       },
     );
 
     const target = {
       ...samples.builder('user'),
-      Image: samples.builder('image'),
+      Image: samples.builder('image', true),
     };
 
     SpecHelper.validateEach(

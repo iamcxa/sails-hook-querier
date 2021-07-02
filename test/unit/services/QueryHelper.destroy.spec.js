@@ -25,15 +25,10 @@ describe('about QueryHelper.destroy operation.', () => {
           id: user.id,
         },
       },
-      {
-        toJSON: true,
-      },
     );
 
     const target = {
       ...samples.builder('user'),
-      GroupId: null,
-      Image: null,
     };
 
     SpecHelper.validateEach(
@@ -74,9 +69,6 @@ describe('about QueryHelper.destroy operation.', () => {
           id: user.id,
         },
       },
-      {
-        toJSON: true,
-      },
     );
 
     const source2 = await QueryHelper.getDetail(
@@ -86,9 +78,6 @@ describe('about QueryHelper.destroy operation.', () => {
         where: {
           id: user.Image.id,
         },
-      },
-      {
-        toJSON: true,
       },
     );
 
