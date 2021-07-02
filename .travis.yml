@@ -19,9 +19,9 @@ services:
 #       - mysql-client
 before_script:
   - pip install --user codecov
-  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('toor') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
   - sudo mysql_upgrade
   - sudo service mysql restart
+  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('toor') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
   - chmod +x ./scripts/*
   - ./scripts/travis-mysql-5.7.sh
 script:
