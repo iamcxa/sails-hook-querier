@@ -125,27 +125,38 @@ function formatQuery({
     if (filter.where) {
       const defaultCondition = formatCondition('and');
       if (!searchable) {
-        query.where[defaultCondition] = filter.where;
+        _.forEach(filter.where, (value, key) => {
+          const op = formatOperator('like');
+          query.where[defaultCondition].push({
+            [key]: {
+              [op]: filter.where[key],
+            },
+          });
+        });
       } else {
         // 組合 searchable
-        for (const key in searchable) {
-          if (_.isString(searchable[key]) && filter.where[key]) {
+        _.forEach(searchable, (value, key) => {
+          if (log && !filter.where[key]) {
+            sails.log(`searchable[${key}] is exists but request[${key}] missing.`);
+          }
+
+          if (_.isString(value) && filter.where[key]) {
             if (!query.where[defaultCondition]) {
               query.where[defaultCondition] = [];
             }
 
-            const op = formatOperator(searchable[key]);
+            const op = formatOperator(value);
             query.where[defaultCondition].push({
               [key]: {
                 [op]: filter.where[key],
               },
             });
-          } else if (_.isObject(searchable[key])) {
+          } else if (_.isObject(value)) {
             const {
               operator,
               condition,
               defaultValue,
-            } = searchable[key];
+            } = value;
 
             const op = formatOperator(operator);
             const cond = formatCondition(condition);
@@ -160,7 +171,18 @@ function formatQuery({
               },
             });
           }
-        }
+        });
+
+        _.forEach(filter.where, (value, key) => {
+          if (Object.keys(searchable).indexOf(key) === -1) {
+            const op = formatOperator('like');
+            query.where[defaultCondition].push({
+              [key]: {
+                [op]: value,
+              },
+            });
+          }
+        });
       }
     }
 
@@ -300,6 +322,7 @@ class Chain {
       searchable: null,
       keyword: null,
       useWhere: [],
+      useRawWhere: null,
     };
   }
 
@@ -359,6 +382,14 @@ class Chain {
    */
   useWhere(parameter) {
     this.data.useWhere.push(parameter);
+    return this;
+  }
+
+  /**
+   * @param {object} where 查詢內容
+   */
+  useRawWhere(parameter) {
+    this.data.useRawWhere.push(parameter);
     return this;
   }
 
@@ -429,7 +460,7 @@ class Chain {
     curPage = 1,
     perPage = 30,
     sort = 'DESC',
-    sortBy = 'createdAt',
+    sortBy,
     order,
     group,
     collate,
@@ -447,6 +478,10 @@ class Chain {
         ...this.data.where,
         ...where,
       };
+    }
+
+    if (this.data.useRawWhere) {
+      this.data.where = this.data.useRawWhere;
     }
 
     return find({
@@ -491,7 +526,7 @@ class Chain {
    */
   findAll({
     sort = 'DESC',
-    sortBy = 'createdAt',
+    sortBy,
     order,
     group,
     collate,
