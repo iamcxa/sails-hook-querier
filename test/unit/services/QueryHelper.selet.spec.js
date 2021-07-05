@@ -1,6 +1,6 @@
 import samples from '../samples';
 
-describe.only('about QueryHelper select operation.', () => {
+describe('about QueryHelper select operation.', () => {
   it('select should be success', async () => {
     const input = {
       ...samples.group,

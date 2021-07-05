@@ -60,15 +60,9 @@ describe('about QueryHelper.create operation.', () => {
       ...samples.builder('group'),
       Users: [{
         ...samples.builder('user', true),
-        Image: {
-          ...samples.builder('image', true),
-        },
       }],
     };
 
-
-    sails.log(source)
-    sails.log(target)
     SpecHelper.validateEach(
       {
         target,

@@ -27,14 +27,10 @@ describe('about QueryHelper.destroy operation.', () => {
       },
     );
 
-    const source = {
-      ...samples.builder('user'),
-    };
-
     SpecHelper.validateEach(
       {
         target,
-        source,
+        source: {},
       },
       {
         strictMode: false,

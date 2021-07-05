@@ -154,7 +154,6 @@ describe('about QueryHelper.getDetail operation.', () => {
         where: {
           id: group.id,
         },
-        attributes: ['name'],
       },
       {
         raw: true,
