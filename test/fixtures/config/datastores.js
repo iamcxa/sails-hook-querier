@@ -28,7 +28,7 @@ module.exports.datastores = {
     url: 'mysql://root:toor@localhost:3306/demo',
     user: 'root',
     password: 'toor',
-    database: 'demo',
+    database: 'test',
     dialect: 'mysql',
     options: {
       dialect: 'mysql',
