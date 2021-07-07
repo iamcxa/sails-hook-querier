@@ -28,7 +28,7 @@ module.exports.datastores = {
     url: 'mysql://root:toor@localhost:3306/demo',
     user: 'root',
     password: 'toor',
-    database: 'demo',
+    database: 'test',
     dialect: 'mysql',
     options: {
       dialect: 'mysql',
@@ -40,10 +40,10 @@ module.exports.datastores = {
 
   travis: (_.has(local, 'datastores.travis') &&
     _.get(local, 'datastores.travis')) || {
-    url: 'mysql://root@127.0.0.1:3306/test',
+    url: 'mysql://root@127.0.0.1:3306/travis_test',
     user: 'root',
     password: '',
-    database: 'test',
+    database: 'travis_test',
     dialect: 'mysql',
     options: {
       dialect: 'mysql',

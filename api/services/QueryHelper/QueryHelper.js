@@ -14,6 +14,7 @@ export { default as update } from './QueryHelper.update';
 export { default as destroy } from './QueryHelper.destroy';
 export * from './QueryHelper.format';
 export * from './QueryHelper.view';
+export { default as select } from './QueryHelper.select';
 
 const TAG = 'QueryHelper';
 const { log } = sails.config.queryhelper;

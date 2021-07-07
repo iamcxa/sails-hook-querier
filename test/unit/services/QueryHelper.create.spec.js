@@ -6,7 +6,7 @@ describe('about QueryHelper.create operation.', () => {
       ...samples.user,
     };
 
-    const source = await QueryHelper.create(
+    const target = await QueryHelper.create(
       {
         modelName: 'User',
         include: [],
@@ -17,12 +17,12 @@ describe('about QueryHelper.create operation.', () => {
       },
     );
 
-    const target = samples.builder('user');
+    const source = samples.builder('user');
 
     SpecHelper.validateEach(
       {
-        source,
         target,
+        source,
       },
       {
         strictMode: false,
@@ -40,7 +40,7 @@ describe('about QueryHelper.create operation.', () => {
       },
     };
 
-    const source = await QueryHelper.create(
+    const target = await QueryHelper.create(
       {
         modelName: 'Group',
         include: [
@@ -56,20 +56,17 @@ describe('about QueryHelper.create operation.', () => {
       },
     );
 
-    const target = {
+    const source = {
       ...samples.builder('group'),
       Users: [{
         ...samples.builder('user', true),
-        Image: {
-          ...samples.builder('image', true),
-        },
       }],
     };
 
     SpecHelper.validateEach(
       {
-        source,
         target,
+        source,
       },
       {
         strictMode: false,

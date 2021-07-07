@@ -189,7 +189,7 @@ export function formatQuery({
           // console.log('query.where.$and=>', query.where.$and);
         } else {
           // 轉型
-          const isNumber = this.isNumeric(item.value);
+          const isNumber = this.isNumeric(field.value);
           let value = isNumber ? parseInt(field.value, 10) : field.value;
           value = _.isDate(value) ? new Date(value) : value;
           if (isNumber) {

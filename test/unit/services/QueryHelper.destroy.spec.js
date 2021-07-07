@@ -17,7 +17,7 @@ describe('about QueryHelper.destroy operation.', () => {
       },
     );
 
-    const source = await QueryHelper.getDetail(
+    const target = await QueryHelper.getDetail(
       {
         modelName: 'User',
         include: [],
@@ -27,14 +27,10 @@ describe('about QueryHelper.destroy operation.', () => {
       },
     );
 
-    const target = {
-      ...samples.builder('user'),
-    };
-
     SpecHelper.validateEach(
       {
-        source,
         target,
+        source: {},
       },
       {
         strictMode: false,
@@ -61,7 +57,7 @@ describe('about QueryHelper.destroy operation.', () => {
       },
     );
 
-    const source1 = await QueryHelper.getDetail(
+    const target1 = await QueryHelper.getDetail(
       {
         modelName: 'User',
         include: [],
@@ -71,7 +67,7 @@ describe('about QueryHelper.destroy operation.', () => {
       },
     );
 
-    const source2 = await QueryHelper.getDetail(
+    const target2 = await QueryHelper.getDetail(
       {
         modelName: 'Image',
         include: [],
@@ -83,8 +79,8 @@ describe('about QueryHelper.destroy operation.', () => {
 
     SpecHelper.validateEach(
       {
-        source: source1,
-        target: {},
+        target: target1,
+        source: {},
       },
       {
         strictMode: false,
@@ -93,8 +89,8 @@ describe('about QueryHelper.destroy operation.', () => {
     );
     SpecHelper.validateEach(
       {
-        source: source2,
-        target: {},
+        target: target2,
+        source: {},
       },
       {
         strictMode: false,
