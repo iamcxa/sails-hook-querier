@@ -62,7 +62,7 @@ describe('about QueryHelper select operation.', () => {
       .useSearchable({
         name: 'like',
       })
-      .usePresenter((data) => ({
+      .usePresenter(async (data) => ({
         name: data.name,
         Users: data.Users,
         formating: true,

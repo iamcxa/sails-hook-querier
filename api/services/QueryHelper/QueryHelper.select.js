@@ -1,3 +1,4 @@
+/* eslint no-await-in-loop: 0 */
 import _ from 'lodash';
 
 function formatOperator(operator) {
@@ -207,14 +208,22 @@ function formatQuery({
   }
 }
 
-function formatOutput({
+async function formatOutput({
   presenter = null,
   data = null,
 }) {
   try {
-    return !_.isNil(presenter) && _.isFunction(presenter)
-      ? presenter(data)
-      : data;
+    let result;
+    if (!_.isNil(presenter) && _.isFunction(presenter)) {
+      if (presenter.constructor.name === 'AsyncFunction') {
+        result = await presenter(data);
+      } else {
+        result = presenter(data);
+      }
+    } else {
+      result = data;
+    }
+    return result;
   } catch (e) {
     sails.log.error(e);
     throw e;
@@ -282,11 +291,14 @@ async function find(
       data = await model.findAndCountAll(query);
     }
 
-    const items = data.rows.map((e) =>
-      formatOutput({
+    const items = [];
+    for (const row of data.rows) {
+      items.push(await formatOutput({
         presenter,
-        data: e ? e.toJSON() : null,
+        data: row,
       }));
+    }
+
     const total = typeof data.count === 'number' ? data.count : data.count.length;
     return {
       paging: {
