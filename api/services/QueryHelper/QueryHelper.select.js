@@ -254,16 +254,10 @@ async function find(
   } = {},
 ) {
   try {
-    const inputHasNull = ValidatorHelper.checkNull({
-      model,
-    });
-    if (inputHasNull) {
-      throw Error(
-        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({
-          inputHasNull,
-        }),
-      );
+    if (!model || !model.name) {
+      throw Error('model missing.');
     }
+
     const query = formatQuery({
       searchable,
       attributes,
