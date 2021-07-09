@@ -39,21 +39,21 @@ function formatCondition(condition) {
 }
 
 function formatQuery({
-  attributes,
-  model,
-  filter,
-  include,
-  collate,
-  searchable,
+  attributes = [],
+  model = undefined,
+  filter = {},
+  include = [],
+  collate = undefined,
+  searchable = undefined,
   duplicating = false,
   paging = true,
   curPage = 1,
   perPage = 30,
   sort = 'DESC',
-  sortBy,
-  order,
-  group,
-  limit,
+  sortBy = undefined,
+  order = undefined,
+  group = undefined,
+  limit = undefined,
   log = false,
 }) {
   let sortByColumn = null;
@@ -232,21 +232,21 @@ async function formatOutput({
 
 async function find(
   {
-    model,
-    scope,
-    include,
-    attributes,
-    searchable,
-    presenter,
+    model = undefined,
+    scope = [],
+    include = [],
+    attributes = [],
+    searchable = undefined,
+    presenter = undefined,
     filter = {
       where: {},
     },
     sort = 'DESC',
-    sortBy,
-    order,
-    collate,
-    group,
-    limit,
+    sortBy = undefined,
+    order = undefined,
+    collate = undefined,
+    group = undefined,
+    limit = undefined,
     log = false,
     paging = true,
     curPage = 1,
@@ -315,7 +315,7 @@ async function find(
   }
 }
 
-class Chain {
+class Query {
   constructor() {
     this.data = {
       attributes: [],
@@ -332,13 +332,16 @@ class Chain {
     };
   }
 
+  /**
+   * @param {object} model - 要進行查詢的 Sequelize models
+   */
   select(model) {
     this.data.model = model;
     return this;
   }
 
   /**
-   * @param {array} include models
+   * @param {Array} models - 要 include 的 Sequelize models array
    */
   useInclude(models) {
     if (Array.isArray(models)) {
@@ -348,7 +351,7 @@ class Chain {
   }
 
   /**
-   * @param {string|array} scope
+   * @param {string|Array} scope - 要使用的 scope name 或 name array
    */
   useScope(scope) {
     if (typeof scope === 'string') {
@@ -360,10 +363,10 @@ class Chain {
   }
 
   /**
-   * @param {string|object} 字串為 operator, defaultCondition 為 and
-   * @param {string} operator
-   * @param {string} condition
-   * @param {string} defaultValue - 搜尋數值未填入時的預設搜尋內容
+   * @param {string|object} searchable - 只有 string 時為 Sequelize operator 且預設 condition 為 and
+   * @param {string} searchable.operator - Sequelize operator, 支援 <>, =, like
+   * @param {string} searchable.condition - Sequelize condition, 支援 and, or
+   * @param {string} searchable.defaultValue - 搜尋數值未填入時的預設搜尋內容
    */
   useSearchable(searchable) {
     this.data.searchable = {
@@ -374,7 +377,7 @@ class Chain {
   }
 
   /**
-   * @param {array} attributes
+   * @param {Array} attributes - 查詢時所需的 attributes
    */
   useAttribute(attributes) {
     if (Array.isArray(attributes)) {
@@ -384,7 +387,10 @@ class Chain {
   }
 
   /**
-   * @param {function(request: object)} request 為傳入內容
+   * @param {object|function(request: object)} parameter -
+   * where 查詢內容 object,
+   * 傳入 function 時, function 會傳入 useRequest 所儲存的結果,
+   * useWhere 的查詢在未使用 useSearchable 時預設 operator 為 like
    */
   useWhere(parameter) {
     this.data.useWhere.push(parameter);
@@ -392,13 +398,18 @@ class Chain {
   }
 
   /**
-   * @param {object} where 查詢內容
+   * @param {object} parameter -
+   * 原始 where 查詢 object, 使用後將忽略 useWhere() 的功能
    */
   useRawWhere(parameter) {
     this.data.useRawWhere.push(parameter);
     return this;
   }
 
+  /**
+   * @param {object} request -
+   * 傳入 req.validate 驗證過後的 request 內容供 useWhere() 使用
+   */
   useRequest(request) {
     this.data.request = {
       ...this.data.request,
@@ -426,7 +437,7 @@ class Chain {
   }
 
   /**
-   * @param {function} presenter
+   * @param {function} presenter - 用於 formating 查詢輸出的結果
    */
   usePresenter(presenter) {
     if (typeof presenter === 'function') {
@@ -435,32 +446,38 @@ class Chain {
     return this;
   }
 
-  useFullTextSearch(request) {
-    if (typeof request['%keyword%'] === 'string') {
-      this.data['%keyword%'] = request['%keyword%'];
+  /**
+   * @param {string} keyword - 全文檢索查詢用關鍵字
+   */
+  useFullTextSearch(keyword) {
+    if (typeof keyword === 'string') {
+      // FIXME: keyword 查詢未實作
+      this.data.keyword = keyword;
     }
     return this;
   }
 
   /**
-   * @param {number} curPage - 當前頁面位置
-   * @param {number} perPage - 每頁結果數量
-   * @param {string} sort - 排序方法
-   * @param {string} sortBy - 排序欄位
-   * @param {object} order - 其他排序
-   * @param {string} collate - 語系
-   * @param {number} limit - 搜尋數量上限
-   * @return {object}
-   * @property {array} items - 搜尋結果
-   * @property {object} paging - 分頁設定
-   * @property {number} paging.lastPage - 最後一頁位置
-   * @property {number} paging.curPage - 當前頁面位置
-   * @property {number} paging.perPage - 每頁結果數量
-   * @property {string} paging.sort - 排序方法
-   * @property {string} paging.sortBy - 排序欄位
-   * @property {object} paging.order - 其他排序
-   * @property {number} paging.limit - 搜尋數量上限
-   * @property {number} paging.total - 總搜尋數量
+   * @param {object} query - 查詢用 object
+   * @param {number} [query.curPage=1] - 當前頁面位置
+   * @param {number} [query.perPage=30] - 每頁結果數量
+   * @param {string} [query.sort='DESC'] - 排序方法
+   * @param {string} query.sortBy - 排序欄位
+   * @param {object} query.order - 其他排序
+   * @param {Array} query.group - 分組
+   * @param {string} query.collate - 語系
+   * @param {number} query.limit - 搜尋數量上限
+   * @return {object} result - 回傳結果
+   * @property {Array} result.items - 搜尋結果
+   * @property {object} result.paging - 分頁設定
+   * @property {number} result.paging.lastPage - 最後一頁位置
+   * @property {number} result.paging.curPage - 當前頁面位置
+   * @property {number} result.paging.perPage - 每頁結果數量
+   * @property {string} result.paging.sort - 排序方法
+   * @property {string} result.paging.sortBy - 排序欄位
+   * @property {object} result.paging.order - 其他排序
+   * @property {number} result.paging.limit - 搜尋數量上限
+   * @property {number} result.paging.total - 總搜尋數量
    */
   getPaging({
     curPage = 1,
@@ -513,22 +530,24 @@ class Chain {
   }
 
   /**
-   * @param {string} sort - 排序方法
-   * @param {string} sortBy - 排序欄位
-   * @param {object} order - 其他排序
-   * @param {string} collate - 語系
-   * @param {number} limit - 搜尋數量上限
-   * @return {object}
-   * @property {array} items - 搜尋結果
-   * @property {object} paging - 分頁設定
-   * @property {number} paging.lastPage - 最後一頁位置
-   * @property {number} paging.curPage - 當前頁面位置
-   * @property {number} paging.perPage - 每頁結果數量
-   * @property {string} paging.sort - 排序方法
-   * @property {string} paging.sortBy - 排序欄位
-   * @property {object} paging.order - 其他排序
-   * @property {number} paging.limit - 搜尋數量上限
-   * @property {number} paging.total - 總搜尋數量
+   * @param {object} query - 查詢用 object
+   * @param {string} [query.sort='DESC'] - 排序方法
+   * @param {string} query.sortBy - 排序欄位
+   * @param {object} query.order - 其他排序
+   * @param {Array} query.group - 分組
+   * @param {string} query.collate - 語系
+   * @param {number} query.limit - 搜尋數量上限
+   * @return {object} result - 回傳結果
+   * @property {Array} result.items - 搜尋結果
+   * @property {object} result.paging - 分頁設定
+   * @property {number} result.paging.lastPage - 最後一頁位置
+   * @property {number} result.paging.curPage - 當前頁面位置
+   * @property {number} result.paging.perPage - 每頁結果數量
+   * @property {string} result.paging.sort - 排序方法
+   * @property {string} result.paging.sortBy - 排序欄位
+   * @property {object} result.paging.order - 其他排序
+   * @property {number} result.paging.limit - 搜尋數量上限
+   * @property {number} result.paging.total - 總搜尋數量
    */
   findAll({
     sort = 'DESC',
@@ -573,6 +592,14 @@ class Chain {
   }
 }
 
+/**
+ * 將回傳 class Query 並呼叫 Query.select(model)
+ * @param {model} model - 要進行查詢的 Sequelize models
+ */
 export default function select(model) {
-  return new Chain().select(model);
+  return new Query().select(model);
 }
+
+export {
+  Query,
+};
