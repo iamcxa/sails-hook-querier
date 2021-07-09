@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">QueryHelper/QueryHelper.select.js | sails-hook-sequelize-querier</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Hook to add powerful customize sequelize querier for sails application"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="sails-hook-sequelize-querier"><meta property="twitter:description" content="Hook to add powerful customize sequelize querier for sails application"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/iamcxa/sails-hook-querier"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/QueryHelper/QueryHelper.select.js~Query.html">Query</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-create">create</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-destroy">destroy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatFieldQueryWithOrCondition">formatFieldQueryWithOrCondition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatInput">formatInput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatOutput">formatOutput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matchFormat">matchFormat</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetail">getDetail</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-buildEmptyModel">buildEmptyModel</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAssociations">getAssociations</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEnumValues">getEnumValues</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelByObject">getIncludeModelByObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIncludeModelColumns">getIncludeModelColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelByName">getModelByName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelColumnType">getModelColumnType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelColumns">getModelColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelOutputColumns">getModelOutputColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModelSearchableColumns">getModelSearchableColumns</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isCommonField">isCommonField</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNumeric">isNumeric</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelAssociationsToArray">modelAssociationsToArray</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validate">validate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-select">select</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-update">update</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-findBy">findBy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatQuery">formatQuery</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetailPageFieldWithAssociations">getDetailPageFieldWithAssociations</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getIndexPageTableAndFilters">getIndexPageTableAndFilters</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-TAG">TAG</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-commonFields">commonFields</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isDate">isDate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-langCode">langCode</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">QueryHelper/QueryHelper.select.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* eslint no-await-in-loop: 0 */
+import _ from &apos;lodash&apos;;
+
+function formatOperator(operator) {
+  const { Op } = Sequelize;
+  let op;
+  switch (operator) {
+    case &apos;&lt;&gt;&apos;:
+      op = Op.ne;
+      break;
+    case &apos;=&apos;:
+      op = Op.eq;
+      break;
+    case &apos;like&apos;:
+      op = Op.like;
+      break;
+    default:
+      throw Error(&apos;this operator not supported.&apos;);
+  }
+
+  return op;
+}
+
+function formatCondition(condition) {
+  const { Op } = Sequelize;
+  let cond;
+  switch (condition) {
+    case &apos;and&apos;:
+      cond = Op.and;
+      break;
+    case &apos;or&apos;:
+      cond = Op.or;
+      break;
+    default:
+      throw Error(&apos;this condition not supported.&apos;);
+  }
+
+  return cond;
+}
+
+function formatQuery({
+  attributes = [],
+  model = undefined,
+  filter = {},
+  include = [],
+  collate = undefined,
+  searchable = undefined,
+  duplicating = false,
+  paging = true,
+  curPage = 1,
+  perPage = 30,
+  sort = &apos;DESC&apos;,
+  sortBy = undefined,
+  order = undefined,
+  group = undefined,
+  limit = undefined,
+  log = false,
+}) {
+  let sortByColumn = null;
+  try {
+    let mOrder = order;
+    const columns = _.keys(model.rawAttributes);
+
+    if (sortBy) {
+      sortByColumn = sortBy;
+    } else if (columns.some((c) =&gt; c === &apos;createdAt&apos;)) {
+      sortByColumn = &apos;createdAt&apos;;
+    } else if (columns.some((c) =&gt; c === &apos;id&apos;)) {
+      sortByColumn = &apos;id&apos;;
+    }
+
+    if (sortByColumn &amp;&amp; !mOrder) {
+      mOrder = [[Sequelize.col(sortByColumn), sort]];
+    }
+
+    // &#x7D44;&#x5408;&#x641C;&#x5C0B; query
+    const query = {
+      where: {},
+      order: mOrder,
+      collate,
+      duplicating,
+      ...paging ? {
+        limit: limit &amp;&amp; limit &gt; perPage ? perPage : limit,
+        offset: (curPage - 1) * perPage,
+      } : {
+        ...limit ? { limit } : {},
+      },
+    };
+
+    if (include &amp;&amp; _.isArray(include)) {
+      query.include = [];
+      include.forEach((e) =&gt; {
+        const inc = {
+          model: e.model,
+        };
+        if (e.as) {
+          inc.as = e.as;
+        }
+        if (e.limit) {
+          inc.limit = e.limit;
+        }
+        if (e.where) {
+          inc.where = e.where;
+        }
+        if (e.include) {
+          inc.include = e.include;
+        }
+        if (e.through) {
+          inc.through = e.through;
+        }
+        if (e.required) {
+          inc.required = e.required;
+        }
+        if (e.attributes) {
+          inc.attributes = e.attributes;
+        }
+        query.include.push(inc);
+      });
+    }
+
+    if (attributes) {
+      query.attributes = attributes;
+    }
+
+    // &#x5982;&#x679C;&#x6709;&#x6307;&#x5B9A;&#x5B8C;&#x5168;&#x7B26;&#x5408;&#x6B04;&#x4F4D;
+    if (filter.where) {
+      const defaultCondition = formatCondition(&apos;and&apos;);
+      if (!searchable) {
+        _.forEach(filter.where, (value, key) =&gt; {
+          const op = formatOperator(&apos;like&apos;);
+          query.where[defaultCondition].push({
+            [key]: {
+              [op]: filter.where[key],
+            },
+          });
+        });
+      } else {
+        // &#x7D44;&#x5408; searchable
+        _.forEach(searchable, (value, key) =&gt; {
+          if (log &amp;&amp; !filter.where[key]) {
+            sails.log(`searchable[${key}] is exists but request[${key}] missing.`);
+          }
+
+          if (_.isString(value) &amp;&amp; filter.where[key]) {
+            if (!query.where[defaultCondition]) {
+              query.where[defaultCondition] = [];
+            }
+
+            const op = formatOperator(value);
+            query.where[defaultCondition].push({
+              [key]: {
+                [op]: filter.where[key],
+              },
+            });
+          } else if (_.isObject(value)) {
+            const {
+              operator,
+              condition,
+              defaultValue,
+            } = value;
+
+            const op = formatOperator(operator);
+            const cond = formatCondition(condition);
+
+            if (!query.where[cond]) {
+              query.where[cond] = [];
+            }
+
+            query.where[cond].push({
+              [key]: {
+                [op]: filter.where[key] ? filter.where[key] : defaultValue,
+              },
+            });
+          }
+        });
+
+        _.forEach(filter.where, (value, key) =&gt; {
+          if (Object.keys(searchable).indexOf(key) === -1) {
+            const op = formatOperator(&apos;like&apos;);
+            query.where[defaultCondition].push({
+              [key]: {
+                [op]: value,
+              },
+            });
+          }
+        });
+      }
+    }
+
+    if (log) {
+      if (_.isObject(log)) {
+        query.logging = log;
+      }
+      query.logging = Console.log;
+    }
+
+    if (_.isNil(group) &amp;&amp; include) {
+      query.group = [`${model.name}.id`];
+    } else if (!_.isNil(group) &amp;&amp; group !== false) {
+      query.group = group;
+    }
+    // Console.log(&apos;query=&gt;&apos;);
+    // Console.dir(query);
+    return query;
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+async function formatOutput({
+  presenter = null,
+  data = null,
+}) {
+  try {
+    let result;
+    if (!_.isNil(presenter) &amp;&amp; _.isFunction(presenter)) {
+      if (presenter.constructor.name === &apos;AsyncFunction&apos;) {
+        result = await presenter(data);
+      } else {
+        result = presenter(data);
+      }
+    } else {
+      result = data;
+    }
+    return result;
+  } catch (e) {
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+async function find(
+  {
+    model = undefined,
+    scope = [],
+    include = [],
+    attributes = [],
+    searchable = undefined,
+    presenter = undefined,
+    filter = {
+      where: {},
+    },
+    sort = &apos;DESC&apos;,
+    sortBy = undefined,
+    order = undefined,
+    collate = undefined,
+    group = undefined,
+    limit = undefined,
+    log = false,
+    paging = true,
+    curPage = 1,
+    perPage = 30,
+  } = {},
+) {
+  try {
+    if (!model || !model.name) {
+      throw Error(&apos;model missing.&apos;);
+    }
+
+    const query = formatQuery({
+      searchable,
+      attributes,
+      curPage,
+      perPage,
+      filter,
+      sort,
+      sortBy,
+      order,
+      collate,
+      model,
+      include,
+      log,
+      group,
+      limit,
+    });
+    if (log) {
+      sails.log.debug(&apos;query=&gt;&apos;);
+      Console.dir(query);
+    }
+    let data = null;
+    if (scope) {
+      data = await model.scope(scope).findAndCountAll(query);
+    } else {
+      data = await model.findAndCountAll(query);
+    }
+
+    const items = [];
+    for (const row of data.rows) {
+      items.push(await formatOutput({
+        presenter,
+        data: row,
+      }));
+    }
+
+    const total = typeof data.count === &apos;number&apos; ? data.count : data.count.length;
+    return {
+      paging: {
+        lastPage: paging ? Math.ceil(total / perPage) || 1 : null,
+        curPage: paging ? curPage : null,
+        perPage: paging ? perPage : null,
+        sort: sort.toUpperCase(),
+        sortBy: sortBy ? sortBy.toLowerCase() : sortBy,
+        order,
+        limit: limit || null,
+        total,
+      },
+      filter,
+      items,
+    };
+  } catch (e) {
+    // Console.timeEnd(tag);
+    sails.log.error(e);
+    throw e;
+  }
+}
+
+class Query {
+  constructor() {
+    this.data = {
+      attributes: [],
+      model: null,
+      scope: [],
+      include: [],
+      where: {},
+      request: {},
+      presenter: null,
+      searchable: null,
+      keyword: null,
+      useWhere: [],
+      useRawWhere: null,
+    };
+  }
+
+  /**
+   * @param {object} model - &#x8981;&#x9032;&#x884C;&#x67E5;&#x8A62;&#x7684; Sequelize models
+   */
+  select(model) {
+    this.data.model = model;
+    return this;
+  }
+
+  /**
+   * @param {Array} models - &#x8981; include &#x7684; Sequelize models array
+   */
+  useInclude(models) {
+    if (Array.isArray(models)) {
+      this.data.include = this.data.include.concat(models);
+    }
+    return this;
+  }
+
+  /**
+   * @param {string|Array} scope - &#x8981;&#x4F7F;&#x7528;&#x7684; scope name &#x6216; name array
+   */
+  useScope(scope) {
+    if (typeof scope === &apos;string&apos;) {
+      this.data.scope.push(scope);
+    } else if (Array.isArray(scope)) {
+      this.data.scope = this.data.scope.concat(scope);
+    }
+    return this;
+  }
+
+  /**
+   * @param {string|object} searchable - &#x53EA;&#x6709; string &#x6642;&#x70BA; Sequelize operator &#x4E14;&#x9810;&#x8A2D; condition &#x70BA; and
+   * @param {string} searchable.operator - Sequelize operator, &#x652F;&#x63F4; &lt;&gt;, =, like
+   * @param {string} searchable.condition - Sequelize condition, &#x652F;&#x63F4; and, or
+   * @param {string} searchable.defaultValue - &#x641C;&#x5C0B;&#x6578;&#x503C;&#x672A;&#x586B;&#x5165;&#x6642;&#x7684;&#x9810;&#x8A2D;&#x641C;&#x5C0B;&#x5167;&#x5BB9;
+   */
+  useSearchable(searchable) {
+    this.data.searchable = {
+      ...this.data.searchable ? this.data.searchable : {},
+      ...searchable,
+    };
+    return this;
+  }
+
+  /**
+   * @param {Array} attributes - &#x67E5;&#x8A62;&#x6642;&#x6240;&#x9700;&#x7684; attributes
+   */
+  useAttribute(attributes) {
+    if (Array.isArray(attributes)) {
+      this.data.attributes = this.data.attributes.concat(attributes);
+    }
+    return this;
+  }
+
+  /**
+   * @param {object|function(request: object)} parameter -
+   * where &#x67E5;&#x8A62;&#x5167;&#x5BB9; object,
+   * &#x50B3;&#x5165; function &#x6642;, function &#x6703;&#x50B3;&#x5165; useRequest &#x6240;&#x5132;&#x5B58;&#x7684;&#x7D50;&#x679C;,
+   * useWhere &#x7684;&#x67E5;&#x8A62;&#x5728;&#x672A;&#x4F7F;&#x7528; useSearchable &#x6642;&#x9810;&#x8A2D; operator &#x70BA; like
+   */
+  useWhere(parameter) {
+    this.data.useWhere.push(parameter);
+    return this;
+  }
+
+  /**
+   * @param {object} parameter -
+   * &#x539F;&#x59CB; where &#x67E5;&#x8A62; object, &#x4F7F;&#x7528;&#x5F8C;&#x5C07;&#x5FFD;&#x7565; useWhere() &#x7684;&#x529F;&#x80FD;
+   */
+  useRawWhere(parameter) {
+    this.data.useRawWhere.push(parameter);
+    return this;
+  }
+
+  /**
+   * @param {object} request -
+   * &#x50B3;&#x5165; req.validate &#x9A57;&#x8B49;&#x904E;&#x5F8C;&#x7684; request &#x5167;&#x5BB9;&#x4F9B; useWhere() &#x4F7F;&#x7528;
+   */
+  useRequest(request) {
+    this.data.request = {
+      ...this.data.request,
+      ...request,
+    };
+    return this;
+  }
+
+  useView(view) {
+    this.data.view = {
+      includeColumns: view.includeColumns,
+      excludeColumns: view.excludeColumns,
+    };
+    return this;
+  }
+
+  useCache(cache) {
+    this.data.cache = {
+      minutes: cache.minutes,
+      target: cache.target,
+      tableName: cache.tableName,
+      redisPath: cache.redisPath,
+    };
+    return this;
+  }
+
+  /**
+   * @param {function} presenter - &#x7528;&#x65BC; formating &#x67E5;&#x8A62;&#x8F38;&#x51FA;&#x7684;&#x7D50;&#x679C;
+   */
+  usePresenter(presenter) {
+    if (typeof presenter === &apos;function&apos;) {
+      this.data.presenter = presenter;
+    }
+    return this;
+  }
+
+  /**
+   * @param {string} keyword - &#x5168;&#x6587;&#x6AA2;&#x7D22;&#x67E5;&#x8A62;&#x7528;&#x95DC;&#x9375;&#x5B57;
+   */
+  useFullTextSearch(keyword) {
+    if (typeof keyword === &apos;string&apos;) {
+      // FIXME: keyword &#x67E5;&#x8A62;&#x672A;&#x5BE6;&#x4F5C;
+      this.data.keyword = keyword;
+    }
+    return this;
+  }
+
+  /**
+   * @param {object} query - &#x67E5;&#x8A62;&#x7528; object
+   * @param {number} [query.curPage=1] - &#x7576;&#x524D;&#x9801;&#x9762;&#x4F4D;&#x7F6E;
+   * @param {number} [query.perPage=30] - &#x6BCF;&#x9801;&#x7D50;&#x679C;&#x6578;&#x91CF;
+   * @param {string} [query.sort=&apos;DESC&apos;] - &#x6392;&#x5E8F;&#x65B9;&#x6CD5;
+   * @param {string} query.sortBy - &#x6392;&#x5E8F;&#x6B04;&#x4F4D;
+   * @param {object} query.order - &#x5176;&#x4ED6;&#x6392;&#x5E8F;
+   * @param {Array} query.group - &#x5206;&#x7D44;
+   * @param {string} query.collate - &#x8A9E;&#x7CFB;
+   * @param {number} query.limit - &#x641C;&#x5C0B;&#x6578;&#x91CF;&#x4E0A;&#x9650;
+   * @return {object} result - &#x56DE;&#x50B3;&#x7D50;&#x679C;
+   * @property {Array} result.items - &#x641C;&#x5C0B;&#x7D50;&#x679C;
+   * @property {object} result.paging - &#x5206;&#x9801;&#x8A2D;&#x5B9A;
+   * @property {number} result.paging.lastPage - &#x6700;&#x5F8C;&#x4E00;&#x9801;&#x4F4D;&#x7F6E;
+   * @property {number} result.paging.curPage - &#x7576;&#x524D;&#x9801;&#x9762;&#x4F4D;&#x7F6E;
+   * @property {number} result.paging.perPage - &#x6BCF;&#x9801;&#x7D50;&#x679C;&#x6578;&#x91CF;
+   * @property {string} result.paging.sort - &#x6392;&#x5E8F;&#x65B9;&#x6CD5;
+   * @property {string} result.paging.sortBy - &#x6392;&#x5E8F;&#x6B04;&#x4F4D;
+   * @property {object} result.paging.order - &#x5176;&#x4ED6;&#x6392;&#x5E8F;
+   * @property {number} result.paging.limit - &#x641C;&#x5C0B;&#x6578;&#x91CF;&#x4E0A;&#x9650;
+   * @property {number} result.paging.total - &#x7E3D;&#x641C;&#x5C0B;&#x6578;&#x91CF;
+   */
+  getPaging({
+    curPage = 1,
+    perPage = 30,
+    sort = &apos;DESC&apos;,
+    sortBy,
+    order,
+    group,
+    collate,
+    limit,
+  }) {
+    for (const parameter of this.data.useWhere) {
+      let where = {};
+      if (typeof parameter === &apos;object&apos;) {
+        where = parameter;
+      } else if (typeof parameter === &apos;function&apos;) {
+        where = parameter(this.data.request);
+      }
+
+      this.data.where = {
+        ...this.data.where,
+        ...where,
+      };
+    }
+
+    if (this.data.useRawWhere) {
+      this.data.where = this.data.useRawWhere;
+    }
+
+    return find({
+      model: this.data.model,
+      scope: this.data.scope,
+      include: this.data.include,
+      attributes: this.data.attributes,
+      searchable: this.data.searchable,
+      presenter: this.data.presenter,
+      filter: {
+        where: this.data.where,
+      },
+      curPage,
+      perPage,
+      paging: true,
+      sort,
+      sortBy,
+      order,
+      group,
+      collate,
+      limit,
+    });
+  }
+
+  /**
+   * @param {object} query - &#x67E5;&#x8A62;&#x7528; object
+   * @param {string} [query.sort=&apos;DESC&apos;] - &#x6392;&#x5E8F;&#x65B9;&#x6CD5;
+   * @param {string} query.sortBy - &#x6392;&#x5E8F;&#x6B04;&#x4F4D;
+   * @param {object} query.order - &#x5176;&#x4ED6;&#x6392;&#x5E8F;
+   * @param {Array} query.group - &#x5206;&#x7D44;
+   * @param {string} query.collate - &#x8A9E;&#x7CFB;
+   * @param {number} query.limit - &#x641C;&#x5C0B;&#x6578;&#x91CF;&#x4E0A;&#x9650;
+   * @return {object} result - &#x56DE;&#x50B3;&#x7D50;&#x679C;
+   * @property {Array} result.items - &#x641C;&#x5C0B;&#x7D50;&#x679C;
+   * @property {object} result.paging - &#x5206;&#x9801;&#x8A2D;&#x5B9A;
+   * @property {number} result.paging.lastPage - &#x6700;&#x5F8C;&#x4E00;&#x9801;&#x4F4D;&#x7F6E;
+   * @property {number} result.paging.curPage - &#x7576;&#x524D;&#x9801;&#x9762;&#x4F4D;&#x7F6E;
+   * @property {number} result.paging.perPage - &#x6BCF;&#x9801;&#x7D50;&#x679C;&#x6578;&#x91CF;
+   * @property {string} result.paging.sort - &#x6392;&#x5E8F;&#x65B9;&#x6CD5;
+   * @property {string} result.paging.sortBy - &#x6392;&#x5E8F;&#x6B04;&#x4F4D;
+   * @property {object} result.paging.order - &#x5176;&#x4ED6;&#x6392;&#x5E8F;
+   * @property {number} result.paging.limit - &#x641C;&#x5C0B;&#x6578;&#x91CF;&#x4E0A;&#x9650;
+   * @property {number} result.paging.total - &#x7E3D;&#x641C;&#x5C0B;&#x6578;&#x91CF;
+   */
+  findAll({
+    sort = &apos;DESC&apos;,
+    sortBy,
+    order,
+    group,
+    collate,
+    limit,
+  }) {
+    for (const parameter of this.data.useWhere) {
+      let where = {};
+      if (typeof parameter === &apos;object&apos;) {
+        where = parameter;
+      } else if (typeof parameter === &apos;function&apos;) {
+        where = parameter(this.data.request);
+      }
+
+      this.data.where = {
+        ...this.data.where,
+        ...where,
+      };
+    }
+
+    return find({
+      model: this.data.model,
+      scope: this.data.scope,
+      include: this.data.include,
+      attributes: this.data.attributes,
+      searchable: this.data.searchable,
+      presenter: this.data.presenter,
+      filter: {
+        where: this.data.where,
+      },
+      paging: false,
+      sort,
+      sortBy,
+      order,
+      group,
+      collate,
+      limit,
+    });
+  }
+}
+
+/**
+ * &#x5C07;&#x56DE;&#x50B3; class Query &#x4E26;&#x547C;&#x53EB; Query.select(model)
+ * @param {model} model - &#x8981;&#x9032;&#x884C;&#x67E5;&#x8A62;&#x7684; Sequelize models
+ */
+export default function select(model) {
+  return new Query().select(model);
+}
+
+export {
+  Query,
+};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -29,7 +29,8 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-create">create</a></span></span></li>
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/QueryHelper/QueryHelper.select.js~Query.html">Query</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-create">create</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-destroy">destroy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatFieldQueryWithOrCondition">formatFieldQueryWithOrCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatInput">formatInput</a></span></span></li>
@@ -50,6 +51,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNumeric">isNumeric</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelAssociationsToArray">modelAssociationsToArray</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validate">validate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-select">select</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-update">update</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-findBy">findBy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatQuery">formatQuery</a></span></span></li>
@@ -79,6 +81,7 @@
  *     readonly{Array} = [],     &#x8981;&#x88AB;&#x8A2D;&#x5B9A;&#x70BA; readonly &#x7684;&#x6B04;&#x4F4D;&#x540D;&#x7A31;&#x3002;
  *     format{Object} = null,     &#x9810;&#x5148;&#x5B9A;&#x7FA9;&#x7684;&#x8CC7;&#x6599;&#x683C;&#x5F0F;&#x3002;
  *     formatCb{Function} = null, &#x6700;&#x5F8C;&#x8F38;&#x51FA;&#x524D;&#x518D;&#x6B21;&#x683C;&#x5F0F;&#x5316;&#x8CC7;&#x6599;&#x7684; callback&#x3002;
+ *     raw = false,               &#x662F;&#x5426;&#x8F38;&#x51FA;&#x6210; JSON&#x3002;
  *   }
  * @example &#x4F9D;&#x64DA; Parent ID &#x67E5;&#x8A62; User &#x8207; Parent&#xFF0C;&#x540C;&#x6642;&#x5305;&#x542B; Student&#x3002;
  * QueryHelper.getDetail({
@@ -130,6 +133,7 @@
  *      },
  *      fields,
  *    }),
+ *    raw: true,
  *  });
  * @returns {Object} &#x5C6C;&#x65BC;&#x67D0;&#x500B; ID &#x7684;&#x8CC7;&#x6599;&#x3002;
  */
@@ -177,6 +181,7 @@ export default async function getDetail(
     // &#x7D44;&#x5408;&#x67E5;&#x8A62; Query
     const query = {
       raw,
+      nest: raw,
     };
     if (where) {
       query.where = where;
@@ -184,7 +189,7 @@ export default async function getDetail(
     if (include &amp;&amp; _.isArray(include)) {
       query.include = [];
       include.forEach((e) =&gt; {
-        if (!e.model &amp;&amp; !e.modelName) {
+        if (!e.name &amp;&amp; !e.model &amp;&amp; !e.modelName) {
           throw Error(
             MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({
               field: &apos;include&apos;,
@@ -193,7 +198,15 @@ export default async function getDetail(
             }),
           );
         }
-        const thisModelName = e.model ? e.model.name : e.modelName;
+        let thisModelName;
+        if (e.name) {
+          thisModelName = e.name;
+        } else if (e.model &amp;&amp; e.model.name) {
+          thisModelName = e.model.name;
+        } else if (e.modelName) {
+          thisModelName = e.modelName;
+        }
+
         const arr = this.getModelOutputColumns({
           modelName: thisModelName,
           as: e.as,
@@ -206,8 +219,18 @@ export default async function getDetail(
           readonly,
         });
         fields = fields.concat(arr);
+
+        let thisModel;
+        if (e.name) {
+          thisModel = e;
+        } else if (e.model &amp;&amp; e.model.name) {
+          thisModel = e.model;
+        } else if (e.modelName) {
+          thisModel = this.getModelByName(e.modelName);
+        }
+
         const inc = {
-          model: e.model ? e.model : this.getModelByName(e.modelName),
+          model: thisModel,
         };
         if (e.as) {
           inc.as = e.as;
@@ -333,7 +356,7 @@ export default async function getDetail(
       fields,
       required,
       readonly,
-      data: data ? data.toJSON() : data,
+      data,
       extra,
       view,
     });

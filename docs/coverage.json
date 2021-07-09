@@ -1,7 +1,7 @@
 {
-  "coverage": "50%",
-  "expectCount": 32,
-  "actualCount": 16,
+  "coverage": "52.72%",
+  "expectCount": 55,
+  "actualCount": 29,
   "files": {
     "QueryHelper/QueryHelper.create.js": {
       "expectCount": 1,
@@ -24,24 +24,40 @@
       "expectCount": 1,
       "actualCount": 0,
       "undocumentLines": [
-        72
+        74
       ]
     },
     "QueryHelper/QueryHelper.js": {
       "expectCount": 20,
       "actualCount": 9,
       "undocumentLines": [
-        19,
-        21,
-        36,
-        71,
-        98,
-        593,
-        25,
+        20,
+        22,
+        37,
+        72,
+        99,
+        594,
         26,
-        18,
         27,
-        28
+        19,
+        28,
+        29
+      ]
+    },
+    "QueryHelper/QueryHelper.select.js": {
+      "expectCount": 23,
+      "actualCount": 13,
+      "undocumentLines": [
+        4,
+        24,
+        41,
+        211,
+        233,
+        318,
+        319,
+        320,
+        421,
+        429
       ]
     },
     "QueryHelper/QueryHelper.update.js": {

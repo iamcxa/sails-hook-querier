@@ -569,7 +569,7 @@
     "name": "QueryHelper/QueryHelper.create.js",
     "content": "/**\n * @module QueryHelper.create\n *\n * 依據給予的資料建立\n * @version 1.0\n * @param Required {Object} {\n *     langCode{String} = 'zh-TW',   要新增的資料語系。\n *     modelName{String} = null,     要新增的目標 Sequelize Model 名稱。\n *     include{Object|Array} = null, 額外給予的 Sequelize include Query。\n *     input{Object} = null,         要新增的原始資料。\n *   }\n * @param Optional {Object} {\n *     format{Object} = null,        原始資料的格式化樣板。\n *     formatCb{Object} = null,      原始資料的格式化 callback。\n *   }\n * @example 依據 input 建立一筆 User 的新資料，並且包含建立 Parent 與 Passport，同時附有建立資料前的 formatCb。\n * QueryHelper.create({\n *    modelName: 'User',\n *    include: [Parent, Passport],\n *    input: rawData,\n *  }, {\n *    format,\n *    formatCb: e => ({\n *      ...e,\n *     username: rawData.Parent.idNumber,\n *    }),\n * });\n * @returns {Object} created item\n */\n\nexport default async function create(\n  {\n    langCode = this.langCode,\n    modelName = undefined,\n    include = undefined,\n    input = undefined,\n  } = {},\n  { toJSON = undefined, format = undefined, formatCb = undefined } = {},\n) {\n  try {\n    const { error, value } = this.validate({\n      value: {\n        langCode,\n        modelName,\n        include,\n        input,\n        format,\n        formatCb,\n        toJSON,\n      },\n      schema: (j) => ({\n        modelName: j.string().required(),\n        input: j.object().required(),\n        langCode: j.string(),\n        include: j.array().items(j.any()),\n        format: j.array().items(j.string()).allow(null),\n        formatCb: j.func().allow(null),\n        toJSON: j.boolean(),\n      }),\n    });\n    if (error) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.PARAMETER_FORMAT_INVALID({\n          error,\n          value,\n        }),\n      );\n    }\n    const model = this.getModelByName(modelName);\n    if (langCode) {\n      // TODO: 語系篩選\n    }\n    // Console.log('modelName=>', modelName);\n    // Console.log('include=>', include);\n    // Console.log('input==============>');\n    // Console.dir(input);\n    // Console.log('source==============>');\n    // Console.dir(this.buildEmptyModel({\n    //   modelName,\n    // }));\n    if (!format) {\n      // eslint-disable-next-line\n      format = this.getModelColumns({\n        modelName,\n        modelPrefix: false,\n        include: include\n          ? this.getIncludeModelColumns({\n            modelName,\n            include,\n          }) : null,\n      });\n      Console.log('format==============>');\n      Console.dir(format);\n    }\n    const data = this.formatInput({\n      modelName,\n      format,\n      formatCb,\n      source: this.buildEmptyModel({\n        modelName,\n      }),\n      rawData: input,\n    });\n    Console.log('data==============>');\n    Console.dir(data);\n    // const cretaeBuild = await model.build(data, { include });\n    // Console.log('build==============>');\n    // Console.dir(cretaeBuild);\n    // const errors = await cretaeBuild.validate().catch((e) => {\n    //   Console.log(\"!!!!!!catch\");\n    //   Console.log(e);\n    //   throw e;\n    // });\n    // Console.log(errors);\n    // return await cretaeBuild.save();\n    const createdItem = await model.create(data, {\n      include,\n    });\n    if (!createdItem) {\n      throw Error('QueryHelper.Create.Failed.Null.Created.Item');\n    }\n    return toJSON\n      ? createdItem.get({\n        plain: true,\n      })\n      : createdItem;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n",
     "static": true,
-    "longname": "/Users/kent/Project/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.create.js",
+    "longname": "/home/rsghost/dev/cases/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.create.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
@@ -638,9 +638,9 @@
     "__docId__": 50,
     "kind": "file",
     "name": "QueryHelper/QueryHelper.destroy.js",
-    "content": "/**\n * 依據給予的 id array 刪除對象\n * @version 1.0\n * @param Required {Object} {\n *    modelName{String} = null,  要刪除的目標 Sequelize Model 名稱。\n *    ids{Array} = [],           要刪除的欄位 ID 陣列。\n * }\n * @example 刪除 User 表中，ID 為 1~4 的資料。\n * QueryHelper.destroy({\n *    modelName: 'User',\n *    ids: [1, 2, 3, 4],\n * });\n * // [1, 1, 1, 0]\n * @returns {Array} 包含是否完成的陣列\n */\n\nimport _ from 'lodash';\n\nexport default async function destroy({\n  modelName = null,\n  include = null,\n  force = false,\n  ids = [],\n}) {\n  try {\n    const inputHasNull = ValidatorHelper.checkNull({\n      modelName,\n      ids,\n    });\n    if (inputHasNull) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({\n          inputHasNull,\n        }),\n      );\n    }\n    if (!_.isArray(ids)) {\n      throw Error(MESSAGE.BAD_REQUEST.CHECK_INPUT_PARAMETER_TYPE('ids', Array));\n    }\n    const model = this.getModelByName(modelName);\n    const results = [];\n    /* eslint no-await-in-loop: 0 */\n    for (const id of ids) {\n      // delete associated model item with giving model id.\n      if (include) {\n        for (const includeModel of include) {\n          let includeModelName;\n\n          if (includeModel.model) {\n            includeModelName = includeModel.model.name;\n          } else if (includeModel.modelName) {\n            includeModelName = includeModel.modelName;\n          } else if (includeModel.name) {\n            includeModelName = includeModel.name;\n          }\n\n          const target = await model.findByPk(id);\n          const associatedId = target[_.upperFirst(includeModelName)].dataValues.id;\n\n          if (associatedId) {\n            const includedModelInstance = sails.models[includeModelName.toLowerCase()];\n            const deletedAssociatedModelId = await includedModelInstance.destroy({\n              where: {\n                id: associatedId,\n              },\n              force,\n            });\n            const message = `[!] Delete  \"${modelName}\"'s associated model \"${includeModelName}\" with id \"${associatedId}\" (?=${deletedAssociatedModelId})`;\n\n            if (deletedAssociatedModelId) {\n              sails.log.debug(`${message} success.`);\n            } else {\n              sails.log.debug(`${message} failed.`);\n            }\n          } else {\n            throw Error(`${modelName} has no associated with ${includeModel}.`);\n          }\n        }\n      }\n      const result = await model.destroy({\n        where: {\n          id,\n        },\n        force,\n      });\n      results.push({\n        success: Boolean(result),\n        id,\n      });\n    }\n    // Console.log('results=>', results);\n    return results;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n",
+    "content": "/**\n * 依據給予的 id array 刪除對象\n * @version 1.0\n * @param Required {Object} {\n *    modelName{String} = null,  要刪除的目標 Sequelize Model 名稱。\n *    ids{Array} = [],           要刪除的欄位 ID 陣列。\n * }\n * @example 刪除 User 表中，ID 為 1~4 的資料。\n * QueryHelper.destroy({\n *    modelName: 'User',\n *    ids: [1, 2, 3, 4],\n * });\n * // [1, 1, 1, 0]\n * @returns {Array} 包含是否完成的陣列\n */\n\nimport _ from 'lodash';\n\nexport default async function destroy({\n  modelName = null,\n  include = null,\n  force = false,\n  ids = [],\n}) {\n  try {\n    const inputHasNull = ValidatorHelper.checkNull({\n      modelName,\n      ids,\n    });\n    if (inputHasNull) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({\n          inputHasNull,\n        }),\n      );\n    }\n    if (!_.isArray(ids)) {\n      throw Error(MESSAGE.BAD_REQUEST.CHECK_INPUT_PARAMETER_TYPE('ids', Array));\n    }\n    const model = this.getModelByName(modelName);\n    const results = [];\n    /* eslint no-await-in-loop: 0 */\n    for (const id of ids) {\n      // delete associated model item with giving model id.\n      if (include) {\n        for (const includeModel of include) {\n          let includeModelName;\n\n          if (includeModel.model) {\n            includeModelName = includeModel.model.name;\n          } else if (includeModel.modelName) {\n            includeModelName = includeModel.modelName;\n          } else if (includeModel.name) {\n            includeModelName = includeModel.name;\n          }\n\n          const target = await model.findByPk(id);\n\n          let associatedId;\n          if (target[_.upperFirst(includeModelName)]\n            && target[_.upperFirst(includeModelName)].dataValues) {\n            associatedId = target[_.upperFirst(includeModelName)].dataValues.id;\n          } else if (sails.models[includeModelName.toLowerCase()]) {\n            const query = { where: {} };\n            query.where[`${_.upperFirst(modelName)}Id`] = id;\n            const item = await sails.models[includeModelName.toLowerCase()].findOne(query);\n            if (item && item.dataValues) {\n              associatedId = item.dataValues.id;\n            }\n          }\n\n          if (associatedId) {\n            const includedModelInstance = sails.models[includeModelName.toLowerCase()];\n            const deletedAssociatedModelId = await includedModelInstance.destroy({\n              where: {\n                id: associatedId,\n              },\n              force,\n            });\n            const message = `[!] Delete  \"${modelName}\"'s associated model \"${includeModelName}\" with id \"${associatedId}\" (?=${deletedAssociatedModelId})`;\n\n            if (deletedAssociatedModelId) {\n              sails.log.debug(`${message} success.`);\n            } else {\n              sails.log.debug(`${message} failed.`);\n            }\n          } else {\n            throw Error(`${modelName} has no associated with ${includeModel}.`);\n          }\n        }\n      }\n      const result = await model.destroy({\n        where: {\n          id,\n        },\n        force,\n      });\n      results.push({\n        success: Boolean(result),\n        id,\n      });\n    }\n    // Console.log('results=>', results);\n    return results;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n",
     "static": true,
-    "longname": "/Users/kent/Project/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.destroy.js",
+    "longname": "/home/rsghost/dev/cases/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.destroy.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
@@ -688,7 +688,7 @@
     "name": "QueryHelper/QueryHelper.format.js",
     "content": "import _ from 'lodash';\n\n/**\n * 依據輸入的 format 物件來格式化輸出，將 data 與 format 合併並保留 format 作為預設值。\n * @version 20180310\n * @example\n * QueryHelper.matchFormat({\n *    format: {\n *      updatedAt: '',\n *      createdAt: '',\n *      id: '',\n *      type: '',\n *      title: {\n *        'zh-TW': '',\n *        en: '',\n *      },\n *    },\n *    data,\n * });\n * // {\n * //  updatedAt: '03/29/2018',\n * //  createdAt: '03/29/2018',\n * //  id: 5,\n * //  type: 'ceu',\n * //  title: {\n * //    'zh-TW': '測試測試測試測試',\n * //    en: 'Test Test Test'\n * //  },\n * // }\n * @param Required {Object} {\n *     format{Object} = null,  預先定義的資料格式。\n *     data{Object} = null,    尚未處理過的輸入資料。\n *   }\n * @returns formated data\n * @see {@link https://lodash.com/docs/4.17.5#findKey}\n * @see {@link https://lodash.com/docs/4.17.5#hasIn}\n * @see {@link https://lodash.com/docs/4.17.5#has}\n */\nexport function matchFormat({ format = null, data = null }) {\n  try {\n    const body = { ...format };\n    for (const prop in format) {\n      if (typeof data[prop] !== 'undefined' && data[prop] !== null) {\n        if (_.has(data, prop)) {\n          body[prop] = data[prop];\n        } else if (_.hasIn(data, prop)) {\n          body[prop] = data[_.findKey(data, prop)][prop];\n        }\n      }\n    }\n    return body;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 依據定義好的欄位比對並同步輸入與目標物件。\n * @version 1.0\n * @param Required {Object} {\n *     modelName{String} = null,  目標 Sequelize Model 名稱。\n *     format{Object} = null,     預先定義的資料格式。\n *     formatCb{Function} = null, 最後輸出前再次格式化資料的 callback。\n *     rawData{Object} = null,    尚未處理過的輸入資料。\n *     source{Object} = null,     要被填入的空白資料欄位。\n *   }\n * @example\n * QueryHelper.formatInput({\n *    modelName,\n *    format,\n *    formatCb,\n *    source: QueryHelper.buildEmptyModel({\n *       modelName,\n *    }),\n *    rawData: input,\n * });\n * @returns {Object} 格式化過的輸入資料。\n * @see {@link https://lodash.com/docs/4.17.5#hasIn}\n * @see {@link https://lodash.com/docs/4.17.5#has}\n * @see {@link https://lodash.com/docs/4.17.5#set}\n */\nexport function formatInput({\n  // eslint-disable-next-line no-unused-vars\n  modelName = null,\n  format = null,\n  source = null,\n  rawData = null,\n  formatCb = null,\n}) {\n  try {\n    // 比對來源與目的物件是否有以下欄位\n    if (format) {\n      for (const path of format) {\n        // Console.log('path=>', path);\n        if (_.hasIn(rawData, path)) {\n          // Console.log('_.get(rawData, path)=>', _.get(rawData, path));\n          const value = _.get(rawData, path);\n          if (\n            _.isNil(value)\n            || (!this.isNumeric(value)\n              && _.isEmpty(value)\n              && !_.isBoolean(value)\n              && !_.isFunction(value))\n          ) {\n            _.set(source, path, null);\n          } else if (_.isString(value) && value.match(this.isDate) !== null) {\n            // 檢查輸入是否包含日期\n            try {\n              const valueAsDate = new Date(value);\n              _.set(source, path, valueAsDate);\n            } catch (e) {\n              sails.log.warn(\n                `[!] ${this.TAG}.formatInput: Parse Value \"${value}\" into Date type failed(${e}). this may not be an issue, will fallback to it origin String type value.`,\n              );\n              _.set(source, path, value);\n            }\n          } else if (value === 'Invalid date') {\n            _.set(source, path, null);\n          } else {\n            _.set(source, path, value);\n          }\n        }\n      }\n    }\n    const hasCb = !_.isNil(formatCb) && _.isFunction(formatCb);\n    return hasCb ? formatCb(source) : source;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 格式化來自 Sequelize Query 的輸出物件，並視輸入來輸出該 Model 的欄位定義給前端。\n * 如果有給予 fields，可以依據 required 與 readonly 參數，給予前端可以自動產生表格的資料。\n * @version 1.0\n * @param Required {Object} {\n *     format{Object} = null,     預先定義的資料格式。\n *     formatCb{Function} = null, 最後輸出前再次格式化資料的 callback。\n *     data{Object} = null,       來自 Sequelize Query 後的原始的輸出資料。\n *     fields{Object} = null,     預先定義的 Sequelize Model 欄位定義。\n *     required{Array} = [],     要被設定為 required 的欄位名稱。\n *     readonly{Array} = [],     要被設定為 readonly 的欄位名稱。\n *  }\n * @example\n * QueryHelper.formatOutput({\n *    format,\n *    formatCb,\n *    fields,\n *    required,\n *    readonly,\n *    data: data.toJSON(),\n *  });\n * @returns {Object} 格式化過的輸出資料與 Sequelize Model 欄位定義。\n */\nexport function formatOutput({\n  format = null,\n  formatCb = null,\n  data = null,\n  fields = null,\n  required = [],\n  readonly = [],\n  extra = null,\n  view = false,\n}) {\n  let result = {};\n  try {\n    // 格式化輸出\n    if (format) {\n      // 比對來源與目的物件是否有以下欄位\n      for (const path of format) {\n        if (_.hasIn(data, path)) {\n          const value = _.get(data, path);\n          if (_.isEmpty(value)) {\n            _.set(result, path, null);\n            // 檢查輸入是否包含日期\n          } else if (value.match(this.isDate) !== null) {\n            _.set(result, path, new Date(value));\n          } else {\n            _.set(result, path, value);\n          }\n        }\n      }\n    } else {\n      result = data;\n    }\n    // 檢查並輸出前端要顯示的欄位與類型\n    if (view && fields) {\n      result._fields = fields.map((field) => {\n        // 如果已經有 required 與 readonly 欄位則不修改\n        if (_.has(field, 'required') && _.has(field, 'readonly')) {\n          return field;\n        }\n        return {\n          ...field,\n          required: required ? required.some((r) => r === field) : false,\n          readonly: readonly ? readonly.some((r) => r === field) : false,\n        };\n      });\n    }\n    if (extra) {\n      result = {\n        ...result,\n        ...extra,\n      };\n    }\n    return !_.isNil(formatCb) && _.isFunction(formatCb)\n      ? formatCb(result)\n      : result;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 替 fields 加入 or 條件\n * @param {*} fields\n * @returns\n */\nexport function formatFieldQueryWithOrCondition(fields) {\n  try {\n    const fieldsOr = [];\n    const fieldsOrCommand = [];\n    fields.forEach((e) => {\n      if (!fieldsOr.find((x) => x === e.key)) {\n        fieldsOr.push(e.key);\n        fieldsOrCommand.push({\n          $or: [\n            {\n              key: e.key,\n              value: e.value,\n            },\n          ],\n        });\n      } else {\n        const i = fieldsOr.findIndex((x) => x === e.key);\n        fieldsOrCommand[i].$or.push({\n          key: e.key,\n          value: e.value,\n        });\n      }\n    });\n    return fieldsOrCommand;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n",
     "static": true,
-    "longname": "/Users/kent/Project/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.format.js",
+    "longname": "/home/rsghost/dev/cases/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.format.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
@@ -884,9 +884,9 @@
     "__docId__": 57,
     "kind": "file",
     "name": "QueryHelper/QueryHelper.getDetail.js",
-    "content": "/**\n * 依據 ID 取回詳細資料。\n * @version 1.0\n * @param Required {Object} {\n *     langCode{String} = 'zh-TW',      要查詢的資料語系。\n *     modelName{String} = null,        要查詢的目標 Sequelize Model 名稱。\n *     include{Object|Array} = null,    額外給予的 Sequelize Query-include 參數。\n *     where{Object} = null,            Sequelize Query-where 查詢。\n *     attributes{Object|Array} = null, 查詢時的 Sequelize Query-attributes 參數。\n *   }\n * @param Optional {Object} {\n *     required{Array} = [],     要被設定為 required 的欄位名稱。\n *     readonly{Array} = [],     要被設定為 readonly 的欄位名稱。\n *     format{Object} = null,     預先定義的資料格式。\n *     formatCb{Function} = null, 最後輸出前再次格式化資料的 callback。\n *   }\n * @example 依據 Parent ID 查詢 User 與 Parent，同時包含 Student。\n * QueryHelper.getDetail({\n *    modelName: 'User',\n *    where: { id: { $not: null } },\n *    attributes: [\n *      'id',\n *      'email',\n *      'nameTW',\n *      'nameEN',\n *    ],\n *    include: [{\n *      model: Parent,\n *      where: { id: parentId },\n *      attributes: {\n *        exclude: ['createdAt', 'updatedAt'],\n *      },\n *      include: [{\n *        model: Student,\n *        through: 'StudentParent',\n *        attributes: ['id', 'idNumber1', 'idNumber2'],\n *        include: [{\n *          model: User,\n *          attributes: ['id', 'email', 'nameTW', 'nameEN'],\n *        }],\n *      }],\n *    }],\n *  }, {\n *    required,\n *    readonly,\n *    format: null,\n *    formatCb: e => ({\n *      data: {\n *        ...e.data,\n *        Parent: {\n *          ..._.omit(e.data.Parent, ['Students']),\n *          Students: e.data.Parent.Students.map(s => ({\n *            ..._.omit(s, ['StudentParent']),\n *            relationship: s.StudentParent.relationship,\n *            comment: s.StudentParent.relationship,\n *          })),\n *          passportDuedate1:\n *            moment(e.data.Parent.passportDuedate1, 'YYYY/MM-DD').format('YYYY-MM-DD'),\n *          passportDuedate2:\n *            moment(e.data.Parent.passportDuedate2, 'YYYY/MM-DD').format('YYYY-MM-DD'),\n *          birthday:\n *            moment(e.data.Parent.birthday, 'YYYY/MM-DD').format('YYYY-MM-DD'),\n *        },\n *      },\n *      fields,\n *    }),\n *  });\n * @returns {Object} 屬於某個 ID 的資料。\n */\nimport _ from 'lodash';\n\nexport default async function getDetail(\n  {\n    langCode = 'zh-TW',\n    modelName = null,\n    where = null,\n    include = null,\n    attributes = null,\n  },\n  {\n    log = false,\n    raw = false,\n    required = null,\n    readonly = null,\n    view = false,\n    outputFieldNamePairs = null,\n    viewExclude = null,\n    viewInclude = null,\n    format = null,\n    formatCb = null,\n  } = {},\n) {\n  const extra = {};\n  try {\n    const model = this.getModelByName(modelName);\n    if (!where) {\n      throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(' where'));\n    }\n    if (langCode) {\n      // TODO: 語系篩選\n    }\n    // 自動整合欄位類型與選項\n    let fields = this.getModelOutputColumns({\n      langCode,\n      modelName,\n      required,\n      readonly,\n      exclude: viewExclude,\n      include: viewInclude,\n    });\n    // 組合查詢 Query\n    const query = {\n      raw,\n    };\n    if (where) {\n      query.where = where;\n    }\n    if (include && _.isArray(include)) {\n      query.include = [];\n      include.forEach((e) => {\n        if (!e.model && !e.modelName) {\n          throw Error(\n            MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({\n              field: 'include',\n              required: ['model', 'modelName'],\n              input: `${e}`,\n            }),\n          );\n        }\n        const thisModelName = e.model ? e.model.name : e.modelName;\n        const arr = this.getModelOutputColumns({\n          modelName: thisModelName,\n          as: e.as,\n          exclude: viewExclude\n            ? viewExclude.filter((ex) => ex.indexOf(thisModelName) > -1)\n            : null,\n          modelPrefix: true,\n          langCode,\n          required,\n          readonly,\n        });\n        fields = fields.concat(arr);\n        const inc = {\n          model: e.model ? e.model : this.getModelByName(e.modelName),\n        };\n        if (e.as) {\n          inc.as = e.as;\n        }\n        if (e.limit) {\n          inc.limit = e.limit;\n        }\n        if (e.where) {\n          inc.where = e.where;\n        }\n        if (e.through) {\n          inc.through = e.through;\n        }\n        if (e.include) {\n          inc.include = e.include;\n        }\n        if (e.required) {\n          inc.required = e.required;\n        }\n        if (e.attributes) {\n          inc.attributes = e.attributes;\n        }\n        query.include.push(inc);\n      });\n    }\n    if (attributes) {\n      query.attributes = attributes;\n      fields = fields.filter((e) => {\n        if (_.isArray(attributes)) {\n          return attributes.some((attr) => e.name === attr);\n        }\n        if (_.isObject(attributes) && _.isArray(attributes.include)) {\n          return attributes.include.some((attr) => e.name === attr);\n        }\n        return attributes;\n      });\n    }\n    if (log) {\n      if (_.isFunction(log)) {\n        query.logging = log;\n      } else {\n        query.logging = Console.log;\n      }\n    }\n    // Console.log('fields=>', fields);\n    // Console.log('query=>');\n    // Console.dir(query);\n    const data = await model.findOne(query);\n    // if (!data) {\n    //   throw Error(MESSAGE.BAD_REQUEST.NO_TARGET_FOUNDED({\n    //     where: `${modelName}:${_.values(where)}`,\n    //   }));\n    // }\n\n    // 自動取出關聯的資料欄位與對應資料來源，並且將欄位設成 chosen 以供選擇\n    if (view) {\n      extra._associations = this.getAssociations(modelName);\n      {\n        const associatedData = {};\n        // 只取出 1v1 的關聯，即當下 model 中的 AbcId 欄位的 model Abc\n        const associatedModels = this.getAssociations(modelName, {\n          one2One: true,\n        });\n        for (const target of associatedModels) {\n          /* eslint no-await-in-loop: 0 */\n          const modelData = await sails.models[target.toLowerCase()].findAll();\n          // Console.log('modelData=>', modelData);\n          associatedData[target] = modelData;\n        }\n        fields.map((field) => {\n          const isThisFieldAssociated = associatedModels.some(\n            (ass) => field.name === `${ass}Id`,\n          );\n          // Console.log('isThisFieldAssociated=>', isThisFieldAssociated);\n          if (isThisFieldAssociated) {\n            const associatedModelName = field.name.replace('Id', '');\n            const values = associatedData[associatedModelName];\n            /* eslint no-param-reassign: 0 */\n            let modelOutputPropName = null;\n            {\n              // Console.log('associatedModelName=>', associatedModelName);\n              // 如果有指定哪個 model 使用哪個 prop 輸出\n              const assignModelOutputField = outputFieldNamePairs\n                ? outputFieldNamePairs.filter(\n                  (pair) => pair.modelName === associatedModelName,\n                )[0]\n                : null;\n              // Console.log('assignModelOutputField=>', assignModelOutputField);\n              modelOutputPropName = assignModelOutputField\n                ? assignModelOutputField.target\n                : null;\n              // Console.log('modelOutputPropName=>', modelOutputPropName);\n            }\n            // 可能要再加上一對多判斷\n            field.type = 'chosen';\n            field.required = true;\n            field.values = values\n              ? values\n                .concat([\n                  {\n                    id: null,\n                  },\n                ])\n                .map((v) => {\n                  let name = v[modelOutputPropName] || v.name || v.key || v.id;\n                  if (_.isFunction(modelOutputPropName)) {\n                    name = modelOutputPropName(v);\n                  }\n                  return {\n                    value: v.id,\n                    name,\n                  };\n                })\n              : [];\n          }\n          return field;\n        });\n      }\n    }\n    return this.formatOutput({\n      format,\n      formatCb,\n      fields,\n      required,\n      readonly,\n      data: data ? data.toJSON() : data,\n      extra,\n      view,\n    });\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n",
+    "content": "/**\n * 依據 ID 取回詳細資料。\n * @version 1.0\n * @param Required {Object} {\n *     langCode{String} = 'zh-TW',      要查詢的資料語系。\n *     modelName{String} = null,        要查詢的目標 Sequelize Model 名稱。\n *     include{Object|Array} = null,    額外給予的 Sequelize Query-include 參數。\n *     where{Object} = null,            Sequelize Query-where 查詢。\n *     attributes{Object|Array} = null, 查詢時的 Sequelize Query-attributes 參數。\n *   }\n * @param Optional {Object} {\n *     required{Array} = [],     要被設定為 required 的欄位名稱。\n *     readonly{Array} = [],     要被設定為 readonly 的欄位名稱。\n *     format{Object} = null,     預先定義的資料格式。\n *     formatCb{Function} = null, 最後輸出前再次格式化資料的 callback。\n *     raw = false,               是否輸出成 JSON。\n *   }\n * @example 依據 Parent ID 查詢 User 與 Parent，同時包含 Student。\n * QueryHelper.getDetail({\n *    modelName: 'User',\n *    where: { id: { $not: null } },\n *    attributes: [\n *      'id',\n *      'email',\n *      'nameTW',\n *      'nameEN',\n *    ],\n *    include: [{\n *      model: Parent,\n *      where: { id: parentId },\n *      attributes: {\n *        exclude: ['createdAt', 'updatedAt'],\n *      },\n *      include: [{\n *        model: Student,\n *        through: 'StudentParent',\n *        attributes: ['id', 'idNumber1', 'idNumber2'],\n *        include: [{\n *          model: User,\n *          attributes: ['id', 'email', 'nameTW', 'nameEN'],\n *        }],\n *      }],\n *    }],\n *  }, {\n *    required,\n *    readonly,\n *    format: null,\n *    formatCb: e => ({\n *      data: {\n *        ...e.data,\n *        Parent: {\n *          ..._.omit(e.data.Parent, ['Students']),\n *          Students: e.data.Parent.Students.map(s => ({\n *            ..._.omit(s, ['StudentParent']),\n *            relationship: s.StudentParent.relationship,\n *            comment: s.StudentParent.relationship,\n *          })),\n *          passportDuedate1:\n *            moment(e.data.Parent.passportDuedate1, 'YYYY/MM-DD').format('YYYY-MM-DD'),\n *          passportDuedate2:\n *            moment(e.data.Parent.passportDuedate2, 'YYYY/MM-DD').format('YYYY-MM-DD'),\n *          birthday:\n *            moment(e.data.Parent.birthday, 'YYYY/MM-DD').format('YYYY-MM-DD'),\n *        },\n *      },\n *      fields,\n *    }),\n *    raw: true,\n *  });\n * @returns {Object} 屬於某個 ID 的資料。\n */\nimport _ from 'lodash';\n\nexport default async function getDetail(\n  {\n    langCode = 'zh-TW',\n    modelName = null,\n    where = null,\n    include = null,\n    attributes = null,\n  },\n  {\n    log = false,\n    raw = false,\n    required = null,\n    readonly = null,\n    view = false,\n    outputFieldNamePairs = null,\n    viewExclude = null,\n    viewInclude = null,\n    format = null,\n    formatCb = null,\n  } = {},\n) {\n  const extra = {};\n  try {\n    const model = this.getModelByName(modelName);\n    if (!where) {\n      throw Error(MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER(' where'));\n    }\n    if (langCode) {\n      // TODO: 語系篩選\n    }\n    // 自動整合欄位類型與選項\n    let fields = this.getModelOutputColumns({\n      langCode,\n      modelName,\n      required,\n      readonly,\n      exclude: viewExclude,\n      include: viewInclude,\n    });\n    // 組合查詢 Query\n    const query = {\n      raw,\n      nest: raw,\n    };\n    if (where) {\n      query.where = where;\n    }\n    if (include && _.isArray(include)) {\n      query.include = [];\n      include.forEach((e) => {\n        if (!e.name && !e.model && !e.modelName) {\n          throw Error(\n            MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({\n              field: 'include',\n              required: ['model', 'modelName'],\n              input: `${e}`,\n            }),\n          );\n        }\n        let thisModelName;\n        if (e.name) {\n          thisModelName = e.name;\n        } else if (e.model && e.model.name) {\n          thisModelName = e.model.name;\n        } else if (e.modelName) {\n          thisModelName = e.modelName;\n        }\n\n        const arr = this.getModelOutputColumns({\n          modelName: thisModelName,\n          as: e.as,\n          exclude: viewExclude\n            ? viewExclude.filter((ex) => ex.indexOf(thisModelName) > -1)\n            : null,\n          modelPrefix: true,\n          langCode,\n          required,\n          readonly,\n        });\n        fields = fields.concat(arr);\n\n        let thisModel;\n        if (e.name) {\n          thisModel = e;\n        } else if (e.model && e.model.name) {\n          thisModel = e.model;\n        } else if (e.modelName) {\n          thisModel = this.getModelByName(e.modelName);\n        }\n\n        const inc = {\n          model: thisModel,\n        };\n        if (e.as) {\n          inc.as = e.as;\n        }\n        if (e.limit) {\n          inc.limit = e.limit;\n        }\n        if (e.where) {\n          inc.where = e.where;\n        }\n        if (e.through) {\n          inc.through = e.through;\n        }\n        if (e.include) {\n          inc.include = e.include;\n        }\n        if (e.required) {\n          inc.required = e.required;\n        }\n        if (e.attributes) {\n          inc.attributes = e.attributes;\n        }\n        query.include.push(inc);\n      });\n    }\n    if (attributes) {\n      query.attributes = attributes;\n      fields = fields.filter((e) => {\n        if (_.isArray(attributes)) {\n          return attributes.some((attr) => e.name === attr);\n        }\n        if (_.isObject(attributes) && _.isArray(attributes.include)) {\n          return attributes.include.some((attr) => e.name === attr);\n        }\n        return attributes;\n      });\n    }\n    if (log) {\n      if (_.isFunction(log)) {\n        query.logging = log;\n      } else {\n        query.logging = Console.log;\n      }\n    }\n    // Console.log('fields=>', fields);\n    // Console.log('query=>');\n    // Console.dir(query);\n    const data = await model.findOne(query);\n    // if (!data) {\n    //   throw Error(MESSAGE.BAD_REQUEST.NO_TARGET_FOUNDED({\n    //     where: `${modelName}:${_.values(where)}`,\n    //   }));\n    // }\n\n    // 自動取出關聯的資料欄位與對應資料來源，並且將欄位設成 chosen 以供選擇\n    if (view) {\n      extra._associations = this.getAssociations(modelName);\n      {\n        const associatedData = {};\n        // 只取出 1v1 的關聯，即當下 model 中的 AbcId 欄位的 model Abc\n        const associatedModels = this.getAssociations(modelName, {\n          one2One: true,\n        });\n        for (const target of associatedModels) {\n          /* eslint no-await-in-loop: 0 */\n          const modelData = await sails.models[target.toLowerCase()].findAll();\n          // Console.log('modelData=>', modelData);\n          associatedData[target] = modelData;\n        }\n        fields.map((field) => {\n          const isThisFieldAssociated = associatedModels.some(\n            (ass) => field.name === `${ass}Id`,\n          );\n          // Console.log('isThisFieldAssociated=>', isThisFieldAssociated);\n          if (isThisFieldAssociated) {\n            const associatedModelName = field.name.replace('Id', '');\n            const values = associatedData[associatedModelName];\n            /* eslint no-param-reassign: 0 */\n            let modelOutputPropName = null;\n            {\n              // Console.log('associatedModelName=>', associatedModelName);\n              // 如果有指定哪個 model 使用哪個 prop 輸出\n              const assignModelOutputField = outputFieldNamePairs\n                ? outputFieldNamePairs.filter(\n                  (pair) => pair.modelName === associatedModelName,\n                )[0]\n                : null;\n              // Console.log('assignModelOutputField=>', assignModelOutputField);\n              modelOutputPropName = assignModelOutputField\n                ? assignModelOutputField.target\n                : null;\n              // Console.log('modelOutputPropName=>', modelOutputPropName);\n            }\n            // 可能要再加上一對多判斷\n            field.type = 'chosen';\n            field.required = true;\n            field.values = values\n              ? values\n                .concat([\n                  {\n                    id: null,\n                  },\n                ])\n                .map((v) => {\n                  let name = v[modelOutputPropName] || v.name || v.key || v.id;\n                  if (_.isFunction(modelOutputPropName)) {\n                    name = modelOutputPropName(v);\n                  }\n                  return {\n                    value: v.id,\n                    name,\n                  };\n                })\n              : [];\n          }\n          return field;\n        });\n      }\n    }\n    return this.formatOutput({\n      format,\n      formatCb,\n      fields,\n      required,\n      readonly,\n      data,\n      extra,\n      view,\n    });\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n",
     "static": true,
-    "longname": "/Users/kent/Project/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.getDetail.js",
+    "longname": "/home/rsghost/dev/cases/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.getDetail.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
@@ -905,7 +905,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.getDetail.js",
     "importStyle": "getDetail",
     "description": null,
-    "lineNumber": 72,
+    "lineNumber": 74,
     "undocument": true,
     "params": [
       {
@@ -942,9 +942,9 @@
     "__docId__": 59,
     "kind": "file",
     "name": "QueryHelper/QueryHelper.js",
-    "content": "/**\n * @module QueryHelper\n * @author Kent Chen<iamcxa@gmail.com>\n */\n/* eslint no-underscore-dangle: 0 */\n// import moment from 'moment';\nimport _ from 'lodash';\nimport inflection from 'inflection';\nimport Joi from 'joi';\n\nexport { default as getDetail } from './QueryHelper.getDetail';\nexport { default as create } from './QueryHelper.create';\nexport { default as update } from './QueryHelper.update';\nexport { default as destroy } from './QueryHelper.destroy';\nexport * from './QueryHelper.format';\nexport * from './QueryHelper.view';\n\nconst TAG = 'QueryHelper';\nconst { log } = sails.config.queryhelper;\n\nconst fakeConsole = {};\nfor (const key of Object.keys(console)) {\n  fakeConsole[key] = () => {};\n}\nconst langCode = 'zh-TW';\nconst commonFields = ['createdAt', 'updatedAt', 'deletedAt', 'id'];\nconst isNumeric = (val) => !Number.isNaN(parseFloat(val)) && Number.isFinite(val);\nconst isDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/g;\n\nglobal.Console = log ? console : fakeConsole;\n\nexport {\n  langCode, log, commonFields, TAG, isNumeric, isDate,\n};\n\nexport function validate({\n  value, schema, options, callback,\n}) {\n  return Joi.validate(\n    value,\n    _.isFunction(schema) ? Joi.object().keys(schema(Joi)) : schema,\n    options,\n    callback,\n  );\n}\n\n/**\n * 定義共通資料欄位，用來將 Model Name 去除，以便使用同一組 i18n。\n * @example model.User.createdAt ==> model.createdAt\n * @param {*} name\n */\nexport function isCommonField(name) {\n  try {\n    return this.commonFields\n      .concat([\n        'isValid',\n        'index',\n        'isActive',\n        'isActivated',\n        'isConfirmed',\n        'activatedAt',\n        'confirmedAt',\n      ])\n      .some((e) => name.indexOf(e) !== -1);\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\nexport function getModelByName(modelName) {\n  try {\n    if (!modelName) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({\n          modelName,\n        }),\n      );\n    }\n    let model = null;\n    if (_.isString(modelName)) {\n      model = sails.models[modelName.toLowerCase()];\n    }\n    if (!model || !_.isObject(model)) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({\n          modelName,\n        }),\n      );\n    }\n    return model;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\nexport function getIncludeModelByObject(includeModelObject) {\n  try {\n    // Console.log('includeModelObject=>', includeModelObject);\n    // Console.log('includeModelObject=>', includeModelObject.model);\n    // Console.log('includeModelObject=>', includeModelObject.model.name);\n    if (!includeModelObject) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({\n          includeModelObject,\n        }),\n      );\n    }\n    let model = null;\n    if (_.isObject(includeModelObject)) {\n      // 如果是 { model: ModelClass } 形式\n      if (includeModelObject.model && includeModelObject.model.name) {\n        model = sails.models[includeModelObject.model.name.toLowerCase()];\n        // 如果是 { modelName: ModelClass } 形式\n      } else if (includeModelObject.modelName) {\n        model = sails.models[includeModelObject.modelName.toLowerCase()];\n        // 如果是 ModelClass {} 形式\n      } else if (includeModelObject.name) {\n        model = includeModelObject;\n      }\n    }\n    // Console.log('model=>', model);\n    if (!model) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({\n          includeModelObject,\n        }),\n      );\n    }\n    return model;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 取出目標 Model 全部是文字類型的欄位名稱\n * @version 1.0\n * @param {String} modelName = null 要查詢的目標 Sequelize Model 名稱。\n * @example 取出 Parent 中，全部屬性為文字類型的欄位名稱。\n * QueryHelper.getModelSearchableColumns('Parent');\n * // *  [{ key: 'Parent.education', type: 'String' }\n * // *   { key: 'Parent.password', type: 'String' }]\n * @returns {Array} Object contains field and type\n */\nexport function getModelSearchableColumns(\n  modelName = null,\n  { date = false, integer = false } = {},\n) {\n  try {\n    const model = this.getModelByName(modelName);\n    // 取出全部的 model field\n    const targets = [];\n    // eslint-disable-next-line\n    for (const key in model.rawAttributes) {\n      if (\n        model.rawAttributes[key].type.key === 'STRING'\n        || model.rawAttributes[key].type.key === 'TEXT'\n        || model.rawAttributes[key].type.key === 'JSON'\n        || model.rawAttributes[key].type.key === 'UUID'\n        || model.rawAttributes[key].type.key === 'ENUM'\n      ) {\n        targets.push({\n          key: `${modelName}.${key}`,\n          type: 'STRING',\n        });\n      }\n      if (\n        date\n        && (model.rawAttributes[key].type.key === 'DATE'\n          || model.rawAttributes[key].type.key === 'DATEONLY')\n      ) {\n        targets.push({\n          key: `${modelName}.${key}`,\n          type: 'DATE',\n        });\n      }\n      if (integer && model.rawAttributes[key].type.key === 'INTEGER') {\n        targets.push({\n          key: `${modelName}.${key}`,\n          type: 'NUMBER',\n        });\n      }\n    }\n    // 移除不必要的屬性\n    const exclude = ['createdAt', 'updatedAt'];\n    return targets.filter((e) => !exclude.some((ex) => ex === e));\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 取得傳入的 model column ENUM 的值\n * @version 1.0\n * @param {String} [modelName=null]\n * @param {String} [columnName=null]\n * @example 取出 Parent 中 ENUM 欄位 union 的全部值。\n * QueryHelper.getEnumValues('Parent', 'union');\n * // * [ '非會員', '個人會員', '學生會員', '相關會員', '理事', '監事', '理事長', '常務理事', '常務監事' ]\n * @returns {Array} column's ENUM values.\n */\nexport function getEnumValues(modelName = null, columnName = null) {\n  try {\n    if (!modelName || !columnName) {\n      throw Error('Missing required parameter: `modelName` is required.');\n    }\n    const model = this.getModelByName(modelName);\n    const { values } = model.rawAttributes[columnName];\n    return _.isArray(values) ? values : null;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 產生 VUE form 需要的欄位名稱與類型\n * @param {any} {\n *     modelName = null,\n * }\n * @returns\n */\nexport function getModelOutputColumns({\n  // langCode = null,\n  modelName = null,\n  modelPrefix = false,\n  readonly = null,\n  required = null,\n  exclude = null,\n  include = null,\n}) {\n  try {\n    let prefix = '';\n    if (_.isBoolean(modelPrefix)) {\n      prefix = modelPrefix ? `${modelName}.` : '';\n    } else if (_.isString(modelPrefix)) {\n      prefix = `${modelPrefix}.`;\n    }\n    const model = this.getModelByName(modelName);\n    const fields = [];\n    for (const name of _.keys(model.rawAttributes)) {\n      const modelAttr = model.rawAttributes[name];\n      let fieldName;\n\n      if (modelPrefix && !this.isCommonField(name)) {\n        fieldName = `${prefix}${name}`;\n      } else {\n        fieldName = name;\n      }\n\n      const field = {\n        values: null,\n        name: fieldName,\n      };\n      // 自動依據資料庫轉型 input\n      switch (modelAttr.type.key) {\n        case 'ENUM':\n          field.type = 'chosen';\n          field.values = modelAttr.values.map((e) => ({\n            value: e,\n            name: e,\n          }));\n          break;\n        case 'DOUBLE PRECISION':\n        case 'INTEGER':\n          field.type = 'number';\n          break;\n        case 'DATEONLY':\n          field.type = 'date';\n          break;\n        default: {\n          // eslint-disable-next-line no-underscore-dangle\n          const length = modelAttr.type._length;\n          if (length) {\n            field.limit = length - 1;\n          }\n          field.type = modelAttr.type.key.toLowerCase();\n          break;\n        }\n      }\n      fields.push(field);\n    }\n    const autoReadonly = ['createdAt', 'updatedAt', 'deletedAt', 'id'].concat(\n      readonly || [],\n    );\n    const autoRequired = this.getModelColumns({\n      modelName,\n      exclude: autoReadonly,\n      required: true,\n    }).concat(required || []);\n\n    const getPhrase = (name) => {\n      const output = modelPrefix\n        ? `model.${_.upperFirst(name)}`\n        : `model.${_.upperFirst(modelName)}.${name}`;\n      return this.isCommonField(name) ? `model.${name}` : output;\n    };\n    return fields\n      .filter((e) => !this.commonFields.some((ex) => e.name === ex))\n      .filter((e) =>\n        (!_.isEmpty(include) ? include.some((inc) => e.name === inc) : e))\n      .filter((e) =>\n        (!_.isEmpty(exclude) ? !exclude.some((ex) => e.name === ex) : e))\n      .map((field) => ({\n        ...field,\n        label: sails.__(getPhrase(field.name)),\n        // label: sails.__({\n        //   phrase: getPhrase(field.name),\n        //   locale: langCode || 'zh-TW',\n        // }),\n        required: autoRequired.some((r) => r === field.name),\n        readonly: autoReadonly.some((r) => r === field.name),\n      }));\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 依據給予的 Sequelize Model 名稱，產生空白的欄位格式 JSON，並以 null 填充。\n * @version 20180310\n * @param {Object} {\n *     modelName{String} = null, 目標 Model 名稱。\n *     exclude{Array} = [], 要排除的欄位名稱。\n *     include{Array} = [], 要額外加入的欄位名稱。\n * }\n * @example\n * QueryHelper.buildEmptyModel({\n *    modelName: 'User',\n *    exclude: ['id'],\n * }),\n * // {\n * //  locale: null,\n * //  weights: null,\n * //  gender: null,\n * //  resetPasswordTokenExpire: null,\n * //  username: null,\n * //  avatar: null,\n * //  avatarThumb: null,\n * //  score: null,\n * //  isActived: null,\n * //  resetPasswordToken: null,\n * //  verificationEmailToken: null,\n * //  isEmailVerified: null,\n * //  createdAt: null,\n * //  updatedAt: null,\n * //  deletedAt: null,\n * // }\n * @returns {Object} 空的 model 欄位格式 JSON。\n */\nexport function buildEmptyModel({\n  modelName = null,\n  exclude = [],\n  include = [],\n} = {}) {\n  try {\n    const model = {};\n    this.getModelColumns({\n      modelName,\n      exclude,\n      include,\n    }).forEach((e) => {\n      model[e.replace(`${modelName}.`, '')] = null;\n    });\n    return model;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 取得某個 Sequelize Model 的所有欄位名稱。\n * @version 20180310\n * @param {Object} {\n *     modelPrefix = false,\n *     modelName = null,\n *     exclude = [],\n *     include = [],\n *   }\n * @example 取得 Parent 的欄位，同時加上 email/nameTW/nameEN 三個額外欄位、排除\n * id/UserId/createdAt/updatedAt 四個欄位，並且在查詢得到的欄位名稱前加上 `Parent` prefix。\n * QueryHelper.getModelColumns({\n *    modelName: 'Parent',\n *    modelPrefix: true,\n *    exclude: ['id', 'UserId', 'createdAt', 'updatedAt'],\n *    include: ['email', 'nameTW', 'nameEN'],\n *  });\n * // [ 'Parent.education',\n * //   'Parent.union',\n * //   'Parent.phone',\n * //   'Parent.fax',\n * //   'Parent.app',\n * //   'Parent.comment',\n * //   'Parent.address',\n * //   'Parent.passportName',\n * //   'Parent.profession',\n * //   'Parent.birthday',\n * //   'Parent.idNumber',\n * //   'Parent.mobile',\n * //   'Parent.city',\n * //   'Parent.password',\n * //   'Parent.studentNames',\n * //   'email',\n * //   'nameTW',\n * //   'nameEN' ]\n * @returns {Array} Sequelize Model column names\n * @see {@link https://lodash.com/docs/4.17.5#keys}\n */\nexport function getModelColumns({\n  modelPrefix = false,\n  isPrefixPlural = false,\n  modelName = null,\n  exclude = [],\n  include = [],\n  required = false,\n}) {\n  try {\n    // 取得 model\n    const model = this.getModelByName(modelName);\n    // 取得單複數 model name\n    const outputModelName = isPrefixPlural\n      ? inflection.pluralize(model.name)\n      : model.name;\n    // 組合\n    let prefix = '';\n    if (_.isBoolean(modelPrefix)) {\n      prefix = modelPrefix ? `${outputModelName}.` : '';\n    } else if (_.isString(modelPrefix)) {\n      prefix = `${modelPrefix}.`;\n    }\n    // 自動取得所有欄位\n    const attributes = _.keys(model.rawAttributes)\n      .filter((column) => !exclude.some((ex) => column === ex))\n      .filter((column) => !this.commonFields.some((ex) => column === ex))\n      .filter((column) => {\n        if (required) {\n          const target = model.rawAttributes[column];\n          // Console.log('target=>', target);\n          return target.allowNull !== true && target.primaryKey !== true;\n        }\n        return true;\n      })\n      .map((e) => `${_.upperFirst(prefix)}${e}`)\n      .concat(include);\n    return attributes;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 取得特定 model 內 column 的類型，回傳值為 Sequelize 的 type 字串。\n * @version 20180331\n * @param {Object} {\n *     modelName{String} = null,\n *     columnName{String} = null,\n *  }\n * @example 取得 User 的 email 欄位類型\n * getModelColumnType({\n *    modelName = 'User',\n *    columnName = 'email',\n * });\n * // 'String'\n * @returns {String|Null} column type\n * @see {@link http://docs.sequelizejs.com/manual/tutorial/models-definition.html}\n */\nexport function getModelColumnType({ modelName = null, columnName = null }) {\n  try {\n    const model = this.getModelByName(modelName);\n    // 自動取得所有欄位\n    const column = model.rawAttributes[columnName];\n    if (!_.isNil(column)) {\n      return column.type.key;\n    }\n    return null;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 取得給予 ModelName 之關聯 ModelName，可透過參數指定取得單數或複數名稱。\n * @param {*} modelName\n * @param {*} { singular = false, plural = false }\n * @returns [String...]\n */\nexport function getAssociations(\n  modelName,\n  {\n    singular = false,\n    plural = false,\n    one2One = false,\n    one2Many = false,\n    raw = false,\n  } = {},\n) {\n  const model = this.getModelByName(modelName);\n  const { associations } = model;\n  const result = [];\n  Object.keys(associations).forEach((key) => {\n    const association = {};\n    // all needed information in the 'options' object\n    if (_.has(associations[key], 'options')) {\n      association[key] = associations[key].options;\n      const singularName = association[key].name.singular;\n      const pluralName = association[key].name.plural;\n      if (associations[key].options.constraints !== false) {\n        // // Console.log('associations[key]=>');\n        // // Console.dir(associations[key]);\n        // Console.log('associations[key].HasMany=>', associations[key].hasMany);\n        // Console.dir(associations[key].target);\n        if (singular) {\n          result.push(singularName);\n        } else if (plural) {\n          result.push(pluralName);\n        } else if (one2One) {\n          if (key === singularName) result.push(key);\n        } else if (one2Many) {\n          if (key === pluralName) result.push(key);\n        } else if (raw) {\n          result.push({\n            name: key,\n            singular: singularName,\n            plural: pluralName,\n\n            options: associations[key].options,\n            rawName: association[key].name,\n          });\n        } else {\n          result.push(key);\n        }\n      }\n    }\n  });\n  return result;\n}\n\n/**\n * 取得給予 ModelName 之關聯 ModelName 的欄位名稱，可透過 include 參數指定複數關聯 Model 的欄位名稱。\n * @param {*} modelName\n * @param {*} include\n * @param {*} prefix\n * @returns [String...]\n */\nexport function getIncludeModelColumns({\n  modelName,\n  include,\n  prefix,\n}) {\n  const modelAssociations = this.getAssociations(modelName, {\n    raw: true,\n  });\n  const namePool = modelAssociations.map((association) => association.name);\n  const singularPool = modelAssociations.map((association) => association.singular);\n\n  let result = [];\n  for (const model of include) {\n    const modelItem = this.getIncludeModelByObject(model);\n    const index = singularPool.indexOf(modelItem.name);\n\n    if (index !== -1) {\n      const modelPrefix = prefix ? `${prefix}.${namePool[index]}` : namePool[index];\n      const columns = this.getModelColumns({\n        modelName: modelItem.name,\n        modelPrefix,\n      });\n\n      result = result.concat(columns);\n\n      if (model.include && Array.isArray(model.include)) {\n        result = result.concat(this.getIncludeModelColumns({\n          modelName: modelItem.name,\n          include: model.include,\n          prefix: modelPrefix,\n        }));\n      }\n    }\n  }\n\n  Console.log('result========>');\n  Console.log(result);\n  return result;\n}\n\nexport function modelAssociationsToArray(model) {\n  const result = [];\n  if (typeof model !== 'function' || typeof model.associations !== 'object') {\n    throw Error(\"Model should be an object with the 'associations' property.\");\n  }\n  Object.keys(model.associations).forEach((key) => {\n    const association = {};\n    // all needed information in the 'options' object\n    if (_.has(model.associations[key], 'options')) {\n      association[key] = model.associations[key].options;\n    }\n    result.push(association);\n  });\n  return result;\n}\n\nexport default {};\n",
+    "content": "/**\n * @module QueryHelper\n * @author Kent Chen<iamcxa@gmail.com>\n */\n/* eslint no-underscore-dangle: 0 */\n// import moment from 'moment';\nimport _ from 'lodash';\nimport inflection from 'inflection';\nimport Joi from 'joi';\n\nexport { default as getDetail } from './QueryHelper.getDetail';\nexport { default as create } from './QueryHelper.create';\nexport { default as update } from './QueryHelper.update';\nexport { default as destroy } from './QueryHelper.destroy';\nexport * from './QueryHelper.format';\nexport * from './QueryHelper.view';\nexport { default as select } from './QueryHelper.select';\n\nconst TAG = 'QueryHelper';\nconst { log } = sails.config.queryhelper;\n\nconst fakeConsole = {};\nfor (const key of Object.keys(console)) {\n  fakeConsole[key] = () => {};\n}\nconst langCode = 'zh-TW';\nconst commonFields = ['createdAt', 'updatedAt', 'deletedAt', 'id'];\nconst isNumeric = (val) => !Number.isNaN(parseFloat(val)) && Number.isFinite(val);\nconst isDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/g;\n\nglobal.Console = log ? console : fakeConsole;\n\nexport {\n  langCode, log, commonFields, TAG, isNumeric, isDate,\n};\n\nexport function validate({\n  value, schema, options, callback,\n}) {\n  return Joi.validate(\n    value,\n    _.isFunction(schema) ? Joi.object().keys(schema(Joi)) : schema,\n    options,\n    callback,\n  );\n}\n\n/**\n * 定義共通資料欄位，用來將 Model Name 去除，以便使用同一組 i18n。\n * @example model.User.createdAt ==> model.createdAt\n * @param {*} name\n */\nexport function isCommonField(name) {\n  try {\n    return this.commonFields\n      .concat([\n        'isValid',\n        'index',\n        'isActive',\n        'isActivated',\n        'isConfirmed',\n        'activatedAt',\n        'confirmedAt',\n      ])\n      .some((e) => name.indexOf(e) !== -1);\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\nexport function getModelByName(modelName) {\n  try {\n    if (!modelName) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({\n          modelName,\n        }),\n      );\n    }\n    let model = null;\n    if (_.isString(modelName)) {\n      model = sails.models[modelName.toLowerCase()];\n    }\n    if (!model || !_.isObject(model)) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({\n          modelName,\n        }),\n      );\n    }\n    return model;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\nexport function getIncludeModelByObject(includeModelObject) {\n  try {\n    // Console.log('includeModelObject=>', includeModelObject);\n    // Console.log('includeModelObject=>', includeModelObject.model);\n    // Console.log('includeModelObject=>', includeModelObject.model.name);\n    if (!includeModelObject) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({\n          includeModelObject,\n        }),\n      );\n    }\n    let model = null;\n    if (_.isObject(includeModelObject)) {\n      // 如果是 { model: ModelClass } 形式\n      if (includeModelObject.model && includeModelObject.model.name) {\n        model = sails.models[includeModelObject.model.name.toLowerCase()];\n        // 如果是 { modelName: ModelClass } 形式\n      } else if (includeModelObject.modelName) {\n        model = sails.models[includeModelObject.modelName.toLowerCase()];\n        // 如果是 ModelClass {} 形式\n      } else if (includeModelObject.name) {\n        model = includeModelObject;\n      }\n    }\n    // Console.log('model=>', model);\n    if (!model) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.MODEL_NOT_EXISTS({\n          includeModelObject,\n        }),\n      );\n    }\n    return model;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 取出目標 Model 全部是文字類型的欄位名稱\n * @version 1.0\n * @param {String} modelName = null 要查詢的目標 Sequelize Model 名稱。\n * @example 取出 Parent 中，全部屬性為文字類型的欄位名稱。\n * QueryHelper.getModelSearchableColumns('Parent');\n * // *  [{ key: 'Parent.education', type: 'String' }\n * // *   { key: 'Parent.password', type: 'String' }]\n * @returns {Array} Object contains field and type\n */\nexport function getModelSearchableColumns(\n  modelName = null,\n  { date = false, integer = false } = {},\n) {\n  try {\n    const model = this.getModelByName(modelName);\n    // 取出全部的 model field\n    const targets = [];\n    // eslint-disable-next-line\n    for (const key in model.rawAttributes) {\n      if (\n        model.rawAttributes[key].type.key === 'STRING'\n        || model.rawAttributes[key].type.key === 'TEXT'\n        || model.rawAttributes[key].type.key === 'JSON'\n        || model.rawAttributes[key].type.key === 'UUID'\n        || model.rawAttributes[key].type.key === 'ENUM'\n      ) {\n        targets.push({\n          key: `${modelName}.${key}`,\n          type: 'STRING',\n        });\n      }\n      if (\n        date\n        && (model.rawAttributes[key].type.key === 'DATE'\n          || model.rawAttributes[key].type.key === 'DATEONLY')\n      ) {\n        targets.push({\n          key: `${modelName}.${key}`,\n          type: 'DATE',\n        });\n      }\n      if (integer && model.rawAttributes[key].type.key === 'INTEGER') {\n        targets.push({\n          key: `${modelName}.${key}`,\n          type: 'NUMBER',\n        });\n      }\n    }\n    // 移除不必要的屬性\n    const exclude = ['createdAt', 'updatedAt'];\n    return targets.filter((e) => !exclude.some((ex) => ex === e));\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 取得傳入的 model column ENUM 的值\n * @version 1.0\n * @param {String} [modelName=null]\n * @param {String} [columnName=null]\n * @example 取出 Parent 中 ENUM 欄位 union 的全部值。\n * QueryHelper.getEnumValues('Parent', 'union');\n * // * [ '非會員', '個人會員', '學生會員', '相關會員', '理事', '監事', '理事長', '常務理事', '常務監事' ]\n * @returns {Array} column's ENUM values.\n */\nexport function getEnumValues(modelName = null, columnName = null) {\n  try {\n    if (!modelName || !columnName) {\n      throw Error('Missing required parameter: `modelName` is required.');\n    }\n    const model = this.getModelByName(modelName);\n    const { values } = model.rawAttributes[columnName];\n    return _.isArray(values) ? values : null;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 產生 VUE form 需要的欄位名稱與類型\n * @param {any} {\n *     modelName = null,\n * }\n * @returns\n */\nexport function getModelOutputColumns({\n  // langCode = null,\n  modelName = null,\n  modelPrefix = false,\n  readonly = null,\n  required = null,\n  exclude = null,\n  include = null,\n}) {\n  try {\n    let prefix = '';\n    if (_.isBoolean(modelPrefix)) {\n      prefix = modelPrefix ? `${modelName}.` : '';\n    } else if (_.isString(modelPrefix)) {\n      prefix = `${modelPrefix}.`;\n    }\n    const model = this.getModelByName(modelName);\n    const fields = [];\n    for (const name of _.keys(model.rawAttributes)) {\n      const modelAttr = model.rawAttributes[name];\n      let fieldName;\n\n      if (modelPrefix && !this.isCommonField(name)) {\n        fieldName = `${prefix}${name}`;\n      } else {\n        fieldName = name;\n      }\n\n      const field = {\n        values: null,\n        name: fieldName,\n      };\n      // 自動依據資料庫轉型 input\n      switch (modelAttr.type.key) {\n        case 'ENUM':\n          field.type = 'chosen';\n          field.values = modelAttr.values.map((e) => ({\n            value: e,\n            name: e,\n          }));\n          break;\n        case 'DOUBLE PRECISION':\n        case 'INTEGER':\n          field.type = 'number';\n          break;\n        case 'DATEONLY':\n          field.type = 'date';\n          break;\n        default: {\n          // eslint-disable-next-line no-underscore-dangle\n          const length = modelAttr.type._length;\n          if (length) {\n            field.limit = length - 1;\n          }\n          field.type = modelAttr.type.key.toLowerCase();\n          break;\n        }\n      }\n      fields.push(field);\n    }\n    const autoReadonly = ['createdAt', 'updatedAt', 'deletedAt', 'id'].concat(\n      readonly || [],\n    );\n    const autoRequired = this.getModelColumns({\n      modelName,\n      exclude: autoReadonly,\n      required: true,\n    }).concat(required || []);\n\n    const getPhrase = (name) => {\n      const output = modelPrefix\n        ? `model.${_.upperFirst(name)}`\n        : `model.${_.upperFirst(modelName)}.${name}`;\n      return this.isCommonField(name) ? `model.${name}` : output;\n    };\n    return fields\n      .filter((e) => !this.commonFields.some((ex) => e.name === ex))\n      .filter((e) =>\n        (!_.isEmpty(include) ? include.some((inc) => e.name === inc) : e))\n      .filter((e) =>\n        (!_.isEmpty(exclude) ? !exclude.some((ex) => e.name === ex) : e))\n      .map((field) => ({\n        ...field,\n        label: sails.__(getPhrase(field.name)),\n        // label: sails.__({\n        //   phrase: getPhrase(field.name),\n        //   locale: langCode || 'zh-TW',\n        // }),\n        required: autoRequired.some((r) => r === field.name),\n        readonly: autoReadonly.some((r) => r === field.name),\n      }));\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 依據給予的 Sequelize Model 名稱，產生空白的欄位格式 JSON，並以 null 填充。\n * @version 20180310\n * @param {Object} {\n *     modelName{String} = null, 目標 Model 名稱。\n *     exclude{Array} = [], 要排除的欄位名稱。\n *     include{Array} = [], 要額外加入的欄位名稱。\n * }\n * @example\n * QueryHelper.buildEmptyModel({\n *    modelName: 'User',\n *    exclude: ['id'],\n * }),\n * // {\n * //  locale: null,\n * //  weights: null,\n * //  gender: null,\n * //  resetPasswordTokenExpire: null,\n * //  username: null,\n * //  avatar: null,\n * //  avatarThumb: null,\n * //  score: null,\n * //  isActived: null,\n * //  resetPasswordToken: null,\n * //  verificationEmailToken: null,\n * //  isEmailVerified: null,\n * //  createdAt: null,\n * //  updatedAt: null,\n * //  deletedAt: null,\n * // }\n * @returns {Object} 空的 model 欄位格式 JSON。\n */\nexport function buildEmptyModel({\n  modelName = null,\n  exclude = [],\n  include = [],\n} = {}) {\n  try {\n    const model = {};\n    this.getModelColumns({\n      modelName,\n      exclude,\n      include,\n    }).forEach((e) => {\n      model[e.replace(`${modelName}.`, '')] = null;\n    });\n    return model;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 取得某個 Sequelize Model 的所有欄位名稱。\n * @version 20180310\n * @param {Object} {\n *     modelPrefix = false,\n *     modelName = null,\n *     exclude = [],\n *     include = [],\n *   }\n * @example 取得 Parent 的欄位，同時加上 email/nameTW/nameEN 三個額外欄位、排除\n * id/UserId/createdAt/updatedAt 四個欄位，並且在查詢得到的欄位名稱前加上 `Parent` prefix。\n * QueryHelper.getModelColumns({\n *    modelName: 'Parent',\n *    modelPrefix: true,\n *    exclude: ['id', 'UserId', 'createdAt', 'updatedAt'],\n *    include: ['email', 'nameTW', 'nameEN'],\n *  });\n * // [ 'Parent.education',\n * //   'Parent.union',\n * //   'Parent.phone',\n * //   'Parent.fax',\n * //   'Parent.app',\n * //   'Parent.comment',\n * //   'Parent.address',\n * //   'Parent.passportName',\n * //   'Parent.profession',\n * //   'Parent.birthday',\n * //   'Parent.idNumber',\n * //   'Parent.mobile',\n * //   'Parent.city',\n * //   'Parent.password',\n * //   'Parent.studentNames',\n * //   'email',\n * //   'nameTW',\n * //   'nameEN' ]\n * @returns {Array} Sequelize Model column names\n * @see {@link https://lodash.com/docs/4.17.5#keys}\n */\nexport function getModelColumns({\n  modelPrefix = false,\n  isPrefixPlural = false,\n  modelName = null,\n  exclude = [],\n  include = [],\n  required = false,\n}) {\n  try {\n    // 取得 model\n    const model = this.getModelByName(modelName);\n    // 取得單複數 model name\n    const outputModelName = isPrefixPlural\n      ? inflection.pluralize(model.name)\n      : model.name;\n    // 組合\n    let prefix = '';\n    if (_.isBoolean(modelPrefix)) {\n      prefix = modelPrefix ? `${outputModelName}.` : '';\n    } else if (_.isString(modelPrefix)) {\n      prefix = `${modelPrefix}.`;\n    }\n    // 自動取得所有欄位\n    const attributes = _.keys(model.rawAttributes)\n      .filter((column) => !exclude.some((ex) => column === ex))\n      .filter((column) => !this.commonFields.some((ex) => column === ex))\n      .filter((column) => {\n        if (required) {\n          const target = model.rawAttributes[column];\n          // Console.log('target=>', target);\n          return target.allowNull !== true && target.primaryKey !== true;\n        }\n        return true;\n      })\n      .map((e) => `${_.upperFirst(prefix)}${e}`)\n      .concat(include);\n    return attributes;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 取得特定 model 內 column 的類型，回傳值為 Sequelize 的 type 字串。\n * @version 20180331\n * @param {Object} {\n *     modelName{String} = null,\n *     columnName{String} = null,\n *  }\n * @example 取得 User 的 email 欄位類型\n * getModelColumnType({\n *    modelName = 'User',\n *    columnName = 'email',\n * });\n * // 'String'\n * @returns {String|Null} column type\n * @see {@link http://docs.sequelizejs.com/manual/tutorial/models-definition.html}\n */\nexport function getModelColumnType({ modelName = null, columnName = null }) {\n  try {\n    const model = this.getModelByName(modelName);\n    // 自動取得所有欄位\n    const column = model.rawAttributes[columnName];\n    if (!_.isNil(column)) {\n      return column.type.key;\n    }\n    return null;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 取得給予 ModelName 之關聯 ModelName，可透過參數指定取得單數或複數名稱。\n * @param {*} modelName\n * @param {*} { singular = false, plural = false }\n * @returns [String...]\n */\nexport function getAssociations(\n  modelName,\n  {\n    singular = false,\n    plural = false,\n    one2One = false,\n    one2Many = false,\n    raw = false,\n  } = {},\n) {\n  const model = this.getModelByName(modelName);\n  const { associations } = model;\n  const result = [];\n  Object.keys(associations).forEach((key) => {\n    const association = {};\n    // all needed information in the 'options' object\n    if (_.has(associations[key], 'options')) {\n      association[key] = associations[key].options;\n      const singularName = association[key].name.singular;\n      const pluralName = association[key].name.plural;\n      if (associations[key].options.constraints !== false) {\n        // // Console.log('associations[key]=>');\n        // // Console.dir(associations[key]);\n        // Console.log('associations[key].HasMany=>', associations[key].hasMany);\n        // Console.dir(associations[key].target);\n        if (singular) {\n          result.push(singularName);\n        } else if (plural) {\n          result.push(pluralName);\n        } else if (one2One) {\n          if (key === singularName) result.push(key);\n        } else if (one2Many) {\n          if (key === pluralName) result.push(key);\n        } else if (raw) {\n          result.push({\n            name: key,\n            singular: singularName,\n            plural: pluralName,\n\n            options: associations[key].options,\n            rawName: association[key].name,\n          });\n        } else {\n          result.push(key);\n        }\n      }\n    }\n  });\n  return result;\n}\n\n/**\n * 取得給予 ModelName 之關聯 ModelName 的欄位名稱，可透過 include 參數指定複數關聯 Model 的欄位名稱。\n * @param {*} modelName\n * @param {*} include\n * @param {*} prefix\n * @returns [String...]\n */\nexport function getIncludeModelColumns({\n  modelName,\n  include,\n  prefix,\n}) {\n  const modelAssociations = this.getAssociations(modelName, {\n    raw: true,\n  });\n  const namePool = modelAssociations.map((association) => association.name);\n  const singularPool = modelAssociations.map((association) => association.singular);\n\n  let result = [];\n  for (const model of include) {\n    const modelItem = this.getIncludeModelByObject(model);\n    const index = singularPool.indexOf(modelItem.name);\n\n    if (index !== -1) {\n      const modelPrefix = prefix ? `${prefix}.${namePool[index]}` : namePool[index];\n      const columns = this.getModelColumns({\n        modelName: modelItem.name,\n        modelPrefix,\n      });\n\n      result = result.concat(columns);\n\n      if (model.include && Array.isArray(model.include)) {\n        result = result.concat(this.getIncludeModelColumns({\n          modelName: modelItem.name,\n          include: model.include,\n          prefix: modelPrefix,\n        }));\n      }\n    }\n  }\n\n  Console.log('result========>');\n  Console.log(result);\n  return result;\n}\n\nexport function modelAssociationsToArray(model) {\n  const result = [];\n  if (typeof model !== 'function' || typeof model.associations !== 'object') {\n    throw Error(\"Model should be an object with the 'associations' property.\");\n  }\n  Object.keys(model.associations).forEach((key) => {\n    const association = {};\n    // all needed information in the 'options' object\n    if (_.has(model.associations[key], 'options')) {\n      association[key] = model.associations[key].options;\n    }\n    result.push(association);\n  });\n  return result;\n}\n\nexport default {};\n",
     "static": true,
-    "longname": "/Users/kent/Project/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.js",
+    "longname": "/home/rsghost/dev/cases/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
@@ -961,7 +961,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 19,
+    "lineNumber": 20,
     "undocument": true,
     "type": {
       "types": [
@@ -982,7 +982,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 21,
+    "lineNumber": 22,
     "undocument": true,
     "type": {
       "types": [
@@ -1005,7 +1005,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{validate}",
     "description": null,
-    "lineNumber": 36,
+    "lineNumber": 37,
     "undocument": true,
     "params": [
       {
@@ -1045,7 +1045,7 @@
     "examples": [
       "model.User.createdAt ==> model.createdAt"
     ],
-    "lineNumber": 52,
+    "lineNumber": 53,
     "params": [
       {
         "nullable": null,
@@ -1078,7 +1078,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{getModelByName}",
     "description": null,
-    "lineNumber": 71,
+    "lineNumber": 72,
     "undocument": true,
     "params": [
       {
@@ -1108,7 +1108,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{getIncludeModelByObject}",
     "description": null,
-    "lineNumber": 98,
+    "lineNumber": 99,
     "undocument": true,
     "params": [
       {
@@ -1141,7 +1141,7 @@
     "examples": [
       "取出 Parent 中，全部屬性為文字類型的欄位名稱。\nQueryHelper.getModelSearchableColumns('Parent');\n// *  [{ key: 'Parent.education', type: 'String' }\n// *   { key: 'Parent.password', type: 'String' }]"
     ],
-    "lineNumber": 148,
+    "lineNumber": 149,
     "version": "1.0",
     "unknown": [
       {
@@ -1187,7 +1187,7 @@
     "examples": [
       "取出 Parent 中 ENUM 欄位 union 的全部值。\nQueryHelper.getEnumValues('Parent', 'union');\n// * [ '非會員', '個人會員', '學生會員', '相關會員', '理事', '監事', '理事長', '常務理事', '常務監事' ]"
     ],
-    "lineNumber": 206,
+    "lineNumber": 207,
     "version": "1.0",
     "unknown": [
       {
@@ -1244,7 +1244,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{getModelOutputColumns}",
     "description": "產生 VUE form 需要的欄位名稱與類型",
-    "lineNumber": 227,
+    "lineNumber": 228,
     "unknown": [
       {
         "tagName": "@returns",
@@ -1286,7 +1286,7 @@
     "examples": [
       "QueryHelper.buildEmptyModel({\n   modelName: 'User',\n   exclude: ['id'],\n}),\n// {\n//  locale: null,\n//  weights: null,\n//  gender: null,\n//  resetPasswordTokenExpire: null,\n//  username: null,\n//  avatar: null,\n//  avatarThumb: null,\n//  score: null,\n//  isActived: null,\n//  resetPasswordToken: null,\n//  verificationEmailToken: null,\n//  isEmailVerified: null,\n//  createdAt: null,\n//  updatedAt: null,\n//  deletedAt: null,\n// }"
     ],
-    "lineNumber": 356,
+    "lineNumber": 357,
     "version": "20180310",
     "unknown": [
       {
@@ -1335,7 +1335,7 @@
     "see": [
       "{@link https://lodash.com/docs/4.17.5#keys}"
     ],
-    "lineNumber": 415,
+    "lineNumber": 416,
     "version": "20180310",
     "unknown": [
       {
@@ -1384,7 +1384,7 @@
     "see": [
       "{@link http://docs.sequelizejs.com/manual/tutorial/models-definition.html}"
     ],
-    "lineNumber": 474,
+    "lineNumber": 475,
     "version": "20180331",
     "unknown": [
       {
@@ -1428,7 +1428,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{getAssociations}",
     "description": "取得給予 ModelName 之關聯 ModelName，可透過參數指定取得單數或複數名稱。",
-    "lineNumber": 495,
+    "lineNumber": 496,
     "unknown": [
       {
         "tagName": "@returns",
@@ -1480,7 +1480,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{getIncludeModelColumns}",
     "description": "取得給予 ModelName 之關聯 ModelName 的欄位名稱，可透過 include 參數指定複數關聯 Model 的欄位名稱。",
-    "lineNumber": 553,
+    "lineNumber": 554,
     "unknown": [
       {
         "tagName": "@returns",
@@ -1542,7 +1542,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{modelAssociationsToArray}",
     "description": null,
-    "lineNumber": 593,
+    "lineNumber": 594,
     "undocument": true,
     "params": [
       {
@@ -1570,7 +1570,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{langCode}",
     "description": null,
-    "lineNumber": 25,
+    "lineNumber": 26,
     "undocument": true,
     "type": {
       "types": [
@@ -1590,7 +1590,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{commonFields}",
     "description": null,
-    "lineNumber": 26,
+    "lineNumber": 27,
     "undocument": true,
     "type": {
       "types": [
@@ -1610,7 +1610,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{TAG}",
     "description": null,
-    "lineNumber": 18,
+    "lineNumber": 19,
     "undocument": true,
     "type": {
       "types": [
@@ -1632,7 +1632,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{isNumeric}",
     "description": null,
-    "lineNumber": 27,
+    "lineNumber": 28,
     "undocument": true,
     "params": [
       {
@@ -1656,7 +1656,7 @@
     "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.js",
     "importStyle": "{isDate}",
     "description": null,
-    "lineNumber": 28,
+    "lineNumber": 29,
     "undocument": true,
     "type": {
       "types": [
@@ -1667,16 +1667,1094 @@
   {
     "__docId__": 80,
     "kind": "file",
-    "name": "QueryHelper/QueryHelper.update.js",
-    "content": "/**\n * 依據給予的 ID 與資料更新 target modelName\n * @version 1.0\n * @param Required {Object} {\n *     langCode{String} = 'zh-TW',   要更新的資料語系。\n *     modelName{String} = null,     要更新的目標 Sequelize Model 名稱。\n *     include{Object|Array} = null, 額外給予的 Sequelize Query-include 參數。\n *     input{Object} = null,         要新增的原始資料。\n *     where{Object} = null,         更新時的 Sequelize Query-where 查詢。\n *   }\n * @param Optional {Object} {\n *     format{Object} = null,        原始資料的格式化樣板。\n *     formatCb{Object} = null,      原始資料的格式化 callback。\n *     updateCb{Object} = null,      資料更新完成後，輸出之前的 callback（支援 await）。\n *   }\n * @example 依據 User ID 更新 User，並且更新連帶的 Parent 與 Student，同時有給予一組輸入格式 format。\n * QueryHelper.update({\n *    modelName: 'User',\n *    include: [Passport, {\n *      model: Parent,\n *      include: [{\n *        model: Student,\n *        through: 'StudentParent',\n *      }],\n *    }],\n *    where: { id },\n *    input: inputData,\n *  }, {\n *    format,\n *    formatCb: null,\n *  });\n * @returns {Object} updated item\n */\nimport _ from 'lodash';\n\nexport default async function update(\n  {\n    langCode = this.langCode,\n    modelName = null,\n    include = null,\n    input = null,\n    where = null,\n  } = {},\n  { format = null, formatCb = null } = {},\n) {\n  try {\n    const { error, value } = this.validate({\n      value: {\n        modelName,\n        input,\n        where,\n        langCode,\n        include,\n        format,\n        formatCb,\n      },\n      schema: (j) => ({\n        modelName: j.string().required(),\n        input: j.object().required(),\n        where: j.object().required(),\n        langCode: j.string(),\n        include: j.array().items(j.any()).allow(null),\n        format: j.array().items(j.string()).allow(null),\n        formatCb: j.func().allow(null),\n      }),\n    });\n    if (error) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.PARAMETER_FORMAT_INVALID({\n          error,\n          value,\n        }),\n      );\n    }\n    // Console.log('update modelName=>', modelName);\n    const model = this.getModelByName(modelName);\n    if (langCode) {\n      // TODO: 語系篩選\n    }\n    // Console.log('update input==============>');\n    // Console.dir(input);\n    const query = {\n      where,\n    };\n    if (include) {\n      query.include = include;\n    }\n    let target = await model.findOne(query);\n    if (!target) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.NO_TARGET_FOUNDED({\n          where: `${modelName}:${_.values(where)}`,\n        }),\n      );\n    }\n    if (!format) {\n      // Console.log('associations=>', associations);\n      // eslint-disable-next-line\n      format = this.getModelColumns({\n        modelName,\n        modelPrefix: false,\n        include: include\n          ? this.getIncludeModelColumns({\n            modelName,\n            include,\n          }) : null,\n      });\n      // Console.log('update format==============>');\n      // Console.dir(format);\n    }\n    target = _.merge(\n      target,\n      this.formatInput({\n        modelName,\n        format,\n        formatCb,\n        source: target,\n        rawData: input,\n      }),\n    );\n    // Console.log('update data==============>');\n    // Console.log('target.toJSON=>', target.toJSON);\n    // Console.log('target.save=>', target.save);\n    // Console.dir(target.toJSON ? target.toJSON() : target);\n    const structure = target.toJSON ? target.toJSON() : target;\n    // Console.log('structure=>', structure);\n    const updateIncludeObject = [];\n    Object.keys(structure).forEach((item) => {\n      if (_.isObject(structure[item]) && target[item].save) {\n        updateIncludeObject.push(target[item].save());\n      }\n    });\n    const result = (await Promise.all(updateIncludeObject)) && (await target.save());\n    return result;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n",
+    "name": "QueryHelper/QueryHelper.select.js",
+    "content": "/* eslint no-await-in-loop: 0 */\nimport _ from 'lodash';\n\nfunction formatOperator(operator) {\n  const { Op } = Sequelize;\n  let op;\n  switch (operator) {\n    case '<>':\n      op = Op.ne;\n      break;\n    case '=':\n      op = Op.eq;\n      break;\n    case 'like':\n      op = Op.like;\n      break;\n    default:\n      throw Error('this operator not supported.');\n  }\n\n  return op;\n}\n\nfunction formatCondition(condition) {\n  const { Op } = Sequelize;\n  let cond;\n  switch (condition) {\n    case 'and':\n      cond = Op.and;\n      break;\n    case 'or':\n      cond = Op.or;\n      break;\n    default:\n      throw Error('this condition not supported.');\n  }\n\n  return cond;\n}\n\nfunction formatQuery({\n  attributes = [],\n  model = undefined,\n  filter = {},\n  include = [],\n  collate = undefined,\n  searchable = undefined,\n  duplicating = false,\n  paging = true,\n  curPage = 1,\n  perPage = 30,\n  sort = 'DESC',\n  sortBy = undefined,\n  order = undefined,\n  group = undefined,\n  limit = undefined,\n  log = false,\n}) {\n  let sortByColumn = null;\n  try {\n    let mOrder = order;\n    const columns = _.keys(model.rawAttributes);\n\n    if (sortBy) {\n      sortByColumn = sortBy;\n    } else if (columns.some((c) => c === 'createdAt')) {\n      sortByColumn = 'createdAt';\n    } else if (columns.some((c) => c === 'id')) {\n      sortByColumn = 'id';\n    }\n\n    if (sortByColumn && !mOrder) {\n      mOrder = [[Sequelize.col(sortByColumn), sort]];\n    }\n\n    // 組合搜尋 query\n    const query = {\n      where: {},\n      order: mOrder,\n      collate,\n      duplicating,\n      ...paging ? {\n        limit: limit && limit > perPage ? perPage : limit,\n        offset: (curPage - 1) * perPage,\n      } : {\n        ...limit ? { limit } : {},\n      },\n    };\n\n    if (include && _.isArray(include)) {\n      query.include = [];\n      include.forEach((e) => {\n        const inc = {\n          model: e.model,\n        };\n        if (e.as) {\n          inc.as = e.as;\n        }\n        if (e.limit) {\n          inc.limit = e.limit;\n        }\n        if (e.where) {\n          inc.where = e.where;\n        }\n        if (e.include) {\n          inc.include = e.include;\n        }\n        if (e.through) {\n          inc.through = e.through;\n        }\n        if (e.required) {\n          inc.required = e.required;\n        }\n        if (e.attributes) {\n          inc.attributes = e.attributes;\n        }\n        query.include.push(inc);\n      });\n    }\n\n    if (attributes) {\n      query.attributes = attributes;\n    }\n\n    // 如果有指定完全符合欄位\n    if (filter.where) {\n      const defaultCondition = formatCondition('and');\n      if (!searchable) {\n        _.forEach(filter.where, (value, key) => {\n          const op = formatOperator('like');\n          query.where[defaultCondition].push({\n            [key]: {\n              [op]: filter.where[key],\n            },\n          });\n        });\n      } else {\n        // 組合 searchable\n        _.forEach(searchable, (value, key) => {\n          if (log && !filter.where[key]) {\n            sails.log(`searchable[${key}] is exists but request[${key}] missing.`);\n          }\n\n          if (_.isString(value) && filter.where[key]) {\n            if (!query.where[defaultCondition]) {\n              query.where[defaultCondition] = [];\n            }\n\n            const op = formatOperator(value);\n            query.where[defaultCondition].push({\n              [key]: {\n                [op]: filter.where[key],\n              },\n            });\n          } else if (_.isObject(value)) {\n            const {\n              operator,\n              condition,\n              defaultValue,\n            } = value;\n\n            const op = formatOperator(operator);\n            const cond = formatCondition(condition);\n\n            if (!query.where[cond]) {\n              query.where[cond] = [];\n            }\n\n            query.where[cond].push({\n              [key]: {\n                [op]: filter.where[key] ? filter.where[key] : defaultValue,\n              },\n            });\n          }\n        });\n\n        _.forEach(filter.where, (value, key) => {\n          if (Object.keys(searchable).indexOf(key) === -1) {\n            const op = formatOperator('like');\n            query.where[defaultCondition].push({\n              [key]: {\n                [op]: value,\n              },\n            });\n          }\n        });\n      }\n    }\n\n    if (log) {\n      if (_.isObject(log)) {\n        query.logging = log;\n      }\n      query.logging = Console.log;\n    }\n\n    if (_.isNil(group) && include) {\n      query.group = [`${model.name}.id`];\n    } else if (!_.isNil(group) && group !== false) {\n      query.group = group;\n    }\n    // Console.log('query=>');\n    // Console.dir(query);\n    return query;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\nasync function formatOutput({\n  presenter = null,\n  data = null,\n}) {\n  try {\n    let result;\n    if (!_.isNil(presenter) && _.isFunction(presenter)) {\n      if (presenter.constructor.name === 'AsyncFunction') {\n        result = await presenter(data);\n      } else {\n        result = presenter(data);\n      }\n    } else {\n      result = data;\n    }\n    return result;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\nasync function find(\n  {\n    model = undefined,\n    scope = [],\n    include = [],\n    attributes = [],\n    searchable = undefined,\n    presenter = undefined,\n    filter = {\n      where: {},\n    },\n    sort = 'DESC',\n    sortBy = undefined,\n    order = undefined,\n    collate = undefined,\n    group = undefined,\n    limit = undefined,\n    log = false,\n    paging = true,\n    curPage = 1,\n    perPage = 30,\n  } = {},\n) {\n  try {\n    if (!model || !model.name) {\n      throw Error('model missing.');\n    }\n\n    const query = formatQuery({\n      searchable,\n      attributes,\n      curPage,\n      perPage,\n      filter,\n      sort,\n      sortBy,\n      order,\n      collate,\n      model,\n      include,\n      log,\n      group,\n      limit,\n    });\n    if (log) {\n      sails.log.debug('query=>');\n      Console.dir(query);\n    }\n    let data = null;\n    if (scope) {\n      data = await model.scope(scope).findAndCountAll(query);\n    } else {\n      data = await model.findAndCountAll(query);\n    }\n\n    const items = [];\n    for (const row of data.rows) {\n      items.push(await formatOutput({\n        presenter,\n        data: row,\n      }));\n    }\n\n    const total = typeof data.count === 'number' ? data.count : data.count.length;\n    return {\n      paging: {\n        lastPage: paging ? Math.ceil(total / perPage) || 1 : null,\n        curPage: paging ? curPage : null,\n        perPage: paging ? perPage : null,\n        sort: sort.toUpperCase(),\n        sortBy: sortBy ? sortBy.toLowerCase() : sortBy,\n        order,\n        limit: limit || null,\n        total,\n      },\n      filter,\n      items,\n    };\n  } catch (e) {\n    // Console.timeEnd(tag);\n    sails.log.error(e);\n    throw e;\n  }\n}\n\nclass Query {\n  constructor() {\n    this.data = {\n      attributes: [],\n      model: null,\n      scope: [],\n      include: [],\n      where: {},\n      request: {},\n      presenter: null,\n      searchable: null,\n      keyword: null,\n      useWhere: [],\n      useRawWhere: null,\n    };\n  }\n\n  /**\n   * @param {object} model - 要進行查詢的 Sequelize models\n   */\n  select(model) {\n    this.data.model = model;\n    return this;\n  }\n\n  /**\n   * @param {Array} models - 要 include 的 Sequelize models array\n   */\n  useInclude(models) {\n    if (Array.isArray(models)) {\n      this.data.include = this.data.include.concat(models);\n    }\n    return this;\n  }\n\n  /**\n   * @param {string|Array} scope - 要使用的 scope name 或 name array\n   */\n  useScope(scope) {\n    if (typeof scope === 'string') {\n      this.data.scope.push(scope);\n    } else if (Array.isArray(scope)) {\n      this.data.scope = this.data.scope.concat(scope);\n    }\n    return this;\n  }\n\n  /**\n   * @param {string|object} searchable - 只有 string 時為 Sequelize operator 且預設 condition 為 and\n   * @param {string} searchable.operator - Sequelize operator, 支援 <>, =, like\n   * @param {string} searchable.condition - Sequelize condition, 支援 and, or\n   * @param {string} searchable.defaultValue - 搜尋數值未填入時的預設搜尋內容\n   */\n  useSearchable(searchable) {\n    this.data.searchable = {\n      ...this.data.searchable ? this.data.searchable : {},\n      ...searchable,\n    };\n    return this;\n  }\n\n  /**\n   * @param {Array} attributes - 查詢時所需的 attributes\n   */\n  useAttribute(attributes) {\n    if (Array.isArray(attributes)) {\n      this.data.attributes = this.data.attributes.concat(attributes);\n    }\n    return this;\n  }\n\n  /**\n   * @param {object|function(request: object)} parameter -\n   * where 查詢內容 object,\n   * 傳入 function 時, function 會傳入 useRequest 所儲存的結果,\n   * useWhere 的查詢在未使用 useSearchable 時預設 operator 為 like\n   */\n  useWhere(parameter) {\n    this.data.useWhere.push(parameter);\n    return this;\n  }\n\n  /**\n   * @param {object} parameter -\n   * 原始 where 查詢 object, 使用後將忽略 useWhere() 的功能\n   */\n  useRawWhere(parameter) {\n    this.data.useRawWhere.push(parameter);\n    return this;\n  }\n\n  /**\n   * @param {object} request -\n   * 傳入 req.validate 驗證過後的 request 內容供 useWhere() 使用\n   */\n  useRequest(request) {\n    this.data.request = {\n      ...this.data.request,\n      ...request,\n    };\n    return this;\n  }\n\n  useView(view) {\n    this.data.view = {\n      includeColumns: view.includeColumns,\n      excludeColumns: view.excludeColumns,\n    };\n    return this;\n  }\n\n  useCache(cache) {\n    this.data.cache = {\n      minutes: cache.minutes,\n      target: cache.target,\n      tableName: cache.tableName,\n      redisPath: cache.redisPath,\n    };\n    return this;\n  }\n\n  /**\n   * @param {function} presenter - 用於 formating 查詢輸出的結果\n   */\n  usePresenter(presenter) {\n    if (typeof presenter === 'function') {\n      this.data.presenter = presenter;\n    }\n    return this;\n  }\n\n  /**\n   * @param {string} keyword - 全文檢索查詢用關鍵字\n   */\n  useFullTextSearch(keyword) {\n    if (typeof keyword === 'string') {\n      // FIXME: keyword 查詢未實作\n      this.data.keyword = keyword;\n    }\n    return this;\n  }\n\n  /**\n   * @param {object} query - 查詢用 object\n   * @param {number} [query.curPage=1] - 當前頁面位置\n   * @param {number} [query.perPage=30] - 每頁結果數量\n   * @param {string} [query.sort='DESC'] - 排序方法\n   * @param {string} query.sortBy - 排序欄位\n   * @param {object} query.order - 其他排序\n   * @param {Array} query.group - 分組\n   * @param {string} query.collate - 語系\n   * @param {number} query.limit - 搜尋數量上限\n   * @return {object} result - 回傳結果\n   * @property {Array} result.items - 搜尋結果\n   * @property {object} result.paging - 分頁設定\n   * @property {number} result.paging.lastPage - 最後一頁位置\n   * @property {number} result.paging.curPage - 當前頁面位置\n   * @property {number} result.paging.perPage - 每頁結果數量\n   * @property {string} result.paging.sort - 排序方法\n   * @property {string} result.paging.sortBy - 排序欄位\n   * @property {object} result.paging.order - 其他排序\n   * @property {number} result.paging.limit - 搜尋數量上限\n   * @property {number} result.paging.total - 總搜尋數量\n   */\n  getPaging({\n    curPage = 1,\n    perPage = 30,\n    sort = 'DESC',\n    sortBy,\n    order,\n    group,\n    collate,\n    limit,\n  }) {\n    for (const parameter of this.data.useWhere) {\n      let where = {};\n      if (typeof parameter === 'object') {\n        where = parameter;\n      } else if (typeof parameter === 'function') {\n        where = parameter(this.data.request);\n      }\n\n      this.data.where = {\n        ...this.data.where,\n        ...where,\n      };\n    }\n\n    if (this.data.useRawWhere) {\n      this.data.where = this.data.useRawWhere;\n    }\n\n    return find({\n      model: this.data.model,\n      scope: this.data.scope,\n      include: this.data.include,\n      attributes: this.data.attributes,\n      searchable: this.data.searchable,\n      presenter: this.data.presenter,\n      filter: {\n        where: this.data.where,\n      },\n      curPage,\n      perPage,\n      paging: true,\n      sort,\n      sortBy,\n      order,\n      group,\n      collate,\n      limit,\n    });\n  }\n\n  /**\n   * @param {object} query - 查詢用 object\n   * @param {string} [query.sort='DESC'] - 排序方法\n   * @param {string} query.sortBy - 排序欄位\n   * @param {object} query.order - 其他排序\n   * @param {Array} query.group - 分組\n   * @param {string} query.collate - 語系\n   * @param {number} query.limit - 搜尋數量上限\n   * @return {object} result - 回傳結果\n   * @property {Array} result.items - 搜尋結果\n   * @property {object} result.paging - 分頁設定\n   * @property {number} result.paging.lastPage - 最後一頁位置\n   * @property {number} result.paging.curPage - 當前頁面位置\n   * @property {number} result.paging.perPage - 每頁結果數量\n   * @property {string} result.paging.sort - 排序方法\n   * @property {string} result.paging.sortBy - 排序欄位\n   * @property {object} result.paging.order - 其他排序\n   * @property {number} result.paging.limit - 搜尋數量上限\n   * @property {number} result.paging.total - 總搜尋數量\n   */\n  findAll({\n    sort = 'DESC',\n    sortBy,\n    order,\n    group,\n    collate,\n    limit,\n  }) {\n    for (const parameter of this.data.useWhere) {\n      let where = {};\n      if (typeof parameter === 'object') {\n        where = parameter;\n      } else if (typeof parameter === 'function') {\n        where = parameter(this.data.request);\n      }\n\n      this.data.where = {\n        ...this.data.where,\n        ...where,\n      };\n    }\n\n    return find({\n      model: this.data.model,\n      scope: this.data.scope,\n      include: this.data.include,\n      attributes: this.data.attributes,\n      searchable: this.data.searchable,\n      presenter: this.data.presenter,\n      filter: {\n        where: this.data.where,\n      },\n      paging: false,\n      sort,\n      sortBy,\n      order,\n      group,\n      collate,\n      limit,\n    });\n  }\n}\n\n/**\n * 將回傳 class Query 並呼叫 Query.select(model)\n * @param {model} model - 要進行查詢的 Sequelize models\n */\nexport default function select(model) {\n  return new Query().select(model);\n}\n\nexport {\n  Query,\n};\n",
     "static": true,
-    "longname": "/Users/kent/Project/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.update.js",
+    "longname": "/home/rsghost/dev/cases/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.select.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
     "__docId__": 81,
+    "kind": "function",
+    "name": "formatOperator",
+    "memberof": "QueryHelper/QueryHelper.select.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "QueryHelper/QueryHelper.select.js~formatOperator",
+    "access": "public",
+    "export": false,
+    "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.select.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true,
+    "params": [
+      {
+        "name": "operator",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 82,
+    "kind": "function",
+    "name": "formatCondition",
+    "memberof": "QueryHelper/QueryHelper.select.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "QueryHelper/QueryHelper.select.js~formatCondition",
+    "access": "public",
+    "export": false,
+    "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.select.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 24,
+    "undocument": true,
+    "params": [
+      {
+        "name": "condition",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 83,
+    "kind": "function",
+    "name": "formatQuery",
+    "memberof": "QueryHelper/QueryHelper.select.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "QueryHelper/QueryHelper.select.js~formatQuery",
+    "access": "public",
+    "export": false,
+    "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.select.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 41,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"attributes\": *, \"model\": *, \"filter\": *, \"include\": *, \"collate\": *, \"searchable\": *, \"duplicating\": *, \"paging\": *, \"curPage\": *, \"perPage\": *, \"sort\": *, \"sortBy\": *, \"order\": *, \"group\": *, \"limit\": *, \"log\": *}"
+        ],
+        "defaultRaw": {
+          "attributes": null,
+          "model": null,
+          "filter": null,
+          "include": null,
+          "collate": null,
+          "searchable": null,
+          "duplicating": null,
+          "paging": null,
+          "curPage": null,
+          "perPage": null,
+          "sort": null,
+          "sortBy": null,
+          "order": null,
+          "group": null,
+          "limit": null,
+          "log": null
+        },
+        "defaultValue": "{\"attributes\":null,\"model\":null,\"filter\":null,\"include\":null,\"collate\":null,\"searchable\":null,\"duplicating\":null,\"paging\":null,\"curPage\":null,\"perPage\":null,\"sort\":null,\"sortBy\":null,\"order\":null,\"group\":null,\"limit\":null,\"log\":null}"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 84,
+    "kind": "function",
+    "name": "formatOutput",
+    "memberof": "QueryHelper/QueryHelper.select.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "QueryHelper/QueryHelper.select.js~formatOutput",
+    "access": "public",
+    "export": false,
+    "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.select.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 211,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"presenter\": *, \"data\": *}"
+        ],
+        "defaultRaw": {
+          "presenter": null,
+          "data": null
+        },
+        "defaultValue": "{\"presenter\":null,\"data\":null}"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 85,
+    "kind": "function",
+    "name": "find",
+    "memberof": "QueryHelper/QueryHelper.select.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "QueryHelper/QueryHelper.select.js~find",
+    "access": "public",
+    "export": false,
+    "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.select.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 233,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "optional": true,
+        "types": [
+          "{\"model\": *, \"scope\": *, \"include\": *, \"attributes\": *, \"searchable\": *, \"presenter\": *, \"filter\": *, \"sort\": *, \"sortBy\": *, \"order\": *, \"collate\": *, \"group\": *, \"limit\": *, \"log\": *, \"paging\": *, \"curPage\": *, \"perPage\": *}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"paging\": *, \"filter\": *, \"items\": *}"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 86,
+    "kind": "function",
+    "name": "select",
+    "memberof": "QueryHelper/QueryHelper.select.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "QueryHelper/QueryHelper.select.js~select",
+    "access": "public",
+    "export": true,
+    "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.select.js",
+    "importStyle": "select",
+    "description": "將回傳 class Query 並呼叫 Query.select(model)",
+    "lineNumber": 599,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "model"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "model",
+        "description": "要進行查詢的 Sequelize models"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 87,
+    "kind": "class",
+    "name": "Query",
+    "memberof": "QueryHelper/QueryHelper.select.js",
+    "static": true,
+    "longname": "QueryHelper/QueryHelper.select.js~Query",
+    "access": "public",
+    "export": true,
+    "importPath": "sails-hook-sequelize-querier/QueryHelper/QueryHelper.select.js",
+    "importStyle": "{Query}",
+    "description": null,
+    "lineNumber": 318,
+    "undocument": true,
+    "interface": false
+  },
+  {
+    "__docId__": 88,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#constructor",
+    "access": "public",
+    "description": null,
+    "lineNumber": 319,
+    "undocument": true
+  },
+  {
+    "__docId__": 89,
+    "kind": "member",
+    "name": "data",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#data",
+    "access": "public",
+    "description": null,
+    "lineNumber": 320,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"attributes\": *, \"model\": *, \"scope\": *, \"include\": *, \"where\": *, \"request\": *, \"presenter\": *, \"searchable\": *, \"keyword\": *, \"useWhere\": *, \"useRawWhere\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 90,
+    "kind": "method",
+    "name": "select",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#select",
+    "access": "public",
+    "description": "",
+    "lineNumber": 338,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "model",
+        "description": "要進行查詢的 Sequelize models"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 91,
+    "kind": "method",
+    "name": "useInclude",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#useInclude",
+    "access": "public",
+    "description": "",
+    "lineNumber": 346,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "models",
+        "description": "要 include 的 Sequelize models array"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 92,
+    "kind": "method",
+    "name": "useScope",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#useScope",
+    "access": "public",
+    "description": "",
+    "lineNumber": 356,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string",
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "scope",
+        "description": "要使用的 scope name 或 name array"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 93,
+    "kind": "method",
+    "name": "useSearchable",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#useSearchable",
+    "access": "public",
+    "description": "",
+    "lineNumber": 371,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string",
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "searchable",
+        "description": "只有 string 時為 Sequelize operator 且預設 condition 為 and"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "searchable.operator",
+        "description": "Sequelize operator, 支援 <>, =, like"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "searchable.condition",
+        "description": "Sequelize condition, 支援 and, or"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "searchable.defaultValue",
+        "description": "搜尋數值未填入時的預設搜尋內容"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 94,
+    "kind": "method",
+    "name": "useAttribute",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#useAttribute",
+    "access": "public",
+    "description": "",
+    "lineNumber": 382,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "attributes",
+        "description": "查詢時所需的 attributes"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 95,
+    "kind": "method",
+    "name": "useWhere",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#useWhere",
+    "access": "public",
+    "description": "",
+    "lineNumber": 395,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object",
+          "function(request: object)"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "parameter",
+        "description": "where 查詢內容 object,\n傳入 function 時, function 會傳入 useRequest 所儲存的結果,\nuseWhere 的查詢在未使用 useSearchable 時預設 operator 為 like"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 96,
+    "kind": "method",
+    "name": "useRawWhere",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#useRawWhere",
+    "access": "public",
+    "description": "",
+    "lineNumber": 404,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "parameter",
+        "description": "原始 where 查詢 object, 使用後將忽略 useWhere() 的功能"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 97,
+    "kind": "method",
+    "name": "useRequest",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#useRequest",
+    "access": "public",
+    "description": "",
+    "lineNumber": 413,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "request",
+        "description": "傳入 req.validate 驗證過後的 request 內容供 useWhere() 使用"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 98,
+    "kind": "method",
+    "name": "useView",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#useView",
+    "access": "public",
+    "description": null,
+    "lineNumber": 421,
+    "undocument": true,
+    "params": [
+      {
+        "name": "view",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 99,
+    "kind": "method",
+    "name": "useCache",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#useCache",
+    "access": "public",
+    "description": null,
+    "lineNumber": 429,
+    "undocument": true,
+    "params": [
+      {
+        "name": "cache",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 100,
+    "kind": "method",
+    "name": "usePresenter",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#usePresenter",
+    "access": "public",
+    "description": "",
+    "lineNumber": 442,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "presenter",
+        "description": "用於 formating 查詢輸出的結果"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 101,
+    "kind": "method",
+    "name": "useFullTextSearch",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#useFullTextSearch",
+    "access": "public",
+    "description": "",
+    "lineNumber": 452,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "keyword",
+        "description": "全文檢索查詢用關鍵字"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 102,
+    "kind": "method",
+    "name": "getPaging",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#getPaging",
+    "access": "public",
+    "description": "",
+    "lineNumber": 482,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query",
+        "description": "查詢用 object"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "1",
+        "defaultRaw": 1,
+        "name": "query.curPage",
+        "description": "當前頁面位置"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "30",
+        "defaultRaw": 30,
+        "name": "query.perPage",
+        "description": "每頁結果數量"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "'DESC'",
+        "defaultRaw": "'DESC'",
+        "name": "query.sort",
+        "description": "排序方法"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query.sortBy",
+        "description": "排序欄位"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query.order",
+        "description": "其他排序"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query.group",
+        "description": "分組"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query.collate",
+        "description": "語系"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query.limit",
+        "description": "搜尋數量上限"
+      }
+    ],
+    "properties": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.items",
+        "description": "搜尋結果"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging",
+        "description": "分頁設定"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.lastPage",
+        "description": "最後一頁位置"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.curPage",
+        "description": "當前頁面位置"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.perPage",
+        "description": "每頁結果數量"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.sort",
+        "description": "排序方法"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.sortBy",
+        "description": "排序欄位"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.order",
+        "description": "其他排序"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.limit",
+        "description": "搜尋數量上限"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.total",
+        "description": "總搜尋數量"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object"
+      ],
+      "spread": false,
+      "description": "result - 回傳結果"
+    }
+  },
+  {
+    "__docId__": 103,
+    "kind": "method",
+    "name": "findAll",
+    "memberof": "QueryHelper/QueryHelper.select.js~Query",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "QueryHelper/QueryHelper.select.js~Query#findAll",
+    "access": "public",
+    "description": "",
+    "lineNumber": 552,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query",
+        "description": "查詢用 object"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "'DESC'",
+        "defaultRaw": "'DESC'",
+        "name": "query.sort",
+        "description": "排序方法"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query.sortBy",
+        "description": "排序欄位"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query.order",
+        "description": "其他排序"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query.group",
+        "description": "分組"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query.collate",
+        "description": "語系"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query.limit",
+        "description": "搜尋數量上限"
+      }
+    ],
+    "properties": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.items",
+        "description": "搜尋結果"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging",
+        "description": "分頁設定"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.lastPage",
+        "description": "最後一頁位置"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.curPage",
+        "description": "當前頁面位置"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.perPage",
+        "description": "每頁結果數量"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.sort",
+        "description": "排序方法"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.sortBy",
+        "description": "排序欄位"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.order",
+        "description": "其他排序"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.limit",
+        "description": "搜尋數量上限"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result.paging.total",
+        "description": "總搜尋數量"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object"
+      ],
+      "spread": false,
+      "description": "result - 回傳結果"
+    }
+  },
+  {
+    "__docId__": 104,
+    "kind": "file",
+    "name": "QueryHelper/QueryHelper.update.js",
+    "content": "/**\n * 依據給予的 ID 與資料更新 target modelName\n * @version 1.0\n * @param Required {Object} {\n *     langCode{String} = 'zh-TW',   要更新的資料語系。\n *     modelName{String} = null,     要更新的目標 Sequelize Model 名稱。\n *     include{Object|Array} = null, 額外給予的 Sequelize Query-include 參數。\n *     input{Object} = null,         要新增的原始資料。\n *     where{Object} = null,         更新時的 Sequelize Query-where 查詢。\n *   }\n * @param Optional {Object} {\n *     format{Object} = null,        原始資料的格式化樣板。\n *     formatCb{Object} = null,      原始資料的格式化 callback。\n *     updateCb{Object} = null,      資料更新完成後，輸出之前的 callback（支援 await）。\n *   }\n * @example 依據 User ID 更新 User，並且更新連帶的 Parent 與 Student，同時有給予一組輸入格式 format。\n * QueryHelper.update({\n *    modelName: 'User',\n *    include: [Passport, {\n *      model: Parent,\n *      include: [{\n *        model: Student,\n *        through: 'StudentParent',\n *      }],\n *    }],\n *    where: { id },\n *    input: inputData,\n *  }, {\n *    format,\n *    formatCb: null,\n *  });\n * @returns {Object} updated item\n */\nimport _ from 'lodash';\n\nexport default async function update(\n  {\n    langCode = this.langCode,\n    modelName = null,\n    include = null,\n    input = null,\n    where = null,\n  } = {},\n  { format = null, formatCb = null } = {},\n) {\n  try {\n    const { error, value } = this.validate({\n      value: {\n        modelName,\n        input,\n        where,\n        langCode,\n        include,\n        format,\n        formatCb,\n      },\n      schema: (j) => ({\n        modelName: j.string().required(),\n        input: j.object().required(),\n        where: j.object().required(),\n        langCode: j.string(),\n        include: j.array().items(j.any()).allow(null),\n        format: j.array().items(j.string()).allow(null),\n        formatCb: j.func().allow(null),\n      }),\n    });\n    if (error) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.PARAMETER_FORMAT_INVALID({\n          error,\n          value,\n        }),\n      );\n    }\n    // Console.log('update modelName=>', modelName);\n    const model = this.getModelByName(modelName);\n    if (langCode) {\n      // TODO: 語系篩選\n    }\n    // Console.log('update input==============>');\n    // Console.dir(input);\n    const query = {\n      where,\n    };\n    if (include) {\n      query.include = include;\n    }\n    let target = await model.findOne(query);\n    if (!target) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.NO_TARGET_FOUNDED({\n          where: `${modelName}:${_.values(where)}`,\n        }),\n      );\n    }\n    if (!format) {\n      // Console.log('associations=>', associations);\n      // eslint-disable-next-line\n      format = this.getModelColumns({\n        modelName,\n        modelPrefix: false,\n        include: include\n          ? this.getIncludeModelColumns({\n            modelName,\n            include,\n          }) : null,\n      });\n      // Console.log('update format==============>');\n      // Console.dir(format);\n    }\n    target = _.merge(\n      target,\n      this.formatInput({\n        modelName,\n        format,\n        formatCb,\n        source: target,\n        rawData: input,\n      }),\n    );\n    // Console.log('update data==============>');\n    // Console.log('target.toJSON=>', target.toJSON);\n    // Console.log('target.save=>', target.save);\n    // Console.dir(target.toJSON ? target.toJSON() : target);\n    const structure = target.toJSON ? target.toJSON() : target;\n    // Console.log('structure=>', structure);\n    const updateIncludeObject = [];\n    Object.keys(structure).forEach((item) => {\n      if (_.isObject(structure[item]) && target[item].save) {\n        updateIncludeObject.push(target[item].save());\n      }\n    });\n    const result = (await Promise.all(updateIncludeObject)) && (await target.save());\n    return result;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n",
+    "static": true,
+    "longname": "/home/rsghost/dev/cases/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.update.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 105,
     "kind": "function",
     "name": "update",
     "memberof": "QueryHelper/QueryHelper.update.js",
@@ -1718,18 +2796,18 @@
     }
   },
   {
-    "__docId__": 82,
+    "__docId__": 106,
     "kind": "file",
     "name": "QueryHelper/QueryHelper.view.js",
-    "content": "import _ from 'lodash';\n\n/**\n * 依據輸入資料格式化查詢 query\n * @version 1.0\n * @param {Object} {\n *     langCode{String} = 'zh-TW',      要查詢的資料語系。\n *     modelName{String} = null,        要查詢的目標 Sequelize Model 名稱。\n *     filter = null,\n *     include{Object|Array} = null, 額外給予的 Sequelize include Query。\n *     curPage = 1,\n *     perPage = 30,\n *     sort = 'DESC',\n *     order = null,\n *   }\n * @example\n * @returns {Object}\n */\nexport function formatQuery({\n  attributes = undefined,\n  langCode = 'zh-TW',\n  modelName = undefined,\n  filter = undefined,\n  include = undefined,\n  curPage = 1,\n  perPage = 30,\n  paging = true,\n  sort = 'DESC',\n  sortBy = undefined,\n  order = undefined,\n  group = undefined,\n  subQuery = undefined,\n  duplicating = undefined,\n  collate = undefined,\n  log = false,\n  condition = '$and',\n}) {\n  let sortByColumn = null;\n  try {\n    let mOrder = order;\n    let intPage = Number(curPage);\n    let intLimit = Number(perPage);\n    if (_.isNaN(intPage)) intPage = 1;\n    if (_.isNaN(intLimit)) intLimit = 10;\n    // sails.log('filter=>', filter);\n\n    if (langCode) {\n      // TODO: 語系篩選\n    }\n    const model = this.getModelByName(modelName);\n    const columns = _.keys(model.rawAttributes);\n    // console.log('columns=>', columns);\n    if (sortBy) {\n      sortByColumn = sortBy;\n    } else if (columns.some((c) => c === 'createdAt')) {\n      sortByColumn = 'createdAt';\n    } else if (columns.some((c) => c === 'id')) {\n      sortByColumn = 'id';\n    }\n    if (sortByColumn && !mOrder) {\n      mOrder = [[Sequelize.col(sortByColumn), sort]];\n    }\n\n    // 組合搜尋 query\n    let query = {\n      where: {},\n      order: mOrder,\n    };\n    if (paging) {\n      query = {\n        ...query,\n        limit: intLimit,\n        offset: (intPage - 1) * intLimit,\n      };\n    }\n\n    if (include && _.isArray(include)) {\n      query.include = [];\n      include.forEach((e) => {\n        const inc = {\n          model: e.model ? e.model : this.getModelByName(e.modelName),\n        };\n        if (e.as) {\n          inc.as = e.as;\n        }\n        if (e.limit) {\n          inc.limit = e.limit;\n        }\n        if (e.where) {\n          inc.where = e.where;\n        }\n        if (e.include) {\n          inc.include = e.include;\n        }\n        if (e.through) {\n          inc.through = e.through;\n        }\n        if (e.required) {\n          inc.required = e.required;\n        }\n        if (e.attributes) {\n          inc.attributes = e.attributes;\n        }\n        query.include.push(inc);\n      });\n    }\n\n    if (attributes) {\n      query.attributes = attributes;\n    }\n\n    // 如果有指定完全符合欄位\n    if (filter.where) {\n      if (!query.where[condition]) {\n        query.where[condition] = [];\n      }\n      if (_.isArray(filter.where)) {\n        // eslint-disable-next-line guard-for-in\n        for (const field of filter.where) {\n          // Console.log('field=>', field);\n          query.where[condition].push(field);\n        }\n      } else if (_.isObject(filter.where)) {\n        query.where[condition] = filter.where;\n      } else {\n        throw Error('parameter `filter.where` has to be Array or Object.');\n      }\n    }\n\n    if (filter.having) {\n      query.having = filter.having;\n    }\n\n    // 如果有指定配對的搜尋欄位\n    let fields = _.has(filter, 'fields') ? filter.fields : null;\n    if (_.isString(fields)) {\n      try {\n        fields = JSON.parse(decodeURIComponent(fields));\n      } catch (e) {\n        sails.log.warn(\n          `[!] ${this.TAG}.formatQuery Parse \"filter.fields\" into Json-Array type failed.(${e})) this may not be an issue, please check what is actually be input by frontend.`,\n        );\n        fields = filter.fields;\n      }\n      // Console.log('[QueryHelper] fields=>', fields);\n    }\n    if (!_.isEmpty(fields)) {\n      if (!query.where.$and) {\n        query.where.$and = [];\n      }\n\n      fields.forEach((field) => {\n        Console.log('QueryHelper field=>', field);\n        // 檢查是否有 $or 條件\n        const { $or } = field;\n        if (!_.isNil($or) && _.isArray($or)) {\n          const condition = {\n            $or: [],\n          };\n          $or.forEach((item) => {\n            // 轉型\n            // FIXME: item is not defined\n            const isNumber = this.isNumeric(item.value);\n            let value = isNumber ? parseInt(item.value, 10) : item.value;\n            value = _.isDate(value) ? new Date(value) : value;\n            if (this.isNumeric) {\n              condition.$or.push({\n                [`$${item.key}$`]: {\n                  $eq: value,\n                },\n              });\n            } else {\n              condition.$or.push({\n                [`$${item.key}$`]: {\n                  $like: `%${value}%`,\n                },\n              });\n            }\n          });\n          // 檢查 where 類型\n          if (_.isArray(query.where.$and)) {\n            query.where.$and.push(condition);\n          } else if (_.isPlainObject(query.where.$and)) {\n            query.where.$and = {\n              ...query.where.$and,\n              ...condition,\n            };\n          }\n          // console.log('query.where.$and=>', query.where.$and);\n        } else {\n          // 轉型\n          const isNumber = this.isNumeric(item.value);\n          let value = isNumber ? parseInt(field.value, 10) : field.value;\n          value = _.isDate(value) ? new Date(value) : value;\n          if (isNumber) {\n            query.where.$and.push(\n              Sequelize.where(Sequelize.col(`${field.key}`), 'eq', value),\n            );\n          } else {\n            query.where.$and.push(\n              Sequelize.where(\n                Sequelize.col(`${field.key}`),\n                'like',\n                `%${value}%`,\n              ),\n            );\n          }\n        }\n      });\n    }\n\n    // 全文檢索 - 如果有輸入關鍵字\n    const hasKeyword = filter.search && filter.search.keyword;\n    const hasSearchText = filter.searchText; // 相容舊版寫法\n    if (hasKeyword || hasSearchText) {\n      let kw = '';\n      let targets = null;\n\n      // 搜尋關鍵字\n      if (hasKeyword) {\n        kw = filter.search.keyword.trim();\n        targets = filter.search.fields;\n      }\n      if (hasSearchText) {\n        kw = filter.searchText.trim();\n      }\n\n      // 搜尋的目標欄位\n      if (!targets) {\n        targets = this.getModelSearchableColumns(modelName).map((e) => e.key);\n      }\n\n      // 防錯\n      if (!query.where.$or) {\n        query.where.$or = [];\n      }\n\n      // 推入搜尋目標\n      query.where.$or = targets.map((e) =>\n        Sequelize.where(Sequelize.col(e), 'like', `%${kw}%`));\n\n      // 額外目標欄位\n      if (filter.search.extra) {\n        filter.search.extra.forEach((e) => {\n          query.where.$or.push(\n            Sequelize.where(Sequelize.col(e), 'like', `%${kw}%`),\n          );\n        });\n      }\n    }\n\n    // 搜尋前最後再整理一次 query\n    query = {\n      ...query,\n      collate,\n      subQuery: subQuery || false,\n      duplicating: duplicating || false,\n    };\n    if (log) {\n      if (_.isObject(log)) {\n        query.logging = log;\n      }\n      query.logging = Console.log;\n    }\n    if (_.isNil(group) && include) {\n      query.group = [`${modelName}.id`];\n    } else if (!_.isNil(group) && group !== false) {\n      query.group = group;\n    }\n    // Console.log('query=>');\n    // Console.dir(query);\n    return query;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 依據輸入資料回傳分頁資料\n * @version 1.0\n * @param {Object} {\n *     modelName = null,\n *     include = null,\n *   }\n * @param {Object} {\n *     langCode = 'zh-TW',\n *     filter = null,\n *     curPage = 1,\n *     perPage = 30,\n *     sort = 'DESC',\n *     log = false,\n *   }\n * @param {Object} {\n *     format = null,\n *     formatCb = null,\n *   }\n * @example 查詢 User 包含 Parent\n * QueryHelper.findBy({\n *     modelName: 'User',\n *     include: [\n *       { model: Parent,\n *         required: true,\n *       },\n *     ],\n *   }, {\n *     filter: {\n *       ...mFilter,\n *       search: {\n *         keyword: mFilter.searchText,\n *         extra: [\n *           'User.nameEN', 'User.nameTW',\n *           ...QueryHelper.getModelSearchableColumns('Parent'),\n *         ],\n *       },\n *     },\n *     curPage,\n *     perPage,\n *     sort,\n *     order: ['id'],\n *   }, {\n *     format: null,\n *     formatCb: e => ({\n *       // 先展開 Parent\n *       ...e.data.Parent,\n *       // 再存入 user 資料避免重疊\n *       userId: e.data.id,\n *       createdAt: moment(e.createdAt).format('MM/DD/YYYY'),\n *       name: {\n *         'zh-TW': e.data.nameTW,\n *         en: e.data.nameEN,\n *       },\n *       isActived: e.data.isActived,\n *       studentNames: e.data.Parent.studentNames,\n *     }),\n *   });\n * @returns {Object}\n */\nexport async function findBy(\n  {\n    modelName = null,\n    scope = null,\n    include = [],\n    attributes = null,\n    includeColumns = [],\n    excludeColumns = [],\n  } = {},\n  {\n    langCode = 'zh-TW',\n    whereCondition = '$and',\n    filter = null,\n    curPage = 1,\n    perPage = 30,\n    sort = 'DESC',\n    sortBy = null,\n    order = null,\n    collate = null,\n    log = false,\n    group = null,\n  } = {},\n  { view = false, format = null, formatCb = null } = {},\n) {\n  let extra = {};\n  // const now = new Date().getTime();\n  // const tag = `${modelName}-findBy-${now}`;\n  try {\n    const inputHasNull = ValidatorHelper.checkNull({\n      modelName,\n      filter,\n    });\n    if (inputHasNull) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({\n          inputHasNull,\n        }),\n      );\n    }\n    // if (sortBy) {\n    //   const getModelColumns = name => this.getModelColumns({ modelName: name });\n    //   const isByExistInModel = getModelColumns(modelName)\n    //     .some(e => e.toString() === sortBy.toString());\n\n    //   if (!isByExistInModel && !_.isEmpty(include)) {\n    //     include\n    //       .forEach((inc) => {\n    //         Console.log('inc=>', inc);\n    //         const incModelName = inc.modelName ? inc.modelName : inc.model.name;\n    //         const isByExistInIncludeModel = getModelColumns(incModelName)\n    //           .some(e => e.toString() === sortBy.toString());\n    //         if (isByExistInIncludeModel) {\n    //           // eslint-disable-next-line\n    //           sortBy = inc.model ? `${inc.model.name}.${sortBy}` : `${inc.modelName}.${sortBy}`;\n    //         }\n    //       });\n    //   }\n    //   Console.log('findBy order sortBy=>', sortBy);\n    // }\n    // Console.time(tag);\n    const query = this.formatQuery({\n      attributes,\n      langCode,\n      curPage,\n      perPage,\n      filter,\n      condition: whereCondition,\n      sort,\n      sortBy,\n      order,\n      collate,\n      modelName,\n      include,\n      log,\n      group,\n    });\n    if (log) {\n      sails.log.debug('query=>');\n      Console.dir(query);\n    }\n    const model = this.getModelByName(modelName);\n    let data = null;\n    if (scope) {\n      data = await model.scope(scope).findAndCountAll(query);\n    } else {\n      data = await model.findAndCountAll(query);\n    }\n    // Console.log('data=>', data);\n\n    const items = data.rows.map((e) =>\n      this.formatOutput({\n        modelName,\n        format,\n        formatCb,\n        data: e ? e.toJSON() : null,\n        view,\n      }));\n    const total = typeof data.count === 'number' ? data.count : data.count.length;\n    if (view) {\n      extra = {\n        ...this.getIndexPageTableAndFilters({\n          modelName,\n          langCode,\n          include,\n          includeColumns,\n          excludeColumns,\n        }),\n        _associations: this.getAssociations(modelName),\n      };\n    }\n    // Console.timeEnd(tag);\n    return {\n      paging: {\n        lastPage: Math.ceil(total / perPage) || 1,\n        curPage: parseInt(curPage, 10),\n        perPage: parseInt(perPage, 10),\n        sort: sort.toUpperCase(),\n        sortBy: sortBy ? sortBy.toLowerCase() : sortBy,\n        order,\n        total,\n      },\n      filter,\n      items,\n      ...extra,\n    };\n  } catch (e) {\n    // Console.timeEnd(tag);\n    sails.log.error(e);\n    throw e;\n  }\n}\n\nexport function getIndexPageTableAndFilters({\n  // langCode = 'zh-TW',\n  modelName,\n  include = [],\n  includeColumns = [],\n  excludeColumns = [],\n}) {\n  try {\n    // 取出全部的 table 欄位\n    const autoIncludeColumns = _.isEmpty(include)\n      ? []\n      : _.flattenDeep(\n        include.map((e) => {\n          // Console.log('autoIncludeColumns e=>', e);\n          if (!_.isObject(e)) {\n            throw Error('include model must be an object.');\n          }\n          return (\n            QueryHelper.getModelColumns({\n              modelName: e.model ? e.model.name : e.modelName,\n              modelPrefix: true,\n            }) || []\n          );\n        }),\n      );\n    // console.log('autoIncludeColumns=>', autoIncludeColumns)\n    // Console.log('includeColumns=>', includeColumns);\n\n    // 取出表格欄位\n    let columns = _.isEmpty(includeColumns)\n      ? this.getModelColumns({\n        modelName,\n        modelPrefix: false,\n        exclude: excludeColumns,\n        include: autoIncludeColumns,\n      })\n      : includeColumns;\n    // console.log('columns=>', columns)\n    if (excludeColumns) {\n      columns = columns.filter((c) => !excludeColumns.some((e) => e === c));\n    }\n\n    // 取出表頭\n    const isAutoIncludeField = (name) =>\n      (autoIncludeColumns.some((col) => col === name)\n        ? `model.${_.upperFirst(name)}`\n        : `model.${_.upperFirst(modelName)}.${name}`);\n\n    const headers = columns.map((col) => ({\n      label: sails.__(\n        this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),\n      ),\n      // label: sails.__({\n      //   phrase:\n      //     this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),\n      //   locale: langCode,\n      // }),\n      key: `${_.upperFirst(modelName)}.${col}`,\n    }));\n    // 取出可搜尋欄位\n    const searchable = this.getModelSearchableColumns(modelName, {\n      date: true,\n      integer: true,\n    }).map((e) => ({\n      label: sails.__(\n        this.isCommonField(e.key)\n          ? `model${e.key.replace(modelName, '')}`\n          : `model.${e.key}`,\n      ),\n      // label: sails.__({\n      //   phrase: this.isCommonField(e.key)\n      //     ? `model${e.MESSAGE.replace(modelName, '')}` : `model.${e.key}`,\n      //   locale: langCode,\n      // }),\n      key: e.key,\n      type: e.type,\n    }));\n    // console.log('headers=>', headers)\n    // console.log('columns=>', columns)\n    return {\n      table: {\n        headers,\n        columns,\n      },\n      searchable,\n    };\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\nexport async function getDetailPageFieldWithAssociations({\n  modelName,\n  langCode = 'zh-TW',\n  outputFieldNamePairs = null,\n  // [{ modelName: 'User', displayField: 'username' }]\n  // [{ modelName: 'User', displayField: 'username' }]\n  // autoInclude = false,\n  exclude = [],\n  include = [],\n  required = [],\n  // readonly = [],\n}) {\n  sails.log(\n    `=== getPageFields modelName: \"${modelName}\", langCode: \"${langCode}\" ===`,\n  );\n  try {\n    // 建立全部欄位名稱\n    const fieldNames = QueryHelper.getModelOutputColumns({\n      modelPrefix: false,\n      modelName,\n      langCode,\n    });\n    // 建立空資料\n    const emptyModel = QueryHelper.buildEmptyModel({\n      modelName,\n    });\n\n    // 自動取出關聯的資料欄位\n    {\n      const associatedData = {};\n      // 只取出 1v1 的關聯，即當下 model 中的 AbcId 欄位的 model Abc\n      const associatedModels = this.getAssociations(modelName, {\n        one2One: true,\n      });\n      for (const target of associatedModels) {\n        /* eslint no-await-in-loop: 0 */\n        const modelData = await sails.models[target.toLowerCase()].findAll();\n        // Console.log('modelData=>', modelData);\n        associatedData[target] = modelData;\n      }\n      fieldNames.map((field) => {\n        const isThisFieldAssociated = associatedModels.some(\n          (ass) => field.name === `${ass}Id`,\n        );\n        // Console.log('isThisFieldAssociated=>', isThisFieldAssociated);\n        if (isThisFieldAssociated) {\n          const associatedModelName = field.name.replace('Id', '');\n          const values = associatedData[associatedModelName];\n          /* eslint no-param-reassign: 0 */\n          let modelOutputPropName = null;\n          {\n            // Console.log('associatedModelName=>', associatedModelName);\n            // 如果有指定哪個 model 使用哪個 prop 輸出\n            const assignModelOutputField = outputFieldNamePairs\n              ? outputFieldNamePairs.filter(\n                (pair) => pair.modelName === associatedModelName,\n              )[0]\n              : null;\n            // Console.log('assignModelOutputField=>', assignModelOutputField);\n            modelOutputPropName = assignModelOutputField\n              ? assignModelOutputField.target\n              : null;\n            // Console.log('modelOutputPropName=>', modelOutputPropName);\n          }\n          // 可能要再加上一對多判斷\n          field.type = 'chosen';\n          field.required = true;\n          field.values = values\n            ? values\n              .concat([\n                {\n                  id: null,\n                },\n              ])\n              .map((v) => {\n                let name = v[modelOutputPropName] || v.name || v.key || v.id;\n                if (_.isFunction(modelOutputPropName)) {\n                  name = modelOutputPropName(v);\n                }\n                return {\n                  value: v.id,\n                  name,\n                };\n              })\n            : [];\n        }\n        return field;\n      });\n    }\n    return {\n      ..._.omit(emptyModel, exclude),\n      _fields: _.differenceBy(\n        fieldNames,\n        exclude.map((e) => ({\n          name: e,\n        })),\n        'name',\n      )\n        .concat(include)\n        .map((field) => {\n          const isTarget = required.some((r) => r === field.name);\n          if (isTarget) {\n            field.required = true;\n          }\n          return field;\n        }),\n    };\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n",
+    "content": "import _ from 'lodash';\n\n/**\n * 依據輸入資料格式化查詢 query\n * @version 1.0\n * @param {Object} {\n *     langCode{String} = 'zh-TW',      要查詢的資料語系。\n *     modelName{String} = null,        要查詢的目標 Sequelize Model 名稱。\n *     filter = null,\n *     include{Object|Array} = null, 額外給予的 Sequelize include Query。\n *     curPage = 1,\n *     perPage = 30,\n *     sort = 'DESC',\n *     order = null,\n *   }\n * @example\n * @returns {Object}\n */\nexport function formatQuery({\n  attributes = undefined,\n  langCode = 'zh-TW',\n  modelName = undefined,\n  filter = undefined,\n  include = undefined,\n  curPage = 1,\n  perPage = 30,\n  paging = true,\n  sort = 'DESC',\n  sortBy = undefined,\n  order = undefined,\n  group = undefined,\n  subQuery = undefined,\n  duplicating = undefined,\n  collate = undefined,\n  log = false,\n  condition = '$and',\n}) {\n  let sortByColumn = null;\n  try {\n    let mOrder = order;\n    let intPage = Number(curPage);\n    let intLimit = Number(perPage);\n    if (_.isNaN(intPage)) intPage = 1;\n    if (_.isNaN(intLimit)) intLimit = 10;\n    // sails.log('filter=>', filter);\n\n    if (langCode) {\n      // TODO: 語系篩選\n    }\n    const model = this.getModelByName(modelName);\n    const columns = _.keys(model.rawAttributes);\n    // console.log('columns=>', columns);\n    if (sortBy) {\n      sortByColumn = sortBy;\n    } else if (columns.some((c) => c === 'createdAt')) {\n      sortByColumn = 'createdAt';\n    } else if (columns.some((c) => c === 'id')) {\n      sortByColumn = 'id';\n    }\n    if (sortByColumn && !mOrder) {\n      mOrder = [[Sequelize.col(sortByColumn), sort]];\n    }\n\n    // 組合搜尋 query\n    let query = {\n      where: {},\n      order: mOrder,\n    };\n    if (paging) {\n      query = {\n        ...query,\n        limit: intLimit,\n        offset: (intPage - 1) * intLimit,\n      };\n    }\n\n    if (include && _.isArray(include)) {\n      query.include = [];\n      include.forEach((e) => {\n        const inc = {\n          model: e.model ? e.model : this.getModelByName(e.modelName),\n        };\n        if (e.as) {\n          inc.as = e.as;\n        }\n        if (e.limit) {\n          inc.limit = e.limit;\n        }\n        if (e.where) {\n          inc.where = e.where;\n        }\n        if (e.include) {\n          inc.include = e.include;\n        }\n        if (e.through) {\n          inc.through = e.through;\n        }\n        if (e.required) {\n          inc.required = e.required;\n        }\n        if (e.attributes) {\n          inc.attributes = e.attributes;\n        }\n        query.include.push(inc);\n      });\n    }\n\n    if (attributes) {\n      query.attributes = attributes;\n    }\n\n    // 如果有指定完全符合欄位\n    if (filter.where) {\n      if (!query.where[condition]) {\n        query.where[condition] = [];\n      }\n      if (_.isArray(filter.where)) {\n        // eslint-disable-next-line guard-for-in\n        for (const field of filter.where) {\n          // Console.log('field=>', field);\n          query.where[condition].push(field);\n        }\n      } else if (_.isObject(filter.where)) {\n        query.where[condition] = filter.where;\n      } else {\n        throw Error('parameter `filter.where` has to be Array or Object.');\n      }\n    }\n\n    if (filter.having) {\n      query.having = filter.having;\n    }\n\n    // 如果有指定配對的搜尋欄位\n    let fields = _.has(filter, 'fields') ? filter.fields : null;\n    if (_.isString(fields)) {\n      try {\n        fields = JSON.parse(decodeURIComponent(fields));\n      } catch (e) {\n        sails.log.warn(\n          `[!] ${this.TAG}.formatQuery Parse \"filter.fields\" into Json-Array type failed.(${e})) this may not be an issue, please check what is actually be input by frontend.`,\n        );\n        fields = filter.fields;\n      }\n      // Console.log('[QueryHelper] fields=>', fields);\n    }\n    if (!_.isEmpty(fields)) {\n      if (!query.where.$and) {\n        query.where.$and = [];\n      }\n\n      fields.forEach((field) => {\n        Console.log('QueryHelper field=>', field);\n        // 檢查是否有 $or 條件\n        const { $or } = field;\n        if (!_.isNil($or) && _.isArray($or)) {\n          const condition = {\n            $or: [],\n          };\n          $or.forEach((item) => {\n            // 轉型\n            // FIXME: item is not defined\n            const isNumber = this.isNumeric(item.value);\n            let value = isNumber ? parseInt(item.value, 10) : item.value;\n            value = _.isDate(value) ? new Date(value) : value;\n            if (this.isNumeric) {\n              condition.$or.push({\n                [`$${item.key}$`]: {\n                  $eq: value,\n                },\n              });\n            } else {\n              condition.$or.push({\n                [`$${item.key}$`]: {\n                  $like: `%${value}%`,\n                },\n              });\n            }\n          });\n          // 檢查 where 類型\n          if (_.isArray(query.where.$and)) {\n            query.where.$and.push(condition);\n          } else if (_.isPlainObject(query.where.$and)) {\n            query.where.$and = {\n              ...query.where.$and,\n              ...condition,\n            };\n          }\n          // console.log('query.where.$and=>', query.where.$and);\n        } else {\n          // 轉型\n          const isNumber = this.isNumeric(field.value);\n          let value = isNumber ? parseInt(field.value, 10) : field.value;\n          value = _.isDate(value) ? new Date(value) : value;\n          if (isNumber) {\n            query.where.$and.push(\n              Sequelize.where(Sequelize.col(`${field.key}`), 'eq', value),\n            );\n          } else {\n            query.where.$and.push(\n              Sequelize.where(\n                Sequelize.col(`${field.key}`),\n                'like',\n                `%${value}%`,\n              ),\n            );\n          }\n        }\n      });\n    }\n\n    // 全文檢索 - 如果有輸入關鍵字\n    const hasKeyword = filter.search && filter.search.keyword;\n    const hasSearchText = filter.searchText; // 相容舊版寫法\n    if (hasKeyword || hasSearchText) {\n      let kw = '';\n      let targets = null;\n\n      // 搜尋關鍵字\n      if (hasKeyword) {\n        kw = filter.search.keyword.trim();\n        targets = filter.search.fields;\n      }\n      if (hasSearchText) {\n        kw = filter.searchText.trim();\n      }\n\n      // 搜尋的目標欄位\n      if (!targets) {\n        targets = this.getModelSearchableColumns(modelName).map((e) => e.key);\n      }\n\n      // 防錯\n      if (!query.where.$or) {\n        query.where.$or = [];\n      }\n\n      // 推入搜尋目標\n      query.where.$or = targets.map((e) =>\n        Sequelize.where(Sequelize.col(e), 'like', `%${kw}%`));\n\n      // 額外目標欄位\n      if (filter.search.extra) {\n        filter.search.extra.forEach((e) => {\n          query.where.$or.push(\n            Sequelize.where(Sequelize.col(e), 'like', `%${kw}%`),\n          );\n        });\n      }\n    }\n\n    // 搜尋前最後再整理一次 query\n    query = {\n      ...query,\n      collate,\n      subQuery: subQuery || false,\n      duplicating: duplicating || false,\n    };\n    if (log) {\n      if (_.isObject(log)) {\n        query.logging = log;\n      }\n      query.logging = Console.log;\n    }\n    if (_.isNil(group) && include) {\n      query.group = [`${modelName}.id`];\n    } else if (!_.isNil(group) && group !== false) {\n      query.group = group;\n    }\n    // Console.log('query=>');\n    // Console.dir(query);\n    return query;\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\n/**\n * 依據輸入資料回傳分頁資料\n * @version 1.0\n * @param {Object} {\n *     modelName = null,\n *     include = null,\n *   }\n * @param {Object} {\n *     langCode = 'zh-TW',\n *     filter = null,\n *     curPage = 1,\n *     perPage = 30,\n *     sort = 'DESC',\n *     log = false,\n *   }\n * @param {Object} {\n *     format = null,\n *     formatCb = null,\n *   }\n * @example 查詢 User 包含 Parent\n * QueryHelper.findBy({\n *     modelName: 'User',\n *     include: [\n *       { model: Parent,\n *         required: true,\n *       },\n *     ],\n *   }, {\n *     filter: {\n *       ...mFilter,\n *       search: {\n *         keyword: mFilter.searchText,\n *         extra: [\n *           'User.nameEN', 'User.nameTW',\n *           ...QueryHelper.getModelSearchableColumns('Parent'),\n *         ],\n *       },\n *     },\n *     curPage,\n *     perPage,\n *     sort,\n *     order: ['id'],\n *   }, {\n *     format: null,\n *     formatCb: e => ({\n *       // 先展開 Parent\n *       ...e.data.Parent,\n *       // 再存入 user 資料避免重疊\n *       userId: e.data.id,\n *       createdAt: moment(e.createdAt).format('MM/DD/YYYY'),\n *       name: {\n *         'zh-TW': e.data.nameTW,\n *         en: e.data.nameEN,\n *       },\n *       isActived: e.data.isActived,\n *       studentNames: e.data.Parent.studentNames,\n *     }),\n *   });\n * @returns {Object}\n */\nexport async function findBy(\n  {\n    modelName = null,\n    scope = null,\n    include = [],\n    attributes = null,\n    includeColumns = [],\n    excludeColumns = [],\n  } = {},\n  {\n    langCode = 'zh-TW',\n    whereCondition = '$and',\n    filter = null,\n    curPage = 1,\n    perPage = 30,\n    sort = 'DESC',\n    sortBy = null,\n    order = null,\n    collate = null,\n    log = false,\n    group = null,\n  } = {},\n  { view = false, format = null, formatCb = null } = {},\n) {\n  let extra = {};\n  // const now = new Date().getTime();\n  // const tag = `${modelName}-findBy-${now}`;\n  try {\n    const inputHasNull = ValidatorHelper.checkNull({\n      modelName,\n      filter,\n    });\n    if (inputHasNull) {\n      throw Error(\n        MESSAGE.BAD_REQUEST.NO_REQUIRED_PARAMETER({\n          inputHasNull,\n        }),\n      );\n    }\n    // if (sortBy) {\n    //   const getModelColumns = name => this.getModelColumns({ modelName: name });\n    //   const isByExistInModel = getModelColumns(modelName)\n    //     .some(e => e.toString() === sortBy.toString());\n\n    //   if (!isByExistInModel && !_.isEmpty(include)) {\n    //     include\n    //       .forEach((inc) => {\n    //         Console.log('inc=>', inc);\n    //         const incModelName = inc.modelName ? inc.modelName : inc.model.name;\n    //         const isByExistInIncludeModel = getModelColumns(incModelName)\n    //           .some(e => e.toString() === sortBy.toString());\n    //         if (isByExistInIncludeModel) {\n    //           // eslint-disable-next-line\n    //           sortBy = inc.model ? `${inc.model.name}.${sortBy}` : `${inc.modelName}.${sortBy}`;\n    //         }\n    //       });\n    //   }\n    //   Console.log('findBy order sortBy=>', sortBy);\n    // }\n    // Console.time(tag);\n    const query = this.formatQuery({\n      attributes,\n      langCode,\n      curPage,\n      perPage,\n      filter,\n      condition: whereCondition,\n      sort,\n      sortBy,\n      order,\n      collate,\n      modelName,\n      include,\n      log,\n      group,\n    });\n    if (log) {\n      sails.log.debug('query=>');\n      Console.dir(query);\n    }\n    const model = this.getModelByName(modelName);\n    let data = null;\n    if (scope) {\n      data = await model.scope(scope).findAndCountAll(query);\n    } else {\n      data = await model.findAndCountAll(query);\n    }\n    // Console.log('data=>', data);\n\n    const items = data.rows.map((e) =>\n      this.formatOutput({\n        modelName,\n        format,\n        formatCb,\n        data: e ? e.toJSON() : null,\n        view,\n      }));\n    const total = typeof data.count === 'number' ? data.count : data.count.length;\n    if (view) {\n      extra = {\n        ...this.getIndexPageTableAndFilters({\n          modelName,\n          langCode,\n          include,\n          includeColumns,\n          excludeColumns,\n        }),\n        _associations: this.getAssociations(modelName),\n      };\n    }\n    // Console.timeEnd(tag);\n    return {\n      paging: {\n        lastPage: Math.ceil(total / perPage) || 1,\n        curPage: parseInt(curPage, 10),\n        perPage: parseInt(perPage, 10),\n        sort: sort.toUpperCase(),\n        sortBy: sortBy ? sortBy.toLowerCase() : sortBy,\n        order,\n        total,\n      },\n      filter,\n      items,\n      ...extra,\n    };\n  } catch (e) {\n    // Console.timeEnd(tag);\n    sails.log.error(e);\n    throw e;\n  }\n}\n\nexport function getIndexPageTableAndFilters({\n  // langCode = 'zh-TW',\n  modelName,\n  include = [],\n  includeColumns = [],\n  excludeColumns = [],\n}) {\n  try {\n    // 取出全部的 table 欄位\n    const autoIncludeColumns = _.isEmpty(include)\n      ? []\n      : _.flattenDeep(\n        include.map((e) => {\n          // Console.log('autoIncludeColumns e=>', e);\n          if (!_.isObject(e)) {\n            throw Error('include model must be an object.');\n          }\n          return (\n            QueryHelper.getModelColumns({\n              modelName: e.model ? e.model.name : e.modelName,\n              modelPrefix: true,\n            }) || []\n          );\n        }),\n      );\n    // console.log('autoIncludeColumns=>', autoIncludeColumns)\n    // Console.log('includeColumns=>', includeColumns);\n\n    // 取出表格欄位\n    let columns = _.isEmpty(includeColumns)\n      ? this.getModelColumns({\n        modelName,\n        modelPrefix: false,\n        exclude: excludeColumns,\n        include: autoIncludeColumns,\n      })\n      : includeColumns;\n    // console.log('columns=>', columns)\n    if (excludeColumns) {\n      columns = columns.filter((c) => !excludeColumns.some((e) => e === c));\n    }\n\n    // 取出表頭\n    const isAutoIncludeField = (name) =>\n      (autoIncludeColumns.some((col) => col === name)\n        ? `model.${_.upperFirst(name)}`\n        : `model.${_.upperFirst(modelName)}.${name}`);\n\n    const headers = columns.map((col) => ({\n      label: sails.__(\n        this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),\n      ),\n      // label: sails.__({\n      //   phrase:\n      //     this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),\n      //   locale: langCode,\n      // }),\n      key: `${_.upperFirst(modelName)}.${col}`,\n    }));\n    // 取出可搜尋欄位\n    const searchable = this.getModelSearchableColumns(modelName, {\n      date: true,\n      integer: true,\n    }).map((e) => ({\n      label: sails.__(\n        this.isCommonField(e.key)\n          ? `model${e.key.replace(modelName, '')}`\n          : `model.${e.key}`,\n      ),\n      // label: sails.__({\n      //   phrase: this.isCommonField(e.key)\n      //     ? `model${e.MESSAGE.replace(modelName, '')}` : `model.${e.key}`,\n      //   locale: langCode,\n      // }),\n      key: e.key,\n      type: e.type,\n    }));\n    // console.log('headers=>', headers)\n    // console.log('columns=>', columns)\n    return {\n      table: {\n        headers,\n        columns,\n      },\n      searchable,\n    };\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n\nexport async function getDetailPageFieldWithAssociations({\n  modelName,\n  langCode = 'zh-TW',\n  outputFieldNamePairs = null,\n  // [{ modelName: 'User', displayField: 'username' }]\n  // [{ modelName: 'User', displayField: 'username' }]\n  // autoInclude = false,\n  exclude = [],\n  include = [],\n  required = [],\n  // readonly = [],\n}) {\n  sails.log(\n    `=== getPageFields modelName: \"${modelName}\", langCode: \"${langCode}\" ===`,\n  );\n  try {\n    // 建立全部欄位名稱\n    const fieldNames = QueryHelper.getModelOutputColumns({\n      modelPrefix: false,\n      modelName,\n      langCode,\n    });\n    // 建立空資料\n    const emptyModel = QueryHelper.buildEmptyModel({\n      modelName,\n    });\n\n    // 自動取出關聯的資料欄位\n    {\n      const associatedData = {};\n      // 只取出 1v1 的關聯，即當下 model 中的 AbcId 欄位的 model Abc\n      const associatedModels = this.getAssociations(modelName, {\n        one2One: true,\n      });\n      for (const target of associatedModels) {\n        /* eslint no-await-in-loop: 0 */\n        const modelData = await sails.models[target.toLowerCase()].findAll();\n        // Console.log('modelData=>', modelData);\n        associatedData[target] = modelData;\n      }\n      fieldNames.map((field) => {\n        const isThisFieldAssociated = associatedModels.some(\n          (ass) => field.name === `${ass}Id`,\n        );\n        // Console.log('isThisFieldAssociated=>', isThisFieldAssociated);\n        if (isThisFieldAssociated) {\n          const associatedModelName = field.name.replace('Id', '');\n          const values = associatedData[associatedModelName];\n          /* eslint no-param-reassign: 0 */\n          let modelOutputPropName = null;\n          {\n            // Console.log('associatedModelName=>', associatedModelName);\n            // 如果有指定哪個 model 使用哪個 prop 輸出\n            const assignModelOutputField = outputFieldNamePairs\n              ? outputFieldNamePairs.filter(\n                (pair) => pair.modelName === associatedModelName,\n              )[0]\n              : null;\n            // Console.log('assignModelOutputField=>', assignModelOutputField);\n            modelOutputPropName = assignModelOutputField\n              ? assignModelOutputField.target\n              : null;\n            // Console.log('modelOutputPropName=>', modelOutputPropName);\n          }\n          // 可能要再加上一對多判斷\n          field.type = 'chosen';\n          field.required = true;\n          field.values = values\n            ? values\n              .concat([\n                {\n                  id: null,\n                },\n              ])\n              .map((v) => {\n                let name = v[modelOutputPropName] || v.name || v.key || v.id;\n                if (_.isFunction(modelOutputPropName)) {\n                  name = modelOutputPropName(v);\n                }\n                return {\n                  value: v.id,\n                  name,\n                };\n              })\n            : [];\n        }\n        return field;\n      });\n    }\n    return {\n      ..._.omit(emptyModel, exclude),\n      _fields: _.differenceBy(\n        fieldNames,\n        exclude.map((e) => ({\n          name: e,\n        })),\n        'name',\n      )\n        .concat(include)\n        .map((field) => {\n          const isTarget = required.some((r) => r === field.name);\n          if (isTarget) {\n            field.required = true;\n          }\n          return field;\n        }),\n    };\n  } catch (e) {\n    sails.log.error(e);\n    throw e;\n  }\n}\n",
     "static": true,
-    "longname": "/Users/kent/Project/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.view.js",
+    "longname": "/home/rsghost/dev/cases/sails-hook-sequelize-querier/api/services/QueryHelper/QueryHelper.view.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 83,
+    "__docId__": 107,
     "kind": "function",
     "name": "formatQuery",
     "memberof": "QueryHelper/QueryHelper.view.js",
@@ -1775,7 +2853,7 @@
     }
   },
   {
-    "__docId__": 84,
+    "__docId__": 108,
     "kind": "function",
     "name": "findBy",
     "memberof": "QueryHelper/QueryHelper.view.js",
@@ -1841,7 +2919,7 @@
     }
   },
   {
-    "__docId__": 85,
+    "__docId__": 109,
     "kind": "function",
     "name": "getIndexPageTableAndFilters",
     "memberof": "QueryHelper/QueryHelper.view.js",
@@ -1878,7 +2956,7 @@
     }
   },
   {
-    "__docId__": 86,
+    "__docId__": 110,
     "kind": "function",
     "name": "getDetailPageFieldWithAssociations",
     "memberof": "QueryHelper/QueryHelper.view.js",
@@ -1919,15 +2997,15 @@
   {
     "kind": "index",
     "content": "# sails-hook-querier\n\n[![Build Status](https://travis-ci.com/iamcxa/sails-hook-sequelize-querier.svg?token=srJ7G1uLKvLjKziapZ4p&branch=master)](https://travis-ci.com/iamcxa/sails-hook-sequelize-querier)\n\n## Installation\n\n## Usage\n",
-    "longname": "/Users/kent/Project/sails-hook-sequelize-querier/README.md",
+    "longname": "/home/rsghost/dev/cases/sails-hook-sequelize-querier/README.md",
     "name": "./README.md",
     "static": true,
     "access": "public"
   },
   {
     "kind": "packageJSON",
-    "content": "{\n  \"name\": \"sails-hook-sequelize-querier\",\n  \"version\": \"0.1.26\",\n  \"description\": \"Hook to add powerful customize sequelize querier for sails application\",\n  \"main\": \"index.js\",\n  \"author\": {\n    \"name\": \"Kent Chen\",\n    \"email\": \"iamcxa@gmail.com\",\n    \"url\": \"http://iamcxa.me/\"\n  },\n  \"keywords\": [\n    \"sails\",\n    \"sails.js\",\n    \"sails-hook\",\n    \"sequelize\"\n  ],\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"https://github.com/iamcxa/sails-hook-querier\"\n  },\n  \"devDependencies\": {\n    \"@sailshq/eslint\": \"^4.19.3\",\n    \"babel-eslint\": \"^10.1.0\",\n    \"chai\": \"^4.3.4\",\n    \"chai-datetime\": \"^1.8.0\",\n    \"chalk\": \"^4.1.1\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-coverage-plugin\": \"^1.1.0\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"esdoc-lint-plugin\": \"^1.0.2\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"eslint\": \"^7.27.0\",\n    \"eslint-config-airbnb-base\": \"^14.2.1\",\n    \"eslint-plugin-import\": \"^2.23.3\",\n    \"esm\": \"^3.0.84\",\n    \"lodash\": \"^4.17.21\",\n    \"mysql2\": \"^2.2.5\",\n    \"nyc\": \"^15.1.0\",\n    \"sails\": \"^1.4.2\",\n    \"sails-hook-blocks\": \"^0.1.11\",\n    \"sinon\": \"^10.0.0\",\n    \"sqlite3\": \"^5.0.2\",\n    \"supertest\": \"^6.1.3\",\n    \"tracer\": \"^1.1.4\"\n  },\n  \"dependencies\": {\n    \"inflection\": \"^1.13.1\",\n    \"joi\": \"^14.3.1\",\n    \"mocha\": \"^8.4.0\",\n    \"sails-hook-sequelize\": \"git@github.com:MoreAppio/sails-hook-sequelize.git\",\n    \"sails-util-micro-apps\": \"^1.1.1\",\n    \"sequelize\": \"^5.22.4\"\n  },\n  \"engines\": {\n    \"node\": \"^8.9.1\"\n  },\n  \"scripts\": {\n    \"lint\": \"./node_modules/.bin/eslint --max-warnings=0 --report-unused-disable-directives './' && echo '✔  Your .js files look good.'\",\n    \"lint-fix\": \"./node_modules/.bin/eslint --max-warnings=0 --report-unused-disable-directives --fix './' && echo '✔  Your .js files look good.'\",\n    \"prepublishOnly\": \"\",\n    \"doc\": \"esdoc\",\n    \"test\": \"NODE_ENV=test ./node_modules/.bin/nyc --require esm mocha\",\n    \"pretest\": \"touch ./config/local.js\"\n  },\n  \"sails\": {\n    \"isHook\": true\n  }\n}\n",
-    "longname": "/Users/kent/Project/sails-hook-sequelize-querier/package.json",
+    "content": "{\n  \"name\": \"sails-hook-sequelize-querier\",\n  \"version\": \"0.1.26\",\n  \"description\": \"Hook to add powerful customize sequelize querier for sails application\",\n  \"main\": \"index.js\",\n  \"author\": {\n    \"name\": \"Kent Chen\",\n    \"email\": \"iamcxa@gmail.com\",\n    \"url\": \"http://iamcxa.me/\"\n  },\n  \"keywords\": [\n    \"sails\",\n    \"sails.js\",\n    \"sails-hook\",\n    \"sequelize\"\n  ],\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"https://github.com/iamcxa/sails-hook-querier\"\n  },\n  \"devDependencies\": {\n    \"@sailshq/eslint\": \"^4.19.3\",\n    \"babel-eslint\": \"^10.1.0\",\n    \"chai\": \"^4.3.4\",\n    \"chai-datetime\": \"^1.8.0\",\n    \"chalk\": \"^4.1.1\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-coverage-plugin\": \"^1.1.0\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"esdoc-lint-plugin\": \"^1.0.2\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"eslint\": \"^7.27.0\",\n    \"eslint-config-airbnb-base\": \"^14.2.1\",\n    \"eslint-plugin-import\": \"^2.23.3\",\n    \"esm\": \"^3.0.84\",\n    \"lodash\": \"^4.17.21\",\n    \"mysql2\": \"^2.2.5\",\n    \"nyc\": \"^15.1.0\",\n    \"sails\": \"^1.4.2\",\n    \"sails-hook-blocks\": \"^0.1.11\",\n    \"sinon\": \"^10.0.0\",\n    \"sqlite3\": \"^5.0.2\",\n    \"supertest\": \"^6.1.3\",\n    \"tracer\": \"^1.1.4\"\n  },\n  \"peerDependencies\": {},\n  \"dependencies\": {\n    \"sails-hook-sequelize\": \"https://github.com/MoreAppio/sails-hook-sequelize\",\n    \"inflection\": \"^1.13.1\",\n    \"joi\": \"^14.3.1\",\n    \"mocha\": \"^8.4.0\",\n    \"sails-util-micro-apps\": \"^1.1.1\",\n    \"sequelize\": \"^5.22.4\"\n  },\n  \"engines\": {\n    \"node\": \"^8.9.1\"\n  },\n  \"scripts\": {\n    \"lint\": \"./node_modules/.bin/eslint --max-warnings=0 --report-unused-disable-directives './' && echo '✔  Your .js files look good.'\",\n    \"lint-fix\": \"./node_modules/.bin/eslint --max-warnings=0 --report-unused-disable-directives --fix './' && echo '✔  Your .js files look good.'\",\n    \"prepublishOnly\": \"\",\n    \"doc\": \"esdoc\",\n    \"test\": \"NODE_ENV=test ./node_modules/.bin/nyc --require esm mocha\",\n    \"test-travis\": \"NODE_ENV=travis ./node_modules/.bin/nyc --require esm mocha\",\n    \"pretest\": \"touch ./config/local.js\"\n  },\n  \"sails\": {\n    \"isHook\": true\n  }\n}\n",
+    "longname": "/home/rsghost/dev/cases/sails-hook-sequelize-querier/package.json",
     "name": "package.json",
     "static": true,
     "access": "public"
