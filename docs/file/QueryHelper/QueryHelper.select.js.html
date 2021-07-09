@@ -505,7 +505,8 @@ class Query {
   }
 
   /**
-   * @param {function} presenter - &#x7528;&#x65BC; formating &#x67E5;&#x8A62;&#x8F38;&#x51FA;&#x7684;&#x7D50;&#x679C;
+   * @param {function(request: object)} presenter -
+   * &#x6703;&#x50B3;&#x5165;&#x6BCF;&#x7B46;&#x67E5;&#x8A62;&#x7D50;&#x679C; object, &#x7528;&#x65BC; formating &#x8F38;&#x51FA;
    */
   usePresenter(presenter) {
     if (typeof presenter === &apos;function&apos;) {

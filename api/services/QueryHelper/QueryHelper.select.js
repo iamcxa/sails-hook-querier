@@ -437,7 +437,8 @@ class Query {
   }
 
   /**
-   * @param {function} presenter - 用於 formating 查詢輸出的結果
+   * @param {function(request: object)} presenter -
+   * 會傳入每筆查詢結果 object, 用於 formating 輸出
    */
   usePresenter(presenter) {
     if (typeof presenter === 'function') {
