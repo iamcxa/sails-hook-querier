@@ -80,7 +80,7 @@ function formatQuery({
       collate,
       duplicating,
       ...paging ? {
-        limit: limit && limit > perPage ? perPage : limit,
+        limit: limit && limit > perPage ? limit : perPage,
         offset: (curPage - 1) * perPage,
       } : {
         ...limit ? { limit } : {},
@@ -128,6 +128,10 @@ function formatQuery({
       if (!searchable) {
         _.forEach(filter.where, (value, key) => {
           const op = formatOperator('like');
+          if (!query.where[defaultCondition]) {
+            query.where[defaultCondition] = [];
+          }
+
           query.where[defaultCondition].push({
             [key]: {
               [op]: filter.where[key],
@@ -187,6 +191,18 @@ function formatQuery({
       }
     }
 
+    if (filter.keyword) {
+      const keyword = filter.keyword.trim();
+      const defaultCondition = formatCondition('or');
+      if (!query.where[defaultCondition]) {
+        query.where[defaultCondition] = [];
+      }
+
+      columns.forEach((column) => {
+        query.where[defaultCondition].push(Sequelize.where(Sequelize.col(column), 'like', `%${keyword}%`));
+      });
+    }
+
     if (log) {
       if (_.isObject(log)) {
         query.logging = log;
@@ -201,6 +217,7 @@ function formatQuery({
     }
     // Console.log('query=>');
     // Console.dir(query);
+
     return query;
   } catch (e) {
     sails.log.error(e);
@@ -261,6 +278,7 @@ async function find(
     const query = formatQuery({
       searchable,
       attributes,
+      paging,
       curPage,
       perPage,
       filter,
@@ -327,6 +345,7 @@ class Query {
       presenter: null,
       searchable: null,
       keyword: null,
+      keyName: null,
       useWhere: [],
       useRawWhere: null,
     };
@@ -402,7 +421,7 @@ class Query {
    * 原始 where 查詢 object, 使用後將忽略 useWhere() 的功能
    */
   useRawWhere(parameter) {
-    this.data.useRawWhere.push(parameter);
+    this.data.useRawWhere = parameter;
     return this;
   }
 
@@ -448,14 +467,38 @@ class Query {
   }
 
   /**
-   * @param {string} keyword - 全文檢索查詢用關鍵字
+   * @param {string} keyName - useRequest() 所傳入的全文檢索查詢用關鍵字 key name
    */
-  useFullTextSearch(keyword) {
-    if (typeof keyword === 'string') {
-      // FIXME: keyword 查詢未實作
-      this.data.keyword = keyword;
+  useFullTextSearchByKey(keyName) {
+    if (typeof keyName === 'string') {
+      this.data.keyName = keyName;
     }
     return this;
+  }
+
+  queryInit() {
+    for (const parameter of this.data.useWhere) {
+      let where = {};
+      if (typeof parameter === 'object') {
+        where = parameter;
+      } else if (typeof parameter === 'function') {
+        where = parameter(this.data.request);
+      }
+
+      this.data.where = {
+        ...this.data.where,
+        ...where,
+      };
+    }
+
+    if (this.data.useRawWhere) {
+      this.data.where = this.data.useRawWhere;
+    }
+
+    if (this.data.keyName && this.data.request[this.data.keyName]) {
+      this.data.keyword = this.data.request[this.data.keyName];
+      delete this.data.request[this.data.keyName];
+    }
   }
 
   /**
@@ -490,23 +533,7 @@ class Query {
     collate,
     limit,
   }) {
-    for (const parameter of this.data.useWhere) {
-      let where = {};
-      if (typeof parameter === 'object') {
-        where = parameter;
-      } else if (typeof parameter === 'function') {
-        where = parameter(this.data.request);
-      }
-
-      this.data.where = {
-        ...this.data.where,
-        ...where,
-      };
-    }
-
-    if (this.data.useRawWhere) {
-      this.data.where = this.data.useRawWhere;
-    }
+    this.queryInit();
 
     return find({
       model: this.data.model,
@@ -517,6 +544,7 @@ class Query {
       presenter: this.data.presenter,
       filter: {
         where: this.data.where,
+        keyword: this.data.keyword,
       },
       curPage,
       perPage,
@@ -558,19 +586,7 @@ class Query {
     collate,
     limit,
   }) {
-    for (const parameter of this.data.useWhere) {
-      let where = {};
-      if (typeof parameter === 'object') {
-        where = parameter;
-      } else if (typeof parameter === 'function') {
-        where = parameter(this.data.request);
-      }
-
-      this.data.where = {
-        ...this.data.where,
-        ...where,
-      };
-    }
+    this.queryInit();
 
     return find({
       model: this.data.model,
@@ -581,6 +597,7 @@ class Query {
       presenter: this.data.presenter,
       filter: {
         where: this.data.where,
+        keyword: this.data.keyword,
       },
       paging: false,
       sort,
