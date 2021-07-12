@@ -1,5 +1,6 @@
 "globals": {
   "SpecHelper": true,
+  "SeedHelper": true,
   "Image": true,
   "User": true,
   "Group": true
