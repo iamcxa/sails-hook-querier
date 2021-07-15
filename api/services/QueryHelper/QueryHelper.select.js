@@ -55,6 +55,7 @@ function formatQuery({
   group = undefined,
   limit = undefined,
   log = false,
+  toJSON = false,
 }) {
   let sortByColumn = null;
   try {
@@ -215,6 +216,10 @@ function formatQuery({
     } else if (!_.isNil(group) && group !== false) {
       query.group = group;
     }
+
+    if (toJSON) {
+      query.raw = true;
+    }
     // Console.log('query=>');
     // Console.dir(query);
 
@@ -264,10 +269,11 @@ async function find(
     collate = undefined,
     group = undefined,
     limit = undefined,
-    log = false,
     paging = true,
     curPage = 1,
     perPage = 30,
+    toJSON = false,
+    log = false,
   } = {},
 ) {
   try {
@@ -288,10 +294,12 @@ async function find(
       collate,
       model,
       include,
-      log,
       group,
       limit,
+      toJSON,
+      log,
     });
+
     if (log) {
       sails.log.debug('query=>');
       Console.dir(query);
@@ -532,6 +540,8 @@ class Query {
     group,
     collate,
     limit,
+    toJSON,
+    log,
   }) {
     this.queryInit();
 
@@ -555,6 +565,8 @@ class Query {
       group,
       collate,
       limit,
+      toJSON,
+      log,
     });
   }
 
@@ -585,6 +597,8 @@ class Query {
     group,
     collate,
     limit,
+    toJSON,
+    log,
   }) {
     this.queryInit();
 
@@ -606,6 +620,8 @@ class Query {
       group,
       collate,
       limit,
+      toJSON,
+      log,
     });
   }
 }
