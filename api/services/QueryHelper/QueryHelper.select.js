@@ -119,7 +119,7 @@ function formatQuery({
       });
     }
 
-    if (attributes.length > 0) {
+    if (attributes && attributes.length && attributes.length > 0) {
       query.attributes = attributes;
     }
 
