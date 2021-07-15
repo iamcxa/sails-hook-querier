@@ -251,4 +251,36 @@ describe('about QueryHelper select operation.', () => {
     result1.items.length.should.equal(perPage);
     result2.items.length.should.equal(baseSize);
   });
+
+  it('select data should be right', async () => {
+    const result1 = await QueryHelper
+      .select(Group)
+      .useScope([])
+      .getPaging({
+        curPage: 1,
+        perPage: createdGroups.length,
+        toJSON: true,
+      });
+
+    const result2 = await QueryHelper
+      .select(Group)
+      .useScope([])
+      .findAll({
+        toJSON: true,
+      });
+
+    SpecHelper.validateEach({
+      source: createdGroups,
+      target: result1.items,
+    }, {
+      log: false,
+    });
+
+    SpecHelper.validateEach({
+      source: createdGroups,
+      target: result2.items,
+    }, {
+      log: false,
+    });
+  });
 });
