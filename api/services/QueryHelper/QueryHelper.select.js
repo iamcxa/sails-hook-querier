@@ -219,6 +219,7 @@ function formatQuery({
 
     if (toJSON) {
       query.raw = true;
+      query.nest = true;
     }
     // Console.log('query=>');
     // Console.dir(query);
