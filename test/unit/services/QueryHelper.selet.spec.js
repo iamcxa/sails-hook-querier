@@ -209,7 +209,15 @@ describe('about QueryHelper select operation.', () => {
       });
 
     result1.items.length.should.equal(perPage);
+    result1.items.forEach((e) => {
+      e.name.should.be.a('string');
+      e.name.should.be.equal(input.name);
+    });
     result2.items.length.should.equal(baseSize);
+    result2.items.forEach((e) => {
+      e.name.should.be.a('string');
+      e.name.should.be.equal(input.name);
+    });
   });
 
   it('select keyword should be success', async () => {
@@ -244,7 +252,15 @@ describe('about QueryHelper select operation.', () => {
       });
 
     result1.items.length.should.equal(perPage);
+    result1.items.forEach((e) => {
+      e.name.should.be.a('string');
+      e.name.should.be.contains('test');
+    });
     result2.items.length.should.equal(baseSize);
+    result2.items.forEach((e) => {
+      e.name.should.be.a('string');
+      e.name.should.be.contains('test');
+    });
   });
 
   it('select data should be right', async () => {
