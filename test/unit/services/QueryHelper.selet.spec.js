@@ -18,6 +18,7 @@ describe('about QueryHelper select operation.', () => {
     createdGroups = await SeedHelper.create({
       size: baseSize * 3,
       model: Group,
+      include: [User],
       data: (i) => {
         if (i < baseSize) {
           return {
@@ -43,6 +44,9 @@ describe('about QueryHelper select operation.', () => {
     await Group.destroy({
       where: {},
     });
+    await User.destroy({
+      where: {},
+    });
   });
 
   it('select should be success', async () => {
@@ -61,7 +65,6 @@ describe('about QueryHelper select operation.', () => {
       })
       .usePresenter((data) => ({
         name: data.name,
-        Users: data.Users,
         formatted: true,
       }))
       .getPaging({
@@ -84,7 +87,6 @@ describe('about QueryHelper select operation.', () => {
       })
       .usePresenter(async (data) => ({
         name: data.name,
-        Users: data.Users,
         formatted: true,
       }))
       .findAll({
@@ -113,7 +115,6 @@ describe('about QueryHelper select operation.', () => {
       })
       .usePresenter((data) => ({
         name: data.name,
-        Users: data.Users,
       }))
       .getPaging({
         curPage: 1,
@@ -135,7 +136,6 @@ describe('about QueryHelper select operation.', () => {
       })
       .usePresenter((data) => ({
         name: data.name,
-        Users: data.Users,
       }))
       .findAll({
       });
@@ -168,7 +168,6 @@ describe('about QueryHelper select operation.', () => {
         })
         .usePresenter((data) => ({
           name: data.name,
-          Users: data.Users,
         }))
         .getPaging({
           curPage: 1,
@@ -190,7 +189,6 @@ describe('about QueryHelper select operation.', () => {
       })
       .usePresenter((data) => ({
         name: data.name,
-        Users: data.Users,
       }))
       .getPaging({
         curPage: 1,
@@ -206,7 +204,6 @@ describe('about QueryHelper select operation.', () => {
       })
       .usePresenter(async (data) => ({
         name: data.name,
-        Users: data.Users,
       }))
       .findAll({
       });
@@ -226,7 +223,6 @@ describe('about QueryHelper select operation.', () => {
       .useFullTextSearchByKey('keyword')
       .usePresenter((data) => ({
         name: data.name,
-        Users: data.Users,
       }))
       .getPaging({
         curPage: 1,
@@ -243,7 +239,6 @@ describe('about QueryHelper select operation.', () => {
       .useFullTextSearchByKey('keyword')
       .usePresenter(async (data) => ({
         name: data.name,
-        Users: data.Users,
       }))
       .findAll({
       });
@@ -255,6 +250,9 @@ describe('about QueryHelper select operation.', () => {
   it('select data should be right', async () => {
     const result1 = await QueryHelper
       .select(Group)
+      .useInclude([{
+        model: User,
+      }])
       .useScope([])
       .getPaging({
         curPage: 1,
@@ -264,6 +262,9 @@ describe('about QueryHelper select operation.', () => {
 
     const result2 = await QueryHelper
       .select(Group)
+      .useInclude([{
+        model: User,
+      }])
       .useScope([])
       .findAll({
         toJSON: true,
