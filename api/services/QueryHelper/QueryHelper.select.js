@@ -57,7 +57,6 @@ function formatQuery({
   keyword = undefined,
   log = false,
   rawWhere = false,
-  toJSON = false,
 }) {
   let sortByColumn = null;
   try {
@@ -219,11 +218,6 @@ function formatQuery({
       query.group = group;
     }
 
-    if (toJSON) {
-      query.raw = true;
-      query.nest = true;
-    }
-
     return query;
   } catch (e) {
     sails.log.error(e);
@@ -320,7 +314,7 @@ async function find(
     for (const row of data.rows) {
       items.push(await formatOutput({
         presenter,
-        data: row,
+        data: toJSON ? row.toJSON() : row,
       }));
     }
 
