@@ -54,8 +54,9 @@ function formatQuery({
   order = undefined,
   group = undefined,
   limit = undefined,
+  keyword = undefined,
   log = false,
-  toJSON = false,
+  rawWhere = false,
 }) {
   let sortByColumn = null;
   try {
@@ -124,7 +125,7 @@ function formatQuery({
     }
 
     // 如果有指定完全符合欄位
-    if (filter.where) {
+    if (filter.where && !rawWhere) {
       const defaultCondition = formatCondition('and');
       if (!searchable) {
         _.forEach(filter.where, (value, key) => {
@@ -190,17 +191,19 @@ function formatQuery({
           }
         });
       }
+    } else if (filter.where && rawWhere) {
+      query.where = filter.where;
     }
 
-    if (filter.keyword) {
-      const keyword = filter.keyword.trim();
+    if (keyword) {
+      const fmtKeyword = keyword.trim();
       const defaultCondition = formatCondition('or');
       if (!query.where[defaultCondition]) {
         query.where[defaultCondition] = [];
       }
 
       columns.forEach((column) => {
-        query.where[defaultCondition].push(Sequelize.where(Sequelize.col(column), 'like', `%${keyword}%`));
+        query.where[defaultCondition].push(Sequelize.where(Sequelize.col(column), 'like', `%${fmtKeyword}%`));
       });
     }
 
@@ -214,13 +217,6 @@ function formatQuery({
     if (!_.isNil(group) && group !== false) {
       query.group = group;
     }
-
-    if (toJSON) {
-      query.raw = true;
-      query.nest = true;
-    }
-    // Console.log('query=>');
-    // Console.dir(query);
 
     return query;
   } catch (e) {
@@ -271,6 +267,8 @@ async function find(
     paging = true,
     curPage = 1,
     perPage = 30,
+    keyword = undefined,
+    rawWhere = false,
     toJSON = false,
     log = false,
   } = {},
@@ -295,6 +293,8 @@ async function find(
       include,
       group,
       limit,
+      keyword,
+      rawWhere,
       toJSON,
       log,
     });
@@ -314,7 +314,7 @@ async function find(
     for (const row of data.rows) {
       items.push(await formatOutput({
         presenter,
-        data: row,
+        data: toJSON ? row.toJSON() : row,
       }));
     }
 
@@ -553,7 +553,6 @@ class Query {
       presenter: this.data.presenter,
       filter: {
         where: this.data.where,
-        keyword: this.data.keyword,
       },
       curPage,
       perPage,
@@ -563,7 +562,9 @@ class Query {
       order,
       group,
       collate,
+      keyword: this.data.keyword,
       limit,
+      rawWhere: this.data.useRawWhere instanceof Object,
       toJSON,
       log,
     });
@@ -610,7 +611,6 @@ class Query {
       presenter: this.data.presenter,
       filter: {
         where: this.data.where,
-        keyword: this.data.keyword,
       },
       paging: false,
       sort,
@@ -618,7 +618,9 @@ class Query {
       order,
       group,
       collate,
+      keyword: this.data.keyword,
       limit,
+      rawWhere: this.data.useRawWhere instanceof Object,
       toJSON,
       log,
     });
