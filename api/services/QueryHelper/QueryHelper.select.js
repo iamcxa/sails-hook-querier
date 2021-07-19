@@ -211,9 +211,7 @@ function formatQuery({
       query.logging = Console.log;
     }
 
-    if (_.isNil(group) && include) {
-      query.group = [`${model.name}.id`];
-    } else if (!_.isNil(group) && group !== false) {
+    if (!_.isNil(group) && group !== false) {
       query.group = group;
     }
 
