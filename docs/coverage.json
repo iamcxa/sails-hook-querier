@@ -1,6 +1,6 @@
 {
-  "coverage": "52.72%",
-  "expectCount": 55,
+  "coverage": "51.78%",
+  "expectCount": 56,
   "actualCount": 29,
   "files": {
     "QueryHelper/QueryHelper.create.js": {
@@ -45,19 +45,20 @@
       ]
     },
     "QueryHelper/QueryHelper.select.js": {
-      "expectCount": 23,
+      "expectCount": 24,
       "actualCount": 13,
       "undocumentLines": [
         4,
         24,
         41,
-        211,
-        233,
-        318,
-        319,
-        320,
-        421,
-        429
+        228,
+        250,
+        343,
+        344,
+        345,
+        447,
+        455,
+        486
       ]
     },
     "QueryHelper/QueryHelper.update.js": {

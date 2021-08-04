@@ -66,13 +66,13 @@
 </nav>
 
 <div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {Query} from &apos;<span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber318">sails-hook-sequelize-querier/QueryHelper/QueryHelper.select.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {Query} from &apos;<span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber343">sails-hook-sequelize-querier/QueryHelper/QueryHelper.select.js</a></span>&apos;</code></pre></div>
   <span data-ice="access">public</span>
   <span data-ice="kind">class</span>
   
   
   
-  <span data-ice="source">| <span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber318">source</a></span></span>
+  <span data-ice="source">| <span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber343">source</a></span></span>
 </div>
 
 <div class="self-detail detail">
@@ -159,7 +159,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/QueryHelper/QueryHelper.select.js~Query.html#instance-member-data">data</a></span></span><span class="code" data-ice="signature">: {&quot;attributes&quot;: <span>*</span>, &quot;model&quot;: <span>*</span>, &quot;scope&quot;: <span>*</span>, &quot;include&quot;: <span>*</span>, &quot;where&quot;: <span>*</span>, &quot;request&quot;: <span>*</span>, &quot;presenter&quot;: <span>*</span>, &quot;searchable&quot;: <span>*</span>, &quot;keyword&quot;: <span>*</span>, &quot;useWhere&quot;: <span>*</span>, &quot;useRawWhere&quot;: <span>*</span>}</span>
+          <span class="code" data-ice="name"><span><a href="class/QueryHelper/QueryHelper.select.js~Query.html#instance-member-data">data</a></span></span><span class="code" data-ice="signature">: {&quot;attributes&quot;: <span>*</span>, &quot;model&quot;: <span>*</span>, &quot;scope&quot;: <span>*</span>, &quot;include&quot;: <span>*</span>, &quot;where&quot;: <span>*</span>, &quot;request&quot;: <span>*</span>, &quot;presenter&quot;: <span>*</span>, &quot;searchable&quot;: <span>*</span>, &quot;keyword&quot;: <span>*</span>, &quot;keyName&quot;: <span>*</span>, &quot;useWhere&quot;: <span>*</span>, &quot;useRawWhere&quot;: <span>*</span>}</span>
         </p>
       </div>
       <div>
@@ -223,6 +223,34 @@
           
           
           <span class="code" data-ice="name"><span><a href="class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-getPaging">getPaging</a></span></span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-queryInit">queryInit</a></span></span><span class="code" data-ice="signature">()</span>
         </p>
       </div>
       <div>
@@ -334,7 +362,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useFullTextSearch">useFullTextSearch</a></span></span><span class="code" data-ice="signature">(keyword: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useFullTextSearchByKey">useFullTextSearchByKey</a></span></span><span class="code" data-ice="signature">(keyName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -594,7 +622,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber319">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber344">source</a></span></span>
     </span>
   </h3>
 
@@ -636,11 +664,11 @@
     
     
     
-    <span class="code" data-ice="name">data</span><span class="code" data-ice="signature">: {&quot;attributes&quot;: <span>*</span>, &quot;model&quot;: <span>*</span>, &quot;scope&quot;: <span>*</span>, &quot;include&quot;: <span>*</span>, &quot;where&quot;: <span>*</span>, &quot;request&quot;: <span>*</span>, &quot;presenter&quot;: <span>*</span>, &quot;searchable&quot;: <span>*</span>, &quot;keyword&quot;: <span>*</span>, &quot;useWhere&quot;: <span>*</span>, &quot;useRawWhere&quot;: <span>*</span>}</span>
+    <span class="code" data-ice="name">data</span><span class="code" data-ice="signature">: {&quot;attributes&quot;: <span>*</span>, &quot;model&quot;: <span>*</span>, &quot;scope&quot;: <span>*</span>, &quot;include&quot;: <span>*</span>, &quot;where&quot;: <span>*</span>, &quot;request&quot;: <span>*</span>, &quot;presenter&quot;: <span>*</span>, &quot;searchable&quot;: <span>*</span>, &quot;keyword&quot;: <span>*</span>, &quot;keyName&quot;: <span>*</span>, &quot;useWhere&quot;: <span>*</span>, &quot;useRawWhere&quot;: <span>*</span>}</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber320">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber345">source</a></span></span>
     </span>
   </h3>
 
@@ -686,7 +714,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber553">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber593">source</a></span></span>
     </span>
   </h3>
 
@@ -882,7 +910,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber483">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber533">source</a></span></span>
     </span>
   </h3>
 
@@ -1083,6 +1111,49 @@
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-queryInit">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">queryInit</span><span class="code" data-ice="signature">()</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber486">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="instance-method-select">
     <span class="access" data-ice="access">public</span>
     
@@ -1094,7 +1165,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber338">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber364">source</a></span></span>
     </span>
   </h3>
 
@@ -1166,7 +1237,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber382">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber408">source</a></span></span>
     </span>
   </h3>
 
@@ -1238,7 +1309,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber429">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber455">source</a></span></span>
     </span>
   </h3>
 
@@ -1298,18 +1369,18 @@
   
 </div>
 <div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="instance-method-useFullTextSearch">
+  <h3 data-ice="anchor" id="instance-method-useFullTextSearchByKey">
     <span class="access" data-ice="access">public</span>
     
     
     
     
     
-    <span class="code" data-ice="name">useFullTextSearch</span><span class="code" data-ice="signature">(keyword: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
+    <span class="code" data-ice="name">useFullTextSearchByKey</span><span class="code" data-ice="signature">(keyName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber453">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber479">source</a></span></span>
     </span>
   </h3>
 
@@ -1329,10 +1400,10 @@
     <tbody>
     
     <tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">keyword</td>
+      <td data-ice="name" class="code" data-depth="0">keyName</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>&#x5168;&#x6587;&#x6AA2;&#x7D22;&#x67E5;&#x8A62;&#x7528;&#x95DC;&#x9375;&#x5B57;</p>
+      <td data-ice="description"><p>useRequest() &#x6240;&#x50B3;&#x5165;&#x7684;&#x5168;&#x6587;&#x6AA2;&#x7D22;&#x67E5;&#x8A62;&#x7528;&#x95DC;&#x9375;&#x5B57; key name</p>
 </td>
     </tr>
 </tbody>
@@ -1381,7 +1452,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber346">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber372">source</a></span></span>
     </span>
   </h3>
 
@@ -1453,7 +1524,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber443">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber469">source</a></span></span>
     </span>
   </h3>
 
@@ -1525,7 +1596,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber404">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber430">source</a></span></span>
     </span>
   </h3>
 
@@ -1597,7 +1668,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber413">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber439">source</a></span></span>
     </span>
   </h3>
 
@@ -1669,7 +1740,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber356">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber382">source</a></span></span>
     </span>
   </h3>
 
@@ -1741,7 +1812,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber371">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber397">source</a></span></span>
     </span>
   </h3>
 
@@ -1834,7 +1905,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber421">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber447">source</a></span></span>
     </span>
   </h3>
 
@@ -1905,7 +1976,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber395">source</a></span></span>
+      <span data-ice="source"><span><a href="file/QueryHelper/QueryHelper.select.js.html#lineNumber421">source</a></span></span>
     </span>
   </h3>
 
