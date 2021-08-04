@@ -8,3 +8,6 @@ coverage
 config/local.js
 config/local.default.js
 config/local.current.js
+index.js
+docs
+scripts

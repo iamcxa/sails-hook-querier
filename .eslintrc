@@ -1,34 +1,20 @@
 {
   "extends": [
-    "airbnb-base",
-    ".eslintrc-sails"
+    "@udea-io/eslint-config",
+    "@udea-io/eslint-config/node",
+    "@udea-io/eslint-config/mocha"
   ],
 
-  "plugins": [
-    "import"
-  ],
-
-  "env": {
-    "node": true,
-    "mocha": true
-  },
-
-  "parser": "babel-eslint",
-
-  "parserOptions": {
-    "ecmaVersion": 8
-  },
-
-  "rules": {
-    "no-restricted-syntax": [
-      "error",
-      "LabeledStatement",
-      "WithStatement"
-    ],
-    "import/no-extraneous-dependencies": "off",
-    "no-await-in-loop": "warn",
-    "func-names": "off",
-    "no-underscore-dangle": "off",
-    "implicit-arrow-linebreak": "off"
+  "globals": {
+    "Promise": true,
+    "sails": true,
+    "_": true,
+    "async": true,
+    "QueryService": true,
+    "ValidatorHelper": true,
+    "Console": true,
+    "Sequelize": true,
+    "MESSAGE": true,
+    "QueryHelper": true
   }
 }

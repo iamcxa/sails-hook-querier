@@ -11,7 +11,7 @@
  */
 
 module.exports = {
-  models: {
-    datastore: 'travis',
-  },
+	models: {
+		datastore: 'mysql',
+	},
 };
