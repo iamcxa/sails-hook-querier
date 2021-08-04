@@ -48,7 +48,7 @@
     "inflection": "^1.13.1",
     "joi": "^14.3.1",
     "mocha": "^8.4.0",
-    "sails-util-micro-apps": "^1.1.1",
+    "sails-util-micro-apps": "github:udea-io/sails-util-micro-apps",
     "sequelize": "^5.22.4"
   },
   "engines": {
