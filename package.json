@@ -38,7 +38,7 @@
     "prettier": "^2.3.2",
     "prettier-eslint": "^13.0.0",
     "sails": "^1.4.4",
-    "sails-hook-blocks": "^0.1.11",
+    "sails-hook-blocks": "github:iamcxa/sails-hook-blocks",
     "sinon": "^11.1.2",
     "sqlite3": "^5.0.2",
     "supertest": "^6.1.4",
