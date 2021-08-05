@@ -44,7 +44,7 @@ module.exports.datastores = {
 	},
 
 	ci: {
-		user: 'test',
+		user: 'root',
 		password: '',
 		database: 'database-ci',
 		options: {
