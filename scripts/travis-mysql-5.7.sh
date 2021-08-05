@@ -13,5 +13,7 @@ SHOW VARIABLES WHERE Variable_name LIKE 'character%' OR Variable_name LIKE 'coll
 CREATE DATABASE \`database-ci\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 SHOW DATABASES;
 SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+grant all privileges on database-ci.* to 'root'@'%' identified by 'root';
+flush privileges;
 "
 exit

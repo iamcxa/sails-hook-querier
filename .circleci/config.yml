@@ -20,7 +20,7 @@ jobs:
       - image: cimg/node:12.22.4
       - image: circleci/mysql:5.7.35-ram
         environment:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
           MYSQL_ROOT_PASSWORD: ''
 
     steps:
