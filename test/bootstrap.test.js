@@ -44,11 +44,11 @@ before(function (done) {
 				const config = rc('sails');
 				// eslint-disable-next-line import/extensions,import/no-unresolved
 				config.hooks.sequelize = require('sails-hook-sequelize');
-				console.log('config.hooks.sequelize-querier=>', config.hooks.sequelize)
 				config.hooks.querier = require('../index');
 
 				// Attempt to lift sails
 				Sails().lift(config, (err, _sails) => {
+					console.error(err);
 					if (err) {
 						return done(err);
 					}
