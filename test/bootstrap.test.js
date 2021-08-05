@@ -10,9 +10,8 @@ global.SeedHelper = require('../node_modules/sails-hook-blocks/api/services/help
 global.ValidatorHelper = require('../node_modules/sails-hook-blocks/api/services/helpers/VerifyHelper');
 global.VerifyHelper = require('../node_modules/sails-hook-blocks/api/services/helpers/VerifyHelper');
 
-const sails = require('sails');
 const rc = require('rc');
-const Sails = require('./fixtures/app').sails();
+const sails = require('./fixtures/app').sails();
 
 let config = rc('sails');
 
