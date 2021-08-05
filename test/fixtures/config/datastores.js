@@ -35,6 +35,7 @@ module.exports.datastores = {
 		user: 'root',
 		password: 'toor',
 		database: 'demo',
+		dialect: 'mysql',
 		options: {
 			dialect: 'mysql',
 			host: 'localhost',
@@ -47,6 +48,7 @@ module.exports.datastores = {
 		user: 'root',
 		password: '',
 		database: 'database-ci',
+		dialect: 'mysql',
 		options: {
 			dialect: 'mysql',
 			host: '127.0.0.1',
