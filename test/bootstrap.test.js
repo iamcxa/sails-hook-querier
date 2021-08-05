@@ -30,7 +30,7 @@ before(function (done) {
 	const connection = new Sequelize(
 		connInfo.database,
 		connInfo.user,
-		connInfo.password,
+		undefined,
 		connInfo.options,
 	);
 

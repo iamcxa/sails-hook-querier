@@ -46,7 +46,7 @@ module.exports.datastores = {
 
 	ci: (_.has(local, 'datastores.ci') && _.get(local, 'datastores.ci')) || {
 		user: 'root',
-		password: undefined,
+		password: '',
 		database: 'database-ci',
 		dialect: 'mysql',
 		options: {
