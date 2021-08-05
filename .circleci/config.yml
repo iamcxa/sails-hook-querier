@@ -51,13 +51,13 @@ jobs:
             - ./node_modules
       - run:
           name: Setup Test Reports
+          # just for CircleCI
           command: |
-            npm install mocha-junit-reporter # just for CircleCI
+            npm install mocha-junit-reporter
             mkdir reports
       - run:
           name: Running Test Cases
           command: |
-            mkdir -p /tmp/test-results
             npm run test-ci --- --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml
       # Run coverage report for Code Climate
       - run:

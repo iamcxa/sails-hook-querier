@@ -43,13 +43,13 @@ module.exports.datastores = {
 		},
 	},
 
-	ci: {
+	ci: (_.has(local, 'datastores.ci') && _.get(local, 'datastores.ci')) || {
 		user: 'root',
 		password: '',
 		database: 'database-ci',
 		options: {
 			dialect: 'mysql',
-			host: '127.0.0.1',
+			host: 'localhost',
 			port: 3306,
 			logging: console.log,
 		},

@@ -11,4 +11,7 @@
  */
 
 module.exports = {
+	models: {
+		datastore: 'mysql2',
+	},
 };
