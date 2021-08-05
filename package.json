@@ -45,17 +45,17 @@
     "sinon": "^11.1.2"
   },
   "dependencies": {
+    "esm": "^3.2.25",
     "inflection": "^1.13.1",
     "joi": "^14.3.1",
     "lodash": "^4.17.21",
     "mysql2": "^2.2.5",
-    "sqlite3": "^5.0.2",
     "sails": "^1.4.4",
     "sails-hook-blocks": "github:iamcxa/sails-hook-blocks",
     "sails-hook-sequelize": "github:udea-io/sails-hook-sequelize",
     "sails-util-micro-apps": "github:udea-io/sails-util-micro-apps",
     "sequelize": "^5.22.4",
-    "esm": "^3.2.25",
+    "sqlite3": "^5.0.2",
     "tracer": "^1.1.5"
   },
   "engines": {
