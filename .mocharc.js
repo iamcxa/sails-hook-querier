@@ -5,6 +5,8 @@
 // Otherwise, JSON or YAML is recommended.
 
 module.exports = {
+  timeout: "50s",
+  slow: 1000,
   exit: true, // could be expressed as "'no-exit': true"
   require: 'chai',
   spec: ['test/bootstrap.test.js', 'test/**/*.spec.js'],

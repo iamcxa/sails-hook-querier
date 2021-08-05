@@ -44,41 +44,40 @@ jobs:
       - run:
           name: Install Node Packages
           command: "[ ! -d node_modules ] && npm ci --loglevel warn --yes || echo package.json and package-lock.json unchanged. Using cache."
-          # command: "[ ! -d node_modules ] && npm ci --loglevel warn --yes || npm run postinstall && echo package.json and package-lock.json unchanged. Using cache."
       - save_cache:
           key: querier-branch-{{ .Branch }}-checksum-{{checksum "package-lock.json" }}-v1
           paths:
             - ./node_modules
       - run:
           name: Setup Test Reports
+          # just for CircleCI
           command: |
-            npm install mocha-junit-reporter # just for CircleCI
+            npm install mocha-junit-reporter
             mkdir reports
       - run:
           name: Running Test Cases
           command: |
-            mkdir -p /tmp/test-results
             npm run test-ci --- --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml
       # Run coverage report for Code Climate
-      - run:
-          name: Setup Code Climate test-reporter
-          command: |
-            # download test reporter as a static binary
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
-            ./cc-test-reporter before-build
-      - run:
-          name: Get code-coverage report data
-          command: |
-            mkdir coverage
-            # nyc report requires that nyc has already been run,
-            # which creates the .nyc_output folder containing necessary data
-            ./node_modules/.bin/nyc report --reporter=text-lcov > coverage/lcov.info
-            ./cc-test-reporter after-build -t lcov
-      - run:
-          name: Get eslint report data
-          command: |
-            ./node_modules/.bin/eslint ./ --format junit --output-file ./reports/eslint/eslint.xml
+#      - run:
+#          name: Setup Code Climate test-reporter
+#          command: |
+#            # download test reporter as a static binary
+#            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+#            chmod +x ./cc-test-reporter
+#            ./cc-test-reporter before-build
+#      - run:
+#          name: Get code-coverage report data
+#          command: |
+#            mkdir coverage
+#            # nyc report requires that nyc has already been run,
+#            # which creates the .nyc_output folder containing necessary data
+#            ./node_modules/.bin/nyc report --reporter=text-lcov > coverage/lcov.info
+#            ./cc-test-reporter after-build -t lcov
+#      - run:
+#          name: Get eslint report data
+#          command: |
+#            ./node_modules/.bin/eslint ./api --format junit --output-file ./reports/eslint/eslint.xml
       - store_test_results:
           path: reports
       - store_artifacts:

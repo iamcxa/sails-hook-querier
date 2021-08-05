@@ -20,40 +20,40 @@
  */
 
 const _ = require('lodash');
-const local = require('../../../config/local');
+
+let local = {};
+
+try {
+	// eslint-disable-next-line global-require
+	local = require('../../../config/local');
+} catch (e) {
+	console.info('[!] local.js not exists.');
+}
 
 module.exports.datastores = {
-  default: (_.has(local, 'datastores.default') &&
-    _.get(local, 'datastores.default')) || {
-    url: 'mysql://root:toor@localhost:3306/demo',
-    user: 'root',
-    password: 'toor',
-    database: 'test',
-    dialect: 'mysql',
-    options: {
-      dialect: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      logging: console.log,
-    },
-  },
-
-  travis: (_.has(local, 'datastores.travis') &&
-    _.get(local, 'datastores.travis')) || {
-    url: 'mysql://root@127.0.0.1:3306/travis_test',
-    user: 'root',
-    password: '',
-    database: 'travis_test',
-    dialect: 'mysql',
-    options: {
-      dialect: 'mysql',
-      host: '127.0.0.1',
-      port: 3306,
-      logging: console.log,
-    },
-  },
-
-  memory: {
-    adapter: 'sails-memory',
-  },
+	// 'mysql-test': (_.has(local, 'datastores["mysql-test"]') &&
+	// 	_.get(local, 'datastores["mysql-test"]')) || {
+	// 	user: 'root',
+	// 	password: 'toor',
+	// 	database: 'demo',
+	// 	options: {
+	// 		dialect: 'mysql',
+	// 		host: 'localhost',
+	// 		port: 3306,
+	// 		logging: console.log,
+	// 	},
+	// },
+	//
+	// 'mysql-test-ci': (_.has(local, 'datastores["mysql-test-ci"]') &&
+	// 	_.get(local, 'datastores["mysql-test-ci"]')) || {
+	// 	user: 'root',
+	// 	password: '',
+	// 	database: 'database-ci',
+	// 	options: {
+	// 		dialect: 'mysql',
+	// 		host: 'localhost',
+	// 		port: 3306,
+	// 		logging: console.log,
+	// 	},
+	// },
 };

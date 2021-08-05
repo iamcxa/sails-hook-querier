@@ -22,15 +22,12 @@ try {
 }
 
 module.exports = {
-	models: {
-		datastore: 'mysql-test',
-	},
 	datastores: {
 		mysql: (_.has(local, 'datastores["mysql"]') &&
 			_.get(local, 'datastores["mysql"]')) || {
 			user: 'root',
-			password: 'toor',
-			database: 'demo',
+			password: '',
+			database: 'database-ci',
 			options: {
 				dialect: 'mysql',
 				host: 'localhost',
