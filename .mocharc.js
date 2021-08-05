@@ -8,4 +8,5 @@ module.exports = {
   exit: true, // could be expressed as "'no-exit': true"
   require: 'chai',
   spec: ['test/bootstrap.test.js', 'test/**/*.spec.js'],
+  timeout: 600000,
 };
