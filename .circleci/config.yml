@@ -44,7 +44,7 @@ jobs:
       - run:
           name: Install Node Packages
 #          command: "[ ! -d node_modules ] && npm ci --loglevel warn --yes || echo package.json and package-lock.json unchanged. Using cache."
-           command: npm ci
+          command: "npm ci"
       - save_cache:
           key: querier-branch-{{ .Branch }}-checksum-{{checksum "package-lock.json" }}-v1
           paths:
