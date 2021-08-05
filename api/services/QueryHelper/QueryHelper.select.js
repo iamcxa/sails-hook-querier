@@ -1,5 +1,24 @@
 /* eslint no-await-in-loop: 0 */
-import _ from 'lodash';
+const _ = require('lodash');
+const Redis = require('ioredis');
+
+const config = sails.config.queryhelper;
+const redis = new Redis({
+  // ...config.redis,
+});
+
+const cacheAdapter = {
+  redis: {
+    get: async (key) => {
+      const result = await redis.get(key);
+      return result;
+    },
+    set: async (key, value, options) => {
+      await redis.set(key, value, 'EX', options.lifetime);
+      return true;
+    },
+  },
+};
 
 function formatOperator(operator) {
   const { Op } = Sequelize;
@@ -271,6 +290,7 @@ async function find(
     rawWhere = false,
     toJSON = false,
     log = false,
+    cache = undefined,
   } = {},
 ) {
   try {
@@ -319,7 +339,7 @@ async function find(
     }
 
     const total = typeof data.count === 'number' ? data.count : data.count.length;
-    return {
+    const result = {
       paging: {
         lastPage: paging ? Math.ceil(total / perPage) || 1 : null,
         curPage: paging ? curPage : null,
@@ -333,6 +353,14 @@ async function find(
       filter,
       items,
     };
+
+    if (cache) {
+      cache.adapter.set(cache.key, JSON.stringify(result), {
+        lifetime: cache.lifetime,
+      });
+    }
+
+    return result;
   } catch (e) {
     // Console.timeEnd(tag);
     sails.log.error(e);
@@ -453,12 +481,24 @@ class Query {
   }
 
   useCache(cache) {
+    const adapter = typeof cache.adapter === 'string' ? cacheAdapter[cache.adapter] : cache.adapter;
+
+    let key = `${this.data.model.name}`;
+
+    if (cache.key) {
+      key = `${key}::${cache.key}`;
+    }
+
+    if (cache.rawKey) {
+      key = cache.rawKey;
+    }
+
     this.data.cache = {
-      minutes: cache.minutes,
-      target: cache.target,
-      tableName: cache.tableName,
-      redisPath: cache.redisPath,
+      lifetime: cache.lifetime,
+      adapter,
+      key,
     };
+
     return this;
   }
 
@@ -590,7 +630,7 @@ class Query {
    * @property {number} result.paging.limit - 搜尋數量上限
    * @property {number} result.paging.total - 總搜尋數量
    */
-  findAll({
+  async findAll({
     sort = 'DESC',
     sortBy,
     order,
@@ -602,28 +642,43 @@ class Query {
   }) {
     this.queryInit();
 
-    return find({
-      model: this.data.model,
-      scope: this.data.scope,
-      include: this.data.include,
-      attributes: this.data.attributes,
-      searchable: this.data.searchable,
-      presenter: this.data.presenter,
-      filter: {
-        where: this.data.where,
-      },
-      paging: false,
-      sort,
-      sortBy,
-      order,
-      group,
-      collate,
-      keyword: this.data.keyword,
-      limit,
-      rawWhere: this.data.useRawWhere instanceof Object,
-      toJSON,
-      log,
-    });
+    let result;
+
+    if (this.data.cache) {
+      result = await this.data.cache.adapter.get(this.data.cache.key);
+      if (result) {
+        result = JSON.parse(result);
+        result.cache = true;
+      }
+    }
+
+    if (!result) {
+      result = find({
+        model: this.data.model,
+        scope: this.data.scope,
+        include: this.data.include,
+        attributes: this.data.attributes,
+        searchable: this.data.searchable,
+        presenter: this.data.presenter,
+        filter: {
+          where: this.data.where,
+        },
+        paging: false,
+        sort,
+        sortBy,
+        order,
+        group,
+        collate,
+        keyword: this.data.keyword,
+        limit,
+        rawWhere: this.data.useRawWhere instanceof Object,
+        toJSON,
+        log,
+        cache: this.data.cache,
+      });
+    }
+
+    return result;
   }
 }
 

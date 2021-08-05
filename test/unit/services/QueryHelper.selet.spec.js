@@ -9,7 +9,7 @@ describe('about QueryHelper select operation.', () => {
     },
   };
   let createdGroups;
-  const baseSize = 50;
+  const baseSize = 10;
   const perPage = 10;
   before('before test QueryHelper select operation.', async () => {
     await Group.destroy({
@@ -20,6 +20,13 @@ describe('about QueryHelper select operation.', () => {
       model: Group,
       include: [User],
       data: (i) => {
+        if (i < 2) {
+          return {
+            ...input,
+            name: 'targetItem',
+          };
+        }
+
         if (i < baseSize) {
           return {
             ...input,
@@ -299,5 +306,61 @@ describe('about QueryHelper select operation.', () => {
     }, {
       log: false,
     });
+  });
+
+  it('cache data should be success', async () => {
+    let start = process.hrtime();
+    const timer = function (note) {
+      const precision = 3; // 3 decimal places
+      const elapsed = process.hrtime(start)[1] / 1000000;
+      sails.log(`${process.hrtime(start)[0]} s, ${elapsed.toFixed(precision)} ms - ${note}`);
+      start = process.hrtime();
+    };
+
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    timer('query1 start');
+    const result1 = await QueryHelper
+      .select(Group)
+      .useInclude([{
+        model: User,
+      }])
+      .useRequest({
+        name: 'get',
+      })
+      .useWhere((request) => ({
+        name: `%${request.name}%`,
+      }))
+      .useCache({
+        adapter: 'redis',
+        lifetime: 10,
+      })
+      .findAll({
+        toJSON: true,
+      });
+    timer('query1 done');
+    sails.log(result1);
+    await sleep(2000);
+    timer('query2 start');
+    const result2 = await QueryHelper
+      .select(Group)
+      .useInclude([{
+        model: User,
+      }])
+      .useRequest({
+        name: 'get',
+      })
+      .useWhere((request) => ({
+        name: `%${request.name}%`,
+      }))
+      .useCache({
+        adapter: 'redis',
+        lifetime: 10,
+      })
+      .findAll({
+        toJSON: true,
+      });
+    timer('query2 done');
+    sails.log(result2);
   });
 });
