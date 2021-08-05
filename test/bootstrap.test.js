@@ -24,9 +24,8 @@ before(function (done) {
 	console.log('===================================');
 	console.log(`NODE_ENV=>"${process.env.NODE_ENV}"`);
 
-	const connInfo = require('./fixtures/config/datastores').datastores[
-		`mysql-${process.env.NODE_ENV}`
-	];
+	// eslint-disable-next-line import/no-dynamic-require
+	const connInfo = require(`./fixtures/config/env/${process.env.NODE_ENV}`).datastores.mysql;
 
 	console.log(`connection=>`, connInfo);
 	console.log('===================================');
@@ -45,9 +44,9 @@ before(function (done) {
 			connection.query('SET FOREIGN_KEY_CHECKS=1;').then(() => {
 				config = {
 					...config,
-					models: {
-						datastore: `mysql-${process.env.NODE_ENV}`,
-					},
+					// models: {
+					// 	datastore: `mysql-${process.env.NODE_ENV}`,
+					// },
 				};
 				config.hooks.sequelize = require('sails-hook-sequelize');
 				config.hooks.querier = require('../index');

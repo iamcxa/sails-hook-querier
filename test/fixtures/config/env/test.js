@@ -10,8 +10,33 @@
  *
  */
 
+const _ = require('lodash');
+
+let local = {};
+
+try {
+	// eslint-disable-next-line global-require
+	local = require('../../../../config/local');
+} catch (e) {
+	console.info('[!] local.js not exists.');
+}
+
 module.exports = {
 	models: {
 		datastore: 'mysql-test',
+	},
+	datastores: {
+		mysql: (_.has(local, 'datastores["mysql"]') &&
+			_.get(local, 'datastores["mysql"]')) || {
+			user: 'root',
+			password: 'toor',
+			database: 'demo',
+			options: {
+				dialect: 'mysql',
+				host: 'localhost',
+				port: 3306,
+				logging: console.log,
+			},
+		},
 	},
 };
