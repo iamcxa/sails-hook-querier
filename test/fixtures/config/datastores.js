@@ -46,7 +46,7 @@ module.exports.datastores = {
 
 	'mysql-test-ci': (_.has(local, 'datastores["mysql-test-ci"]') &&
 		_.get(local, 'datastores["mysql-test-ci"]')) || {
-		user: 'test',
+		user: 'root',
 		password: '',
 		database: 'database-ci',
 		options: {
