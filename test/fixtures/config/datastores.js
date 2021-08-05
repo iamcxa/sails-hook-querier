@@ -31,11 +31,11 @@ try {
 }
 
 module.exports.datastores = {
-	mysql: (_.has(local, 'datastores.mysql') && _.get(local, 'datastores.mysql')) || {
+	'mysql-test': (_.has(local, 'datastores["mysql-test"]') &&
+		_.get(local, 'datastores["mysql-test"]')) || {
 		user: 'root',
 		password: 'toor',
 		database: 'demo',
-		dialect: 'mysql',
 		options: {
 			dialect: 'mysql',
 			host: 'localhost',
@@ -44,11 +44,11 @@ module.exports.datastores = {
 		},
 	},
 
-	ci: (_.has(local, 'datastores.ci') && _.get(local, 'datastores.ci')) || {
-		user: 'root',
+	'mysql-test-ci': (_.has(local, 'datastores["mysql-test-ci"]') &&
+		_.get(local, 'datastores["mysql-test-ci"]')) || {
+		user: 'test',
 		password: '',
 		database: 'database-ci',
-		dialect: 'mysql',
 		options: {
 			dialect: 'mysql',
 			host: 'localhost',

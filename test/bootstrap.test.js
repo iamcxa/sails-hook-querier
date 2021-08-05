@@ -10,6 +10,12 @@ global.SeedHelper = require('../node_modules/sails-hook-blocks/api/services/help
 global.ValidatorHelper = require('../node_modules/sails-hook-blocks/api/services/helpers/VerifyHelper');
 global.VerifyHelper = require('../node_modules/sails-hook-blocks/api/services/helpers/VerifyHelper');
 
+const sails = require('sails');
+const rc = require('rc');
+const Sails = require('./fixtures/app').sails();
+
+let config = rc('sails');
+
 // eslint-disable-next-line mocha/no-hooks-for-single-case
 before(function (done) {
 	// Hook will timeout in 10 seconds
@@ -20,7 +26,7 @@ before(function (done) {
 	console.log(`NODE_ENV=>"${process.env.NODE_ENV}"`);
 
 	const connInfo = require('./fixtures/config/datastores').datastores[
-		process.env.NODE_ENV === 'test-ci' ? 'ci' : 'mysql'
+		`mysql-${process.env.NODE_ENV}`
 	];
 
 	console.log(`connection=>`, connInfo);
@@ -38,24 +44,29 @@ before(function (done) {
 	connection.query('SET FOREIGN_KEY_CHECKS=0;').then(() =>
 		connection.query('DROP SCHEMA IF EXISTS sails;').then(() =>
 			connection.query('SET FOREIGN_KEY_CHECKS=1;').then(() => {
-				const Sails = require('./fixtures/app').sails;
-				// eslint-disable-next-line import/no-extraneous-dependencies
-				const rc = require('rc');
-				const config = rc('sails');
-				// eslint-disable-next-line import/extensions,import/no-unresolved
+				config = {
+					...config,
+					models: {
+						datastore: `mysql-${process.env.NODE_ENV}`,
+					},
+				};
 				config.hooks.sequelize = require('sails-hook-sequelize');
 				config.hooks.querier = require('../index');
 
 				// Attempt to lift sails
-				Sails().lift(config, (err, _sails) => {
+				sails.lift(config, (err) => {
 					console.error(err);
 					if (err) {
 						return done(err);
 					}
-					sails = _sails;
 					return done(err, sails);
 				});
 			}),
 		),
 	);
+});
+
+// eslint-disable-next-line mocha/no-hooks-for-single-case
+after(function (done) {
+	sails.lower(done);
 });

@@ -12,6 +12,6 @@
 
 module.exports = {
 	models: {
-		datastore: 'ci',
+		datastore: 'mysql-test-ci',
 	},
 };
