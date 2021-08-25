@@ -34,7 +34,7 @@ process.chdir(__dirname);
     sails = require('sails');
     rc = require('sails/accessible/rc');
   } catch (e) {
-    console.error('Encountered an error when attempting to require(\'sails\'):');
+    console.error("Encountered an error when attempting to require('sails'):");
     console.error(e.stack);
     console.error('--');
     console.error(
@@ -48,11 +48,11 @@ process.chdir(__dirname);
     console.error(
       'When you run `sails lift`, your app will still use a local `./node_modules/sails` dependency if it exists,',
     );
-    console.error('but if it doesn\'t, the app will run with the global sails instead!');
+    console.error("but if it doesn't, the app will run with the global sails instead!");
     return;
-  }// -•
+  } // -•
 
   // // Start server
   // sails.lift(rc('sails'));
   module.exports.sails = sails.Sails;
-}());
+})();

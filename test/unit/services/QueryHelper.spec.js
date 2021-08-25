@@ -1,7 +1,7 @@
 import samples from '../samples';
 
-describe('about QueryHelper operation.', () => {
-  it('getModelColumnType should be success', async () => {
+describe('about QueryHelper operation.', function () {
+  it('getModelColumnType should be success', async function () {
     const result = QueryHelper.getModelColumnType({
       modelName: 'User',
       columnName: 'name',
@@ -10,7 +10,7 @@ describe('about QueryHelper operation.', () => {
     result.toLowerCase().should.be.equal(typeof samples.user.name);
   });
 
-  it('getModelColumnType worng column should be success', async () => {
+  it('getModelColumnType worng column should be success', async function () {
     const result = QueryHelper.getModelColumnType({
       modelName: 'User',
       columnName: 'test',
@@ -19,13 +19,13 @@ describe('about QueryHelper operation.', () => {
     should.not.exist(result);
   });
 
-  it('modelAssociationsToArray should be success', async () => {
+  it('modelAssociationsToArray should be success', async function () {
     const result = QueryHelper.modelAssociationsToArray(User);
 
     result.length.should.be.equal(2);
   });
 
-  it('modelAssociationsToArray wrong model should be fail', async () => {
+  it('modelAssociationsToArray wrong model should be fail', async function () {
     try {
       QueryHelper.modelAssociationsToArray({});
     } catch (err) {
@@ -33,19 +33,19 @@ describe('about QueryHelper operation.', () => {
     }
   });
 
-  it('getEnumValues should be success', async () => {
+  it('getEnumValues should be success', async function () {
     const result = QueryHelper.getEnumValues('Group', 'role');
 
     result.length.should.be.equal(2);
   });
 
-  it('getEnumValues wrong column should be success', async () => {
+  it('getEnumValues wrong column should be success', async function () {
     const result = QueryHelper.getEnumValues('Group', 'name');
 
     should.not.exist(result);
   });
 
-  it('getEnumValues wrong model should be fail', async () => {
+  it('getEnumValues wrong model should be fail', async function () {
     try {
       QueryHelper.getEnumValues();
     } catch (err) {
@@ -53,7 +53,7 @@ describe('about QueryHelper operation.', () => {
     }
   });
 
-  it('getEnumValues should be success', async () => {
+  it('getEnumValues should be success', async function () {
     const result = QueryHelper.getModelSearchableColumns('User', {
       date: true,
       integer: true,
@@ -62,7 +62,7 @@ describe('about QueryHelper operation.', () => {
     result.length.should.be.equal(6);
   });
 
-  it('getIncludeModelByObject should be success', async () => {
+  it('getIncludeModelByObject should be success', async function () {
     const result1 = QueryHelper.getIncludeModelByObject({
       model: User,
     });
@@ -78,11 +78,17 @@ describe('about QueryHelper operation.', () => {
     should.exist(result3);
   });
 
-  it('getIncludeModelByObject  wrong model should be fail', async () => {
+  it('getIncludeModelByObject  wrong model should be fail', async function () {
     try {
       QueryHelper.getIncludeModelByObject({});
     } catch (err) {
-      err.message.should.be.equal(JSON.stringify({ message: 'BadRequest.Target.Model.Not.Exits', code: 400, extra: { includeModelObject: {} } }));
+      err.message.should.be.equal(
+        JSON.stringify({
+          message: 'BadRequest.Target.Model.Not.Exits',
+          code: 400,
+          extra: { includeModelObject: {} },
+        }),
+      );
     }
   });
 });

@@ -1,4 +1,4 @@
 module.exports.models = {
-	datastore: `mysql`,
-	migrate: 'drop',
+  datastore: `mysql`,
+  migrate: 'drop',
 };

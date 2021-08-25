@@ -1,7 +1,7 @@
 import samples from '../samples';
 
-describe('about QueryHelper format operation.', () => {
-  it('matchFormat should be success', async () => {
+describe('about QueryHelper format operation.', function () {
+  it('matchFormat should be success', async function () {
     const data = {
       name: 'test',
       age: 1,
@@ -29,12 +29,9 @@ describe('about QueryHelper format operation.', () => {
     );
   });
 
-  it('formatInput should be success', async () => {
-  });
+  it('formatInput should be success', async function () {});
 
-  it('formatOutput should be success', async () => {
-  });
+  it('formatOutput should be success', async function () {});
 
-  it('formatFieldQueryWithOrCondition should be success', async () => {
-  });
+  it('formatFieldQueryWithOrCondition should be success', async function () {});
 });

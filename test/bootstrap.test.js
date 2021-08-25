@@ -17,54 +17,54 @@ let config = rc('sails');
 
 // eslint-disable-next-line mocha/no-hooks-for-single-case
 before(function (done) {
-	// Hook will timeout in 10 seconds
-	this.timeout(11000);
-	chai.should();
+  // Hook will timeout in 10 seconds
+  this.timeout(11000);
+  chai.should();
 
-	console.log('===================================');
-	console.log(`NODE_ENV=>"${process.env.NODE_ENV}"`);
+  console.log('===================================');
+  console.log(`NODE_ENV=>"${process.env.NODE_ENV}"`);
 
-	// eslint-disable-next-line import/no-dynamic-require
-	const connInfo = require(`./fixtures/config/env/${process.env.NODE_ENV}`).datastores.mysql;
+  // eslint-disable-next-line import/no-dynamic-require
+  const connInfo = require(`./fixtures/config/env/${process.env.NODE_ENV}`).datastores.mysql;
 
-	console.log(`connection=>`, connInfo);
-	console.log('===================================');
+  console.log(`connection=>`, connInfo);
+  console.log('===================================');
 
-	const Sequelize = require('sequelize');
-	const connection = new Sequelize(
-		connInfo.database,
-		connInfo.user,
-		connInfo.password,
-		connInfo.options,
-	);
+  const Sequelize = require('sequelize');
+  const connection = new Sequelize(
+    connInfo.database,
+    connInfo.user,
+    connInfo.password,
+    connInfo.options,
+  );
 
-	// Drop schemas if exists
-	connection.query('SET FOREIGN_KEY_CHECKS=0;').then(() =>
-		connection.query('DROP SCHEMA IF EXISTS sails;').then(() =>
-			connection.query('SET FOREIGN_KEY_CHECKS=1;').then(() => {
-				config = {
-					...config,
-					// models: {
-					// 	datastore: `mysql-${process.env.NODE_ENV}`,
-					// },
-				};
-				config.hooks.sequelize = require('sails-hook-sequelize');
-				config.hooks.querier = require('../index');
+  // Drop schemas if exists
+  connection.query('SET FOREIGN_KEY_CHECKS=0;').then(() =>
+    connection.query('DROP SCHEMA IF EXISTS sails;').then(() =>
+      connection.query('SET FOREIGN_KEY_CHECKS=1;').then(() => {
+        config = {
+          ...config,
+          // models: {
+          // 	datastore: `mysql-${process.env.NODE_ENV}`,
+          // },
+        };
+        config.hooks.sequelize = require('sails-hook-sequelize');
+        config.hooks.querier = require('../index');
 
-				// Attempt to lift sails
-				sails.lift(config, (err) => {
-					console.error(err);
-					if (err) {
-						return done(err);
-					}
-					return done(err, sails);
-				});
-			}),
-		),
-	);
+        // Attempt to lift sails
+        sails.lift(config, (err) => {
+          console.error(err);
+          if (err) {
+            return done(err);
+          }
+          return done(err, sails);
+        });
+      }),
+    ),
+  );
 });
 
 // eslint-disable-next-line mocha/no-hooks-for-single-case
 after(function (done) {
-	sails.lower(done);
+  sails.lower(done);
 });
