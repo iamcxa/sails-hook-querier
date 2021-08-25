@@ -14,8 +14,8 @@ const cacheAdapter = {
       return result;
     },
     set: async (key, value, options) => {
-      await redis.set(key, value, 'EX', options.lifetime);
-      return true;
+      const result = await redis.set(key, value, 'EX', options.lifetime);
+      return result;
     },
   },
 };
@@ -266,6 +266,119 @@ async function formatOutput({
   }
 }
 
+async function cached(cache, cb, argv) {
+  let result;
+  if (cache) {
+    const data = await cache.adapter.get(`${cache.key}::*`);
+    if (data) result = JSON.parse(data);
+  }
+
+  if (!result) {
+    result = await cb(argv);
+
+    if (cache) {
+      const cachedAt = Date.now();
+      cache.adapter.set(`${cache.key}::${cachedAt}`, JSON.stringify({
+        ...result,
+        cachedAt,
+      }), {
+        lifetime: cache.lifetime,
+      });
+    }
+  }
+  return result;
+}
+
+async function create(
+  {
+    model = undefined,
+    scope = [],
+    include = [],
+    data = {},
+    // presenter = undefined,
+    // log = false,
+  } = {},
+) {
+  let result;
+
+  if (scope) {
+    result = await model.scope(scope).create(data, {
+      include,
+    });
+  } else {
+    result = await model.create(data, {
+      include,
+    });
+  }
+
+  // if (!_.isNil(presenter) && _.isFunction(presenter)) {
+    // if (presenter.constructor.name === 'AsyncFunction') {
+      // result = await presenter(data);
+    // } else {
+      // result = presenter(data);
+    // }
+  // }
+
+  return result;
+}
+
+async function update(
+  {
+    model = undefined,
+    scope = [],
+    include = [],
+    where = {},
+    data = {},
+    presenter = undefined,
+    // log = false,
+  } = {},
+) {
+  let result;
+
+  if (scope) {
+    result = await model.scope(scope).update(data, {
+      include,
+    });
+  } else {
+    result = await model.update(data, {
+      include,
+    });
+  }
+
+  // if (!_.isNil(presenter) && _.isFunction(presenter)) {
+    // if (presenter.constructor.name === 'AsyncFunction') {
+      // result = await presenter(data);
+    // } else {
+      // result = presenter(data);
+    // }
+  // }
+
+  return result;
+}
+
+async function destroy(
+  {
+    model = undefined,
+    scope = [],
+    include = [],
+    // log = false,
+  } = {},
+) {
+  let result;
+
+  if (scope) {
+    result = await model.scope(scope).destroy(data, {
+      include,
+    });
+  } else {
+    result = await model.destroy(data, {
+      include,
+    });
+  }
+
+  return result;
+}
+
 async function find(
   {
     model = undefined,
@@ -290,7 +403,6 @@ async function find(
     rawWhere = false,
     toJSON = false,
     log = false,
-    cache = undefined,
   } = {},
 ) {
   try {
@@ -353,12 +465,6 @@ async function find(
       filter,
       items,
     };
-
-    if (cache) {
-      cache.adapter.set(cache.key, JSON.stringify(result), {
-        lifetime: cache.lifetime,
-      });
-    }
 
     return result;
   } catch (e) {
@@ -495,6 +601,7 @@ class Query {
 
     this.data.cache = {
       lifetime: cache.lifetime,
+      type: cache.type,
       adapter,
       key,
     };
@@ -584,7 +691,7 @@ class Query {
   }) {
     this.queryInit();
 
-    return find({
+    const result = cached(this.data.cache, find, {
       model: this.data.model,
       scope: this.data.scope,
       include: this.data.include,
@@ -608,6 +715,8 @@ class Query {
       toJSON,
       log,
     });
+
+    return result;
   }
 
   /**
@@ -642,41 +751,80 @@ class Query {
   }) {
     this.queryInit();
 
-    let result;
+    const result = cached(this.data.cache, find, {
+      model: this.data.model,
+      scope: this.data.scope,
+      include: this.data.include,
+      attributes: this.data.attributes,
+      searchable: this.data.searchable,
+      presenter: this.data.presenter,
+      filter: {
+        where: this.data.where,
+      },
+      paging: false,
+      sort,
+      sortBy,
+      order,
+      group,
+      collate,
+      keyword: this.data.keyword,
+      limit,
+      rawWhere: this.data.useRawWhere instanceof Object,
+      toJSON,
+      log,
+      cache: this.data.cache,
+    });
 
-    if (this.data.cache) {
-      result = await this.data.cache.adapter.get(this.data.cache.key);
-      if (result) {
-        result = JSON.parse(result);
-        result.cache = true;
-      }
-    }
+    return result;
+  }
 
-    if (!result) {
-      result = find({
-        model: this.data.model,
-        scope: this.data.scope,
-        include: this.data.include,
-        attributes: this.data.attributes,
-        searchable: this.data.searchable,
-        presenter: this.data.presenter,
-        filter: {
-          where: this.data.where,
-        },
-        paging: false,
-        sort,
-        sortBy,
-        order,
-        group,
-        collate,
-        keyword: this.data.keyword,
-        limit,
-        rawWhere: this.data.useRawWhere instanceof Object,
-        toJSON,
-        log,
-        cache: this.data.cache,
-      });
-    }
+  async create({
+    data,
+    log,
+  }) {
+    this.queryInit();
+
+    const result = cached(this.data.cache, create, {
+      model: this.data.model,
+      scope: this.data.scope,
+      include: this.data.include,
+      data,
+      log,
+    });
+
+    return result;
+  }
+
+  async update({
+    data,
+    log,
+  }) {
+    this.queryInit();
+
+    const result = cached(this.data.cache, update, {
+      model: this.data.model,
+      scope: this.data.scope,
+      include: this.data.include,
+      data,
+      log,
+    });
+
+    return result;
+  }
+
+  async destroy({
+    data,
+    log,
+  }) {
+    this.queryInit();
+
+    const result = cached(this.data.cache, destroy, {
+      model: this.data.model,
+      scope: this.data.scope,
+      include: this.data.include,
+      data,
+      log,
+    });
 
     return result;
   }
