@@ -122,7 +122,9 @@ function formatQuery({
   order = undefined,
   group = undefined,
   limit = undefined,
+  keyword = undefined,
   log = false,
+  rawWhere = false,
 }) {
   let sortByColumn = null;
   try {
@@ -148,7 +150,7 @@ function formatQuery({
       collate,
       duplicating,
       ...paging ? {
-        limit: limit &amp;&amp; limit &gt; perPage ? perPage : limit,
+        limit: limit &amp;&amp; limit &gt; perPage ? limit : perPage,
         offset: (curPage - 1) * perPage,
       } : {
         ...limit ? { limit } : {},
@@ -186,16 +188,20 @@ function formatQuery({
       });
     }
 
-    if (attributes) {
+    if (attributes &amp;&amp; attributes.length &amp;&amp; attributes.length &gt; 0) {
       query.attributes = attributes;
     }
 
     // &#x5982;&#x679C;&#x6709;&#x6307;&#x5B9A;&#x5B8C;&#x5168;&#x7B26;&#x5408;&#x6B04;&#x4F4D;
-    if (filter.where) {
+    if (filter.where &amp;&amp; !rawWhere) {
       const defaultCondition = formatCondition(&apos;and&apos;);
       if (!searchable) {
         _.forEach(filter.where, (value, key) =&gt; {
           const op = formatOperator(&apos;like&apos;);
+          if (!query.where[defaultCondition]) {
+            query.where[defaultCondition] = [];
+          }
+
           query.where[defaultCondition].push({
             [key]: {
               [op]: filter.where[key],
@@ -253,6 +259,20 @@ function formatQuery({
           }
         });
       }
+    } else if (filter.where &amp;&amp; rawWhere) {
+      query.where = filter.where;
+    }
+
+    if (keyword) {
+      const fmtKeyword = keyword.trim();
+      const defaultCondition = formatCondition(&apos;or&apos;);
+      if (!query.where[defaultCondition]) {
+        query.where[defaultCondition] = [];
+      }
+
+      columns.forEach((column) =&gt; {
+        query.where[defaultCondition].push(Sequelize.where(Sequelize.col(column), &apos;like&apos;, `%${fmtKeyword}%`));
+      });
     }
 
     if (log) {
@@ -262,13 +282,10 @@ function formatQuery({
       query.logging = Console.log;
     }
 
-    if (_.isNil(group) &amp;&amp; include) {
-      query.group = [`${model.name}.id`];
-    } else if (!_.isNil(group) &amp;&amp; group !== false) {
+    if (!_.isNil(group) &amp;&amp; group !== false) {
       query.group = group;
     }
-    // Console.log(&apos;query=&gt;&apos;);
-    // Console.dir(query);
+
     return query;
   } catch (e) {
     sails.log.error(e);
@@ -315,10 +332,13 @@ async function find(
     collate = undefined,
     group = undefined,
     limit = undefined,
-    log = false,
     paging = true,
     curPage = 1,
     perPage = 30,
+    keyword = undefined,
+    rawWhere = false,
+    toJSON = false,
+    log = false,
   } = {},
 ) {
   try {
@@ -329,6 +349,7 @@ async function find(
     const query = formatQuery({
       searchable,
       attributes,
+      paging,
       curPage,
       perPage,
       filter,
@@ -338,10 +359,14 @@ async function find(
       collate,
       model,
       include,
-      log,
       group,
       limit,
+      keyword,
+      rawWhere,
+      toJSON,
+      log,
     });
+
     if (log) {
       sails.log.debug(&apos;query=&gt;&apos;);
       Console.dir(query);
@@ -357,7 +382,7 @@ async function find(
     for (const row of data.rows) {
       items.push(await formatOutput({
         presenter,
-        data: row,
+        data: toJSON ? row.toJSON() : row,
       }));
     }
 
@@ -395,6 +420,7 @@ class Query {
       presenter: null,
       searchable: null,
       keyword: null,
+      keyName: null,
       useWhere: [],
       useRawWhere: null,
     };
@@ -470,7 +496,7 @@ class Query {
    * &#x539F;&#x59CB; where &#x67E5;&#x8A62; object, &#x4F7F;&#x7528;&#x5F8C;&#x5C07;&#x5FFD;&#x7565; useWhere() &#x7684;&#x529F;&#x80FD;
    */
   useRawWhere(parameter) {
-    this.data.useRawWhere.push(parameter);
+    this.data.useRawWhere = parameter;
     return this;
   }
 
@@ -516,14 +542,38 @@ class Query {
   }
 
   /**
-   * @param {string} keyword - &#x5168;&#x6587;&#x6AA2;&#x7D22;&#x67E5;&#x8A62;&#x7528;&#x95DC;&#x9375;&#x5B57;
+   * @param {string} keyName - useRequest() &#x6240;&#x50B3;&#x5165;&#x7684;&#x5168;&#x6587;&#x6AA2;&#x7D22;&#x67E5;&#x8A62;&#x7528;&#x95DC;&#x9375;&#x5B57; key name
    */
-  useFullTextSearch(keyword) {
-    if (typeof keyword === &apos;string&apos;) {
-      // FIXME: keyword &#x67E5;&#x8A62;&#x672A;&#x5BE6;&#x4F5C;
-      this.data.keyword = keyword;
+  useFullTextSearchByKey(keyName) {
+    if (typeof keyName === &apos;string&apos;) {
+      this.data.keyName = keyName;
     }
     return this;
+  }
+
+  queryInit() {
+    for (const parameter of this.data.useWhere) {
+      let where = {};
+      if (typeof parameter === &apos;object&apos;) {
+        where = parameter;
+      } else if (typeof parameter === &apos;function&apos;) {
+        where = parameter(this.data.request);
+      }
+
+      this.data.where = {
+        ...this.data.where,
+        ...where,
+      };
+    }
+
+    if (this.data.useRawWhere) {
+      this.data.where = this.data.useRawWhere;
+    }
+
+    if (this.data.keyName &amp;&amp; this.data.request[this.data.keyName]) {
+      this.data.keyword = this.data.request[this.data.keyName];
+      delete this.data.request[this.data.keyName];
+    }
   }
 
   /**
@@ -557,24 +607,10 @@ class Query {
     group,
     collate,
     limit,
+    toJSON,
+    log,
   }) {
-    for (const parameter of this.data.useWhere) {
-      let where = {};
-      if (typeof parameter === &apos;object&apos;) {
-        where = parameter;
-      } else if (typeof parameter === &apos;function&apos;) {
-        where = parameter(this.data.request);
-      }
-
-      this.data.where = {
-        ...this.data.where,
-        ...where,
-      };
-    }
-
-    if (this.data.useRawWhere) {
-      this.data.where = this.data.useRawWhere;
-    }
+    this.queryInit();
 
     return find({
       model: this.data.model,
@@ -594,7 +630,11 @@ class Query {
       order,
       group,
       collate,
+      keyword: this.data.keyword,
       limit,
+      rawWhere: this.data.useRawWhere instanceof Object,
+      toJSON,
+      log,
     });
   }
 
@@ -625,20 +665,10 @@ class Query {
     group,
     collate,
     limit,
+    toJSON,
+    log,
   }) {
-    for (const parameter of this.data.useWhere) {
-      let where = {};
-      if (typeof parameter === &apos;object&apos;) {
-        where = parameter;
-      } else if (typeof parameter === &apos;function&apos;) {
-        where = parameter(this.data.request);
-      }
-
-      this.data.where = {
-        ...this.data.where,
-        ...where,
-      };
-    }
+    this.queryInit();
 
     return find({
       model: this.data.model,
@@ -656,7 +686,11 @@ class Query {
       order,
       group,
       collate,
+      keyword: this.data.keyword,
       limit,
+      rawWhere: this.data.useRawWhere instanceof Object,
+      toJSON,
+      log,
     });
   }
 }

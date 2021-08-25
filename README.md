@@ -1,6 +1,6 @@
 # sails-hook-querier
+[![CircleCI](https://circleci.com/gh/iamcxa/sails-hook-sequelize-querier/tree/master.svg?style=svg)](https://circleci.com/gh/iamcxa/sails-hook-sequelize-querier/tree/master)
 
-[![Build Status](https://travis-ci.com/iamcxa/sails-hook-sequelize-querier.svg?token=srJ7G1uLKvLjKziapZ4p&branch=master)](https://travis-ci.com/iamcxa/sails-hook-sequelize-querier)
 
 ## Installation
 

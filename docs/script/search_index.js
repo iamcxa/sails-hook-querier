@@ -534,6 +534,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "queryhelper/queryhelper.select.js~query#queryinit",
+    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-queryInit",
+    "QueryHelper/QueryHelper.select.js~Query#queryInit",
+    "method"
+  ],
+  [
     "queryhelper/queryhelper.select.js~query#select",
     "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-select",
     "QueryHelper/QueryHelper.select.js~Query#select",
@@ -552,9 +558,9 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "queryhelper/queryhelper.select.js~query#usefulltextsearch",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useFullTextSearch",
-    "QueryHelper/QueryHelper.select.js~Query#useFullTextSearch",
+    "queryhelper/queryhelper.select.js~query#usefulltextsearchbykey",
+    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useFullTextSearchByKey",
+    "QueryHelper/QueryHelper.select.js~Query#useFullTextSearchByKey",
     "method"
   ],
   [

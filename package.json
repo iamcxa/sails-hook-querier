@@ -19,53 +19,63 @@
     "url": "https://github.com/iamcxa/sails-hook-querier"
   },
   "devDependencies": {
-    "@sailshq/eslint": "^4.19.3",
-    "babel-eslint": "^10.1.0",
+    "@babel/eslint-parser": "^7.14.9",
+    "@udea-io/eslint-config": "^0.1.3",
     "chai": "^4.3.4",
     "chai-datetime": "^1.8.0",
-    "chalk": "^4.1.1",
     "esdoc": "^1.1.0",
     "esdoc-coverage-plugin": "^1.1.0",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-lint-plugin": "^1.0.2",
     "esdoc-standard-plugin": "^1.0.0",
-    "eslint": "^7.27.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb": "^18.2.1",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.23.3",
-    "esm": "^3.0.84",
-    "ioredis": "^4.27.7",
-    "lodash": "^4.17.21",
-    "mysql2": "^2.2.5",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-jsdoc": "^36.0.6",
+    "eslint-plugin-mocha": "^9.0.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "husky": "^7.0.1",
+    "lint-staged": "^11.1.1",
+    "mocha": "^8.4.0",
     "nyc": "^15.1.0",
-    "sails": "^1.4.2",
-    "sails-hook-blocks": "^0.1.11",
-    "sinon": "^10.0.0",
-    "sqlite3": "^5.0.2",
-    "supertest": "^6.1.3",
-    "tracer": "^1.1.4"
+    "prettier": "^2.3.2",
+    "prettier-eslint": "^13.0.0",
+    "rc": "^1.2.8",
+    "sinon": "^11.1.2"
   },
-  "peerDependencies": {},
   "dependencies": {
+    "esm": "^3.2.25",
     "inflection": "^1.13.1",
     "joi": "^14.3.1",
-    "mocha": "^8.4.0",
-    "sails-hook-sequelize": "https://github.com/MoreAppio/sails-hook-sequelize",
-    "sails-util-micro-apps": "^1.1.1",
-    "sequelize": "^5.22.4"
+    "lodash": "^4.17.21",
+    "mysql2": "^2.2.5",
+    "sails": "^1.4.4",
+    "sails-hook-blocks": "github:iamcxa/sails-hook-blocks",
+    "sails-hook-sequelize": "github:udea-io/sails-hook-sequelize",
+    "sails-util-micro-apps": "github:udea-io/sails-util-micro-apps",
+    "sequelize": "^5.22.4",
+    "sqlite3": "^5.0.2",
+    "tracer": "^1.1.5"
   },
   "engines": {
-    "node": "^8.9.1"
+    "node": "^12"
   },
   "scripts": {
-    "lint": "./node_modules/.bin/eslint --max-warnings=0 --report-unused-disable-directives './' && echo '✔  Your .js files look good.'",
-    "lint-fix": "./node_modules/.bin/eslint --max-warnings=0 --report-unused-disable-directives --fix './' && echo '✔  Your .js files look good.'",
+    "lint": "./node_modules/.bin/eslint --max-warnings=0 --report-unused-disable-directives './api' && echo '✔  Your .js files look good.'",
+    "lint-fix": "./node_modules/.bin/eslint --max-warnings=0 --report-unused-disable-directives --fix './api' && echo '✔  Your .js files look good.'",
     "prepublishOnly": "",
     "doc": "esdoc",
     "test": "NODE_ENV=test ./node_modules/.bin/nyc --require esm mocha",
-    "test-travis": "NODE_ENV=travis ./node_modules/.bin/nyc --require esm mocha",
-    "pretest": "touch ./config/local.js"
+    "test-ci": "NODE_ENV=test-ci ./node_modules/.bin/nyc --require esm mocha",
+    "pretest": "touch ./config/local.js",
+    "prepare": "husky install"
   },
   "sails": {
     "isHook": true
+  },
+  "lint-staged": {
+    "config/*.js": "eslint --cache --fix"
   }
 }

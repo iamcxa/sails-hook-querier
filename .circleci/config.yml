@@ -1,0 +1,92 @@
+version: 2.1
+
+orbs:
+  # The Node.js orb contains a set of prepackaged CircleCI configuration you can utilize
+  # Orbs reduce the amount of configuration required for common tasks.
+  # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/node
+  node: circleci/node@4.6
+  slack: slack/slack@1.0.4
+
+workflows:
+  build:
+    jobs:
+      #- slack/approval-notification:
+      #    message: Pending approval
+      - build-and-test
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/node:12.22.4
+      - image: circleci/mysql:5.7.35-ram
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_ROOT_PASSWORD: ''
+
+    steps:
+      - checkout
+      - run:
+          name: Wait for Database Connection
+          # preinstalled in circleci/* docker image
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m
+      - run:
+          name: Setup MySQL...
+          command: |
+            sudo apt-get update
+            sudo apt-get install default-mysql-client
+            chmod +x ./scripts/*;
+            ./scripts/travis-mysql-5.7.sh;
+      - restore_cache:
+          key: querier-branch-{{ .Branch }}-checksum-{{checksum "package-lock.json" }}-v1
+      - run:
+          name: Install Newest NPM
+          command: 'sudo npm install -g npm@latest'
+      - run:
+          name: Install Node Packages
+          command: "[ ! -d node_modules ] && npm ci --loglevel warn --yes || echo package.json and package-lock.json unchanged. Using cache."
+      - save_cache:
+          key: querier-branch-{{ .Branch }}-checksum-{{checksum "package-lock.json" }}-v1
+          paths:
+            - ./node_modules
+      - run:
+          name: Setup Test Reports
+          # just for CircleCI
+          command: |
+            npm install mocha-junit-reporter
+            mkdir reports
+      - run:
+          name: Running Test Cases
+          command: |
+            npm run test-ci --- --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml
+      # Run coverage report for Code Climate
+#      - run:
+#          name: Setup Code Climate test-reporter
+#          command: |
+#            # download test reporter as a static binary
+#            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+#            chmod +x ./cc-test-reporter
+#            ./cc-test-reporter before-build
+#      - run:
+#          name: Get code-coverage report data
+#          command: |
+#            mkdir coverage
+#            # nyc report requires that nyc has already been run,
+#            # which creates the .nyc_output folder containing necessary data
+#            ./node_modules/.bin/nyc report --reporter=text-lcov > coverage/lcov.info
+#            ./cc-test-reporter after-build -t lcov
+#      - run:
+#          name: Get eslint report data
+#          command: |
+#            ./node_modules/.bin/eslint ./api --format junit --output-file ./reports/eslint/eslint.xml
+      - store_test_results:
+          path: reports
+      - store_artifacts:
+          path: ./reports/mocha/test-results.xml
+      - store_artifacts:
+          path: ./reports/eslint/eslint.xml
+      - store_artifacts: # upload test coverage as artifact
+          path: ./coverage/lcov.info
+          prefix: tests
+      - slack/status:
+          mentions: 'Kent'
+#          only_for_branch: only_for_branch
