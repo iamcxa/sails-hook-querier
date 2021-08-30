@@ -2,6 +2,6 @@
  * Compatible Package
  */
 
-import queryHelper from './QueryHelper/QueryHelper';
+const queryHelper = require('./QueryHelper/QueryHelper');
 
 module.exports = queryHelper;

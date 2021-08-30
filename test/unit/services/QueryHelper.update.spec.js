@@ -1,7 +1,7 @@
 import samples from '../samples';
 
-describe('about QueryHelper.update operation.', () => {
-  it('update should be success', async () => {
+describe('about QueryHelper.update operation.', function () {
+  it('update should be success', async function () {
     const input = {
       ...samples.user,
     };
@@ -11,17 +11,15 @@ describe('about QueryHelper.update operation.', () => {
     });
 
     const name = 'debugger';
-    await QueryHelper.update(
-      {
-        modelName: 'User',
-        input: {
-          name,
-        },
-        where: {
-          id: user.id,
-        },
+    await QueryHelper.update({
+      modelName: 'User',
+      input: {
+        name,
       },
-    );
+      where: {
+        id: user.id,
+      },
+    });
 
     const target = await QueryHelper.getDetail(
       {
@@ -53,7 +51,7 @@ describe('about QueryHelper.update operation.', () => {
     target.name.should.equal(name);
   });
 
-  it('update and use include models should be success', async () => {
+  it('update and use include models should be success', async function () {
     const input = {
       ...samples.user,
       Image: samples.image,
@@ -64,20 +62,18 @@ describe('about QueryHelper.update operation.', () => {
     });
 
     const url = 'http://goo.gl';
-    await QueryHelper.update(
-      {
-        modelName: 'User',
-        include: [Image],
-        input: {
-          Image: {
-            url,
-          },
-        },
-        where: {
-          id: user.id,
+    await QueryHelper.update({
+      modelName: 'User',
+      include: [Image],
+      input: {
+        Image: {
+          url,
         },
       },
-    );
+      where: {
+        id: user.id,
+      },
+    });
 
     const target = await QueryHelper.getDetail(
       {
@@ -111,7 +107,7 @@ describe('about QueryHelper.update operation.', () => {
     target.Image.url.should.equal(url);
   });
 
-  it('update wrong modelName should be fail', async () => {
+  it('update wrong modelName should be fail', async function () {
     const input = {
       ...samples.user,
     };
@@ -121,18 +117,20 @@ describe('about QueryHelper.update operation.', () => {
     });
 
     try {
-      await QueryHelper.update(
-        {
-          modelName: 'test',
-          input,
-          where: {
-            id: user.id,
-          },
+      await QueryHelper.update({
+        modelName: 'test',
+        input,
+        where: {
+          id: user.id,
         },
-      );
+      });
     } catch (err) {
       err.message.should.equal(
-        JSON.stringify({ message: 'BadRequest.Target.Model.Not.Exits', code: 400, extra: { modelName: 'test' } }),
+        JSON.stringify({
+          message: 'BadRequest.Target.Model.Not.Exits',
+          code: 400,
+          extra: { modelName: 'test' },
+        }),
       );
     }
   });

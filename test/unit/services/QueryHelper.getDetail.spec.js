@@ -1,7 +1,7 @@
 import samples from '../samples';
 
-describe('about QueryHelper.getDetail operation.', () => {
-  it('getDetail should be success', async () => {
+describe('about QueryHelper.getDetail operation.', function () {
+  it('getDetail should be success', async function () {
     const input = {
       ...samples.user,
     };
@@ -40,7 +40,7 @@ describe('about QueryHelper.getDetail operation.', () => {
     );
   });
 
-  it('getDetail and use include models should be success', async () => {
+  it('getDetail and use include models should be success', async function () {
     const input = {
       ...samples.group,
       Users: {
@@ -98,7 +98,7 @@ describe('about QueryHelper.getDetail operation.', () => {
     );
   });
 
-  it('getDetail wrong modelName should be fail', async () => {
+  it('getDetail wrong modelName should be fail', async function () {
     const input = {
       ...samples.user,
     };
@@ -108,23 +108,25 @@ describe('about QueryHelper.getDetail operation.', () => {
     });
 
     try {
-      await QueryHelper.getDetail(
-        {
-          modelName: 'test',
-          input,
-          where: {
-            id: user.id,
-          },
+      await QueryHelper.getDetail({
+        modelName: 'test',
+        input,
+        where: {
+          id: user.id,
         },
-      );
+      });
     } catch (err) {
       err.message.should.equal(
-        JSON.stringify({ message: 'BadRequest.Target.Model.Not.Exits', code: 400, extra: { modelName: 'test' } }),
+        JSON.stringify({
+          message: 'BadRequest.Target.Model.Not.Exits',
+          code: 400,
+          extra: { modelName: 'test' },
+        }),
       );
     }
   });
 
-  it('getDetail with options should be success', async () => {
+  it('getDetail with options should be success', async function () {
     const input = {
       ...samples.group,
       Users: {

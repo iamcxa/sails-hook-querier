@@ -1,7 +1,7 @@
 import samples from '../samples';
 
-describe('about QueryHelper.destroy operation.', () => {
-  it('destroy should be success', async () => {
+describe('about QueryHelper.destroy operation.', function () {
+  it('destroy should be success', async function () {
     const input = {
       ...samples.user,
     };
@@ -10,22 +10,18 @@ describe('about QueryHelper.destroy operation.', () => {
       include: [],
     });
 
-    await QueryHelper.destroy(
-      {
-        modelName: 'User',
-        ids: [user.id],
-      },
-    );
+    await QueryHelper.destroy({
+      modelName: 'User',
+      ids: [user.id],
+    });
 
-    const target = await QueryHelper.getDetail(
-      {
-        modelName: 'User',
-        include: [],
-        where: {
-          id: user.id,
-        },
+    const target = await QueryHelper.getDetail({
+      modelName: 'User',
+      include: [],
+      where: {
+        id: user.id,
       },
-    );
+    });
 
     SpecHelper.validateEach(
       {
@@ -39,7 +35,7 @@ describe('about QueryHelper.destroy operation.', () => {
     );
   });
 
-  it('destroy and use include models should be success', async () => {
+  it('destroy and use include models should be success', async function () {
     const input = {
       ...samples.user,
       Image: samples.image,
@@ -49,33 +45,27 @@ describe('about QueryHelper.destroy operation.', () => {
       include: [Image],
     });
 
-    await QueryHelper.destroy(
-      {
-        modelName: 'User',
-        include: [Image],
-        ids: [user.id],
-      },
-    );
+    await QueryHelper.destroy({
+      modelName: 'User',
+      include: [Image],
+      ids: [user.id],
+    });
 
-    const target1 = await QueryHelper.getDetail(
-      {
-        modelName: 'User',
-        include: [],
-        where: {
-          id: user.id,
-        },
+    const target1 = await QueryHelper.getDetail({
+      modelName: 'User',
+      include: [],
+      where: {
+        id: user.id,
       },
-    );
+    });
 
-    const target2 = await QueryHelper.getDetail(
-      {
-        modelName: 'Image',
-        include: [],
-        where: {
-          id: user.Image.id,
-        },
+    const target2 = await QueryHelper.getDetail({
+      modelName: 'Image',
+      include: [],
+      where: {
+        id: user.Image.id,
       },
-    );
+    });
 
     SpecHelper.validateEach(
       {
@@ -99,7 +89,7 @@ describe('about QueryHelper.destroy operation.', () => {
     );
   });
 
-  it('destroy wrong modelName should be fail', async () => {
+  it('destroy wrong modelName should be fail', async function () {
     const input = {
       ...samples.user,
     };
@@ -109,15 +99,17 @@ describe('about QueryHelper.destroy operation.', () => {
     });
 
     try {
-      await QueryHelper.destroy(
-        {
-          modelName: 'test',
-          ids: [user.id],
-        },
-      );
+      await QueryHelper.destroy({
+        modelName: 'test',
+        ids: [user.id],
+      });
     } catch (err) {
       err.message.should.equal(
-        JSON.stringify({ message: 'BadRequest.Target.Model.Not.Exits', code: 400, extra: { modelName: 'test' } }),
+        JSON.stringify({
+          message: 'BadRequest.Target.Model.Not.Exits',
+          code: 400,
+          extra: { modelName: 'test' },
+        }),
       );
     }
   });
