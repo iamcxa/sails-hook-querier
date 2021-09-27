@@ -1,15 +1,10 @@
 module.exports = {
   reporter: [
-    'json',
-    'text',
+    // 'json',
+    // 'text',
     'text-summary',
-    'html'
+    // 'html'
   ],
   'skip-full': true,
-  exclude: [
-    '.**.{js,json}',
-    'coverage/**',
-    'config/**/*.{js,json}',
-    'test/**/*.{js,json}',
-  ]
+  exclude: ['.**.{js,json}', 'coverage/**', 'config/**/*.{js,json}', 'test/**/*.{js,json}'],
 };

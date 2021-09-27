@@ -29,14 +29,10 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/QueryHelper/QueryHelper.select.js~Query.html">Query</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-create">create</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-destroy">destroy</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatFieldQueryWithOrCondition">formatFieldQueryWithOrCondition</a></span></span></li>
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatFieldQueryWithOrCondition">formatFieldQueryWithOrCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatInput">formatInput</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatOutput">formatOutput</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matchFormat">matchFormat</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetail">getDetail</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-buildEmptyModel">buildEmptyModel</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAssociations">getAssociations</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEnumValues">getEnumValues</a></span></span></li>
@@ -51,8 +47,6 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNumeric">isNumeric</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelAssociationsToArray">modelAssociationsToArray</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validate">validate</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-select">select</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-update">update</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-findBy">findBy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatQuery">formatQuery</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDetailPageFieldWithAssociations">getDetailPageFieldWithAssociations</a></span></span></li>
@@ -67,7 +61,26 @@
 
 <div class="content" data-ice="content"><h1 data-ice="title">QueryHelper/QueryHelper.select.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* eslint no-await-in-loop: 0 */
-import _ from &apos;lodash&apos;;
+const _ = require(&apos;lodash&apos;);
+const Redis = require(&apos;ioredis&apos;);
+
+const config = sails.config.queryhelper;
+const redis = new Redis({
+  // ...config.redis,
+});
+
+const cacheAdapter = {
+  redis: {
+    get: async (key) =&gt; {
+      const result = await redis.get(key);
+      return result;
+    },
+    set: async (key, value, options) =&gt; {
+      const result = await redis.set(key, value, &apos;EX&apos;, options.lifetime);
+      return result;
+    },
+  },
+};
 
 function formatOperator(operator) {
   const { Op } = Sequelize;
@@ -315,6 +328,119 @@ async function formatOutput({
   }
 }
 
+async function cached(cache, cb, argv) {
+  let result;
+  if (cache) {
+    const data = await cache.adapter.get(`${cache.key}::*`);
+    if (data) result = JSON.parse(data);
+  }
+
+  if (!result) {
+    result = await cb(argv);
+
+    if (cache) {
+      const cachedAt = Date.now();
+      cache.adapter.set(`${cache.key}::${cachedAt}`, JSON.stringify({
+        ...result,
+        cachedAt,
+      }), {
+        lifetime: cache.lifetime,
+      });
+    }
+  }
+  return result;
+}
+
+async function create(
+  {
+    model = undefined,
+    scope = [],
+    include = [],
+    data = {},
+    // presenter = undefined,
+    // log = false,
+  } = {},
+) {
+  let result;
+
+  if (scope) {
+    result = await model.scope(scope).create(data, {
+      include,
+    });
+  } else {
+    result = await model.create(data, {
+      include,
+    });
+  }
+
+  // if (!_.isNil(presenter) &amp;&amp; _.isFunction(presenter)) {
+    // if (presenter.constructor.name === &apos;AsyncFunction&apos;) {
+      // result = await presenter(data);
+    // } else {
+      // result = presenter(data);
+    // }
+  // }
+
+  return result;
+}
+
+async function update(
+  {
+    model = undefined,
+    scope = [],
+    include = [],
+    where = {},
+    data = {},
+    presenter = undefined,
+    // log = false,
+  } = {},
+) {
+  let result;
+
+  if (scope) {
+    result = await model.scope(scope).update(data, {
+      include,
+    });
+  } else {
+    result = await model.update(data, {
+      include,
+    });
+  }
+
+  // if (!_.isNil(presenter) &amp;&amp; _.isFunction(presenter)) {
+    // if (presenter.constructor.name === &apos;AsyncFunction&apos;) {
+      // result = await presenter(data);
+    // } else {
+      // result = presenter(data);
+    // }
+  // }
+
+  return result;
+}
+
+async function destroy(
+  {
+    model = undefined,
+    scope = [],
+    include = [],
+    // log = false,
+  } = {},
+) {
+  let result;
+
+  if (scope) {
+    result = await model.scope(scope).destroy(data, {
+      include,
+    });
+  } else {
+    result = await model.destroy(data, {
+      include,
+    });
+  }
+
+  return result;
+}
+
 async function find(
   {
     model = undefined,
@@ -387,7 +513,7 @@ async function find(
     }
 
     const total = typeof data.count === &apos;number&apos; ? data.count : data.count.length;
-    return {
+    const result = {
       paging: {
         lastPage: paging ? Math.ceil(total / perPage) || 1 : null,
         curPage: paging ? curPage : null,
@@ -401,6 +527,8 @@ async function find(
       filter,
       items,
     };
+
+    return result;
   } catch (e) {
     // Console.timeEnd(tag);
     sails.log.error(e);
@@ -521,12 +649,25 @@ class Query {
   }
 
   useCache(cache) {
+    const adapter = typeof cache.adapter === &apos;string&apos; ? cacheAdapter[cache.adapter] : cache.adapter;
+
+    let key = `${this.data.model.name}`;
+
+    if (cache.key) {
+      key = `${key}::${cache.key}`;
+    }
+
+    if (cache.rawKey) {
+      key = cache.rawKey;
+    }
+
     this.data.cache = {
-      minutes: cache.minutes,
-      target: cache.target,
-      tableName: cache.tableName,
-      redisPath: cache.redisPath,
+      lifetime: cache.lifetime,
+      type: cache.type,
+      adapter,
+      key,
     };
+
     return this;
   }
 
@@ -612,7 +753,7 @@ class Query {
   }) {
     this.queryInit();
 
-    return find({
+    const result = cached(this.data.cache, find, {
       model: this.data.model,
       scope: this.data.scope,
       include: this.data.include,
@@ -636,6 +777,8 @@ class Query {
       toJSON,
       log,
     });
+
+    return result;
   }
 
   /**
@@ -658,7 +801,7 @@ class Query {
    * @property {number} result.paging.limit - &#x641C;&#x5C0B;&#x6578;&#x91CF;&#x4E0A;&#x9650;
    * @property {number} result.paging.total - &#x7E3D;&#x641C;&#x5C0B;&#x6578;&#x91CF;
    */
-  findAll({
+  async findAll({
     sort = &apos;DESC&apos;,
     sortBy,
     order,
@@ -670,7 +813,7 @@ class Query {
   }) {
     this.queryInit();
 
-    return find({
+    const result = cached(this.data.cache, find, {
       model: this.data.model,
       scope: this.data.scope,
       include: this.data.include,
@@ -691,7 +834,61 @@ class Query {
       rawWhere: this.data.useRawWhere instanceof Object,
       toJSON,
       log,
+      cache: this.data.cache,
     });
+
+    return result;
+  }
+
+  async create({
+    data,
+    log,
+  }) {
+    this.queryInit();
+
+    const result = cached(this.data.cache, create, {
+      model: this.data.model,
+      scope: this.data.scope,
+      include: this.data.include,
+      data,
+      log,
+    });
+
+    return result;
+  }
+
+  async update({
+    data,
+    log,
+  }) {
+    this.queryInit();
+
+    const result = cached(this.data.cache, update, {
+      model: this.data.model,
+      scope: this.data.scope,
+      include: this.data.include,
+      data,
+      log,
+    });
+
+    return result;
+  }
+
+  async destroy({
+    data,
+    log,
+  }) {
+    this.queryInit();
+
+    const result = cached(this.data.cache, destroy, {
+      model: this.data.model,
+      scope: this.data.scope,
+      include: this.data.include,
+      data,
+      log,
+    });
+
+    return result;
   }
 }
 
@@ -699,13 +896,9 @@ class Query {
  * &#x5C07;&#x56DE;&#x50B3; class Query &#x4E26;&#x547C;&#x53EB; Query.select(model)
  * @param {model} model - &#x8981;&#x9032;&#x884C;&#x67E5;&#x8A62;&#x7684; Sequelize models
  */
-export default function select(model) {
+module.exports = function select(model) {
   return new Query().select(model);
 }
-
-export {
-  Query,
-};
 </code></pre>
 
 </div>

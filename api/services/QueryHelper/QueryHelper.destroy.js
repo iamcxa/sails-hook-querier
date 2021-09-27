@@ -1,5 +1,6 @@
 /**
  * 依據給予的 id array 刪除對象
+ *
  * @version 1.0
  * @param Required {Object} {
  *    modelName{String} = null,  要刪除的目標 Sequelize Model 名稱。
@@ -14,9 +15,9 @@
  * @returns {Array} 包含是否完成的陣列
  */
 
-import _ from 'lodash';
+const _ = require('lodash');
 
-export default async function destroy({
+module.exports = async function destroy({
   modelName = null,
   include = null,
   force = false,
@@ -57,8 +58,10 @@ export default async function destroy({
           const target = await model.findByPk(id);
 
           let associatedId;
-          if (target[_.upperFirst(includeModelName)]
-            && target[_.upperFirst(includeModelName)].dataValues) {
+          if (
+            target[_.upperFirst(includeModelName)] &&
+            target[_.upperFirst(includeModelName)].dataValues
+          ) {
             associatedId = target[_.upperFirst(includeModelName)].dataValues.id;
           } else if (sails.models[includeModelName.toLowerCase()]) {
             const query = { where: {} };
@@ -106,4 +109,4 @@ export default async function destroy({
     sails.log.error(e);
     throw e;
   }
-}
+};

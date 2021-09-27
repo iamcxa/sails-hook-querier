@@ -1,7 +1,7 @@
 {
-  "coverage": "51.78%",
-  "expectCount": 56,
-  "actualCount": 29,
+  "coverage": "43.42%",
+  "expectCount": 76,
+  "actualCount": 33,
   "files": {
     "QueryHelper/QueryHelper.create.js": {
       "expectCount": 1,
@@ -9,69 +9,86 @@
       "undocumentLines": []
     },
     "QueryHelper/QueryHelper.destroy.js": {
-      "expectCount": 1,
-      "actualCount": 0,
+      "expectCount": 2,
+      "actualCount": 1,
       "undocumentLines": [
         19
       ]
     },
     "QueryHelper/QueryHelper.format.js": {
-      "expectCount": 4,
+      "expectCount": 5,
       "actualCount": 4,
-      "undocumentLines": []
+      "undocumentLines": [
+        1
+      ]
     },
     "QueryHelper/QueryHelper.getDetail.js": {
-      "expectCount": 1,
-      "actualCount": 0,
+      "expectCount": 2,
+      "actualCount": 1,
       "undocumentLines": [
         74
       ]
     },
     "QueryHelper/QueryHelper.js": {
-      "expectCount": 20,
-      "actualCount": 9,
+      "expectCount": 23,
+      "actualCount": 10,
       "undocumentLines": [
-        20,
-        22,
-        37,
-        72,
-        99,
-        594,
-        26,
-        27,
+        7,
+        8,
         19,
-        28,
-        29
+        21,
+        36,
+        71,
+        98,
+        593,
+        25,
+        26,
+        18,
+        27,
+        28
       ]
     },
     "QueryHelper/QueryHelper.select.js": {
-      "expectCount": 24,
+      "expectCount": 36,
       "actualCount": 13,
       "undocumentLines": [
-        4,
-        24,
-        41,
-        228,
-        250,
-        343,
-        344,
-        345,
-        447,
-        455,
-        486
+        2,
+        3,
+        5,
+        6,
+        10,
+        23,
+        43,
+        60,
+        247,
+        269,
+        292,
+        325,
+        359,
+        382,
+        477,
+        478,
+        479,
+        581,
+        589,
+        633,
+        781,
+        798,
+        815
       ]
     },
     "QueryHelper/QueryHelper.update.js": {
-      "expectCount": 1,
-      "actualCount": 0,
+      "expectCount": 2,
+      "actualCount": 1,
       "undocumentLines": [
         36
       ]
     },
     "QueryHelper/QueryHelper.view.js": {
-      "expectCount": 4,
+      "expectCount": 5,
       "actualCount": 2,
       "undocumentLines": [
+        1,
         471,
         563
       ]

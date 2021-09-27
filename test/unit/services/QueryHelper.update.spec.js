@@ -1,4 +1,4 @@
-import samples from '../samples';
+const samples = require('../samples');
 
 describe('about QueryHelper.update operation.', function () {
   it('update should be success', async function () {

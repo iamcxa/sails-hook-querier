@@ -1,4 +1,4 @@
-import samples from '../samples';
+const samples = require('../samples');
 
 describe('about QueryHelper format operation.', function () {
   it('matchFormat should be success', async function () {

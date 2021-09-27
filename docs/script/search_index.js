@@ -1,11 +1,5 @@
 window.esdocSearchIndex = [
   [
-    "sails-hook-sequelize-querier/queryhelper/queryhelper.select.js~query",
-    "class/QueryHelper/QueryHelper.select.js~Query.html",
-    "<span>Query</span> <span class=\"search-result-import-path\">sails-hook-sequelize-querier/QueryHelper/QueryHelper.select.js</span>",
-    "class"
-  ],
-  [
     "sails-hook-sequelize-querier/queryhelper/queryhelper.js~tag",
     "variable/index.html#static-variable-TAG",
     "<span>TAG</span> <span class=\"search-result-import-path\">sails-hook-sequelize-querier/QueryHelper/QueryHelper.js</span>",
@@ -22,18 +16,6 @@ window.esdocSearchIndex = [
     "variable/index.html#static-variable-commonFields",
     "<span>commonFields</span> <span class=\"search-result-import-path\">sails-hook-sequelize-querier/QueryHelper/QueryHelper.js</span>",
     "variable"
-  ],
-  [
-    "sails-hook-sequelize-querier/queryhelper/queryhelper.create.js~create",
-    "function/index.html#static-function-create",
-    "<span>create</span> <span class=\"search-result-import-path\">sails-hook-sequelize-querier/QueryHelper/QueryHelper.create.js</span>",
-    "function"
-  ],
-  [
-    "sails-hook-sequelize-querier/queryhelper/queryhelper.destroy.js~destroy",
-    "function/index.html#static-function-destroy",
-    "<span>destroy</span> <span class=\"search-result-import-path\">sails-hook-sequelize-querier/QueryHelper/QueryHelper.destroy.js</span>",
-    "function"
   ],
   [
     "sails-hook-sequelize-querier/queryhelper/queryhelper.view.js~findby",
@@ -69,12 +51,6 @@ window.esdocSearchIndex = [
     "sails-hook-sequelize-querier/queryhelper/queryhelper.js~getassociations",
     "function/index.html#static-function-getAssociations",
     "<span>getAssociations</span> <span class=\"search-result-import-path\">sails-hook-sequelize-querier/QueryHelper/QueryHelper.js</span>",
-    "function"
-  ],
-  [
-    "sails-hook-sequelize-querier/queryhelper/queryhelper.getdetail.js~getdetail",
-    "function/index.html#static-function-getDetail",
-    "<span>getDetail</span> <span class=\"search-result-import-path\">sails-hook-sequelize-querier/QueryHelper/QueryHelper.getDetail.js</span>",
     "function"
   ],
   [
@@ -171,18 +147,6 @@ window.esdocSearchIndex = [
     "sails-hook-sequelize-querier/queryhelper/queryhelper.js~modelassociationstoarray",
     "function/index.html#static-function-modelAssociationsToArray",
     "<span>modelAssociationsToArray</span> <span class=\"search-result-import-path\">sails-hook-sequelize-querier/QueryHelper/QueryHelper.js</span>",
-    "function"
-  ],
-  [
-    "sails-hook-sequelize-querier/queryhelper/queryhelper.select.js~select",
-    "function/index.html#static-function-select",
-    "<span>select</span> <span class=\"search-result-import-path\">sails-hook-sequelize-querier/QueryHelper/QueryHelper.select.js</span>",
-    "function"
-  ],
-  [
-    "sails-hook-sequelize-querier/queryhelper/queryhelper.update.js~update",
-    "function/index.html#static-function-update",
-    "<span>update</span> <span class=\"search-result-import-path\">sails-hook-sequelize-querier/QueryHelper/QueryHelper.update.js</span>",
     "function"
   ],
   [
@@ -508,108 +472,6 @@ window.esdocSearchIndex = [
     "file/QueryHelper/QueryHelper.select.js.html",
     "QueryHelper/QueryHelper.select.js",
     "file"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#constructor",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-constructor-constructor",
-    "QueryHelper/QueryHelper.select.js~Query#constructor",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#data",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-member-data",
-    "QueryHelper/QueryHelper.select.js~Query#data",
-    "member"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#findall",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-findAll",
-    "QueryHelper/QueryHelper.select.js~Query#findAll",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#getpaging",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-getPaging",
-    "QueryHelper/QueryHelper.select.js~Query#getPaging",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#queryinit",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-queryInit",
-    "QueryHelper/QueryHelper.select.js~Query#queryInit",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#select",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-select",
-    "QueryHelper/QueryHelper.select.js~Query#select",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#useattribute",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useAttribute",
-    "QueryHelper/QueryHelper.select.js~Query#useAttribute",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#usecache",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useCache",
-    "QueryHelper/QueryHelper.select.js~Query#useCache",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#usefulltextsearchbykey",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useFullTextSearchByKey",
-    "QueryHelper/QueryHelper.select.js~Query#useFullTextSearchByKey",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#useinclude",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useInclude",
-    "QueryHelper/QueryHelper.select.js~Query#useInclude",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#usepresenter",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-usePresenter",
-    "QueryHelper/QueryHelper.select.js~Query#usePresenter",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#userawwhere",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useRawWhere",
-    "QueryHelper/QueryHelper.select.js~Query#useRawWhere",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#userequest",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useRequest",
-    "QueryHelper/QueryHelper.select.js~Query#useRequest",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#usescope",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useScope",
-    "QueryHelper/QueryHelper.select.js~Query#useScope",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#usesearchable",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useSearchable",
-    "QueryHelper/QueryHelper.select.js~Query#useSearchable",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#useview",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useView",
-    "QueryHelper/QueryHelper.select.js~Query#useView",
-    "method"
-  ],
-  [
-    "queryhelper/queryhelper.select.js~query#usewhere",
-    "class/QueryHelper/QueryHelper.select.js~Query.html#instance-method-useWhere",
-    "QueryHelper/QueryHelper.select.js~Query#useWhere",
-    "method"
   ],
   [
     "queryhelper/queryhelper.update.js",

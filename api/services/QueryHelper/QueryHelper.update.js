@@ -1,17 +1,18 @@
 /**
  * 依據給予的 ID 與資料更新 target modelName
+ *
  * @version 1.0
- * @param Required {Object} {
+ * @param Required {object} {
  *     langCode{String} = 'zh-TW',   要更新的資料語系。
  *     modelName{String} = null,     要更新的目標 Sequelize Model 名稱。
  *     include{Object|Array} = null, 額外給予的 Sequelize Query-include 參數。
- *     input{Object} = null,         要新增的原始資料。
- *     where{Object} = null,         更新時的 Sequelize Query-where 查詢。
+ *     input{object} = null,         要新增的原始資料。
+ *     where{object} = null,         更新時的 Sequelize Query-where 查詢。
  *   }
- * @param Optional {Object} {
- *     format{Object} = null,        原始資料的格式化樣板。
- *     formatCb{Object} = null,      原始資料的格式化 callback。
- *     updateCb{Object} = null,      資料更新完成後，輸出之前的 callback（支援 await）。
+ * @param Optional {object} {
+ *     format{object} = null,        原始資料的格式化樣板。
+ *     formatCb{object} = null,      原始資料的格式化 callback。
+ *     updateCb{object} = null,      資料更新完成後，輸出之前的 callback（支援 await）。
  *   }
  * @example 依據 User ID 更新 User，並且更新連帶的 Parent 與 Student，同時有給予一組輸入格式 format。
  * QueryHelper.update({
@@ -29,18 +30,12 @@
  *    format,
  *    formatCb: null,
  *  });
- * @returns {Object} updated item
+ * @returns {object} updated item
  */
-import _ from 'lodash';
+const _ = require('lodash');
 
-export default async function update(
-  {
-    langCode = this.langCode,
-    modelName = null,
-    include = null,
-    input = null,
-    where = null,
-  } = {},
+module.exports = async function update(
+  { langCode = this.langCode, modelName = null, include = null, input = null, where = null } = {},
   { format = null, formatCb = null } = {},
 ) {
   try {
@@ -101,9 +96,10 @@ export default async function update(
         modelPrefix: false,
         include: include
           ? this.getIncludeModelColumns({
-            modelName,
-            include,
-          }) : null,
+              modelName,
+              include,
+            })
+          : null,
       });
       // Console.log('update format==============>');
       // Console.dir(format);
@@ -136,4 +132,4 @@ export default async function update(
     sails.log.error(e);
     throw e;
   }
-}
+};

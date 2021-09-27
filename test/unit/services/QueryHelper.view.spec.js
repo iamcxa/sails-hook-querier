@@ -1,4 +1,4 @@
-import samples from '../samples';
+const samples = require('../samples');
 
 describe('about QueryHelper view operation.', function () {
   it('formatQuery should be success', async function () {});

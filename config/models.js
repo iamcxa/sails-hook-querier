@@ -11,12 +11,8 @@
 
 /* eslint no-unused-vars: 0 */
 module.exports.models = {
-  scope: {
-  },
-  classMethod: {
-  },
-  instanceMethod: {
-  },
-  hook: {
-  },
+  scope: {},
+  classMethod: {},
+  instanceMethod: {},
+  hook: {},
 };

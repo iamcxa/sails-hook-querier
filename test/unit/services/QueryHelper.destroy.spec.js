@@ -1,4 +1,4 @@
-import samples from '../samples';
+const samples = require('../samples');
 
 describe('about QueryHelper.destroy operation.', function () {
   it('destroy should be success', async function () {
