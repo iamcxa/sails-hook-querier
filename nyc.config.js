@@ -1,9 +1,9 @@
 module.exports = {
   reporter: [
-    'json',
-    'text',
+    // 'json',
+    // 'text',
     'text-summary',
-    'html'
+    // 'html'
   ],
   'skip-full': true,
   exclude: [
