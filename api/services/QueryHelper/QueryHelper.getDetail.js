@@ -1,17 +1,18 @@
 /**
  * 依據 ID 取回詳細資料。
+ *
  * @version 1.0
- * @param Required {Object} {
+ * @param Required {object} {
  *     langCode{String} = 'zh-TW',      要查詢的資料語系。
  *     modelName{String} = null,        要查詢的目標 Sequelize Model 名稱。
  *     include{Object|Array} = null,    額外給予的 Sequelize Query-include 參數。
- *     where{Object} = null,            Sequelize Query-where 查詢。
+ *     where{object} = null,            Sequelize Query-where 查詢。
  *     attributes{Object|Array} = null, 查詢時的 Sequelize Query-attributes 參數。
  *   }
- * @param Optional {Object} {
+ * @param Optional {object} {
  *     required{Array} = [],     要被設定為 required 的欄位名稱。
  *     readonly{Array} = [],     要被設定為 readonly 的欄位名稱。
- *     format{Object} = null,     預先定義的資料格式。
+ *     format{object} = null,     預先定義的資料格式。
  *     formatCb{Function} = null, 最後輸出前再次格式化資料的 callback。
  *     raw = false,               是否輸出成 JSON。
  *   }
@@ -67,18 +68,12 @@
  *    }),
  *    raw: true,
  *  });
- * @returns {Object} 屬於某個 ID 的資料。
+ * @returns {object} 屬於某個 ID 的資料。
  */
 const _ = require('lodash');
 
 module.exports = async function getDetail(
-  {
-    langCode = 'zh-TW',
-    modelName = null,
-    where = null,
-    include = null,
-    attributes = null,
-  },
+  { langCode = 'zh-TW', modelName = null, where = null, include = null, attributes = null },
   {
     log = false,
     raw = false,
@@ -142,9 +137,7 @@ module.exports = async function getDetail(
         const arr = this.getModelOutputColumns({
           modelName: thisModelName,
           as: e.as,
-          exclude: viewExclude
-            ? viewExclude.filter((ex) => ex.indexOf(thisModelName) > -1)
-            : null,
+          exclude: viewExclude ? viewExclude.filter((ex) => ex.indexOf(thisModelName) > -1) : null,
           modelPrefix: true,
           langCode,
           required,
@@ -233,9 +226,7 @@ module.exports = async function getDetail(
           associatedData[target] = modelData;
         }
         fields.map((field) => {
-          const isThisFieldAssociated = associatedModels.some(
-            (ass) => field.name === `${ass}Id`,
-          );
+          const isThisFieldAssociated = associatedModels.some((ass) => field.name === `${ass}Id`);
           // Console.log('isThisFieldAssociated=>', isThisFieldAssociated);
           if (isThisFieldAssociated) {
             const associatedModelName = field.name.replace('Id', '');
@@ -246,14 +237,10 @@ module.exports = async function getDetail(
               // Console.log('associatedModelName=>', associatedModelName);
               // 如果有指定哪個 model 使用哪個 prop 輸出
               const assignModelOutputField = outputFieldNamePairs
-                ? outputFieldNamePairs.filter(
-                  (pair) => pair.modelName === associatedModelName,
-                )[0]
+                ? outputFieldNamePairs.filter((pair) => pair.modelName === associatedModelName)[0]
                 : null;
               // Console.log('assignModelOutputField=>', assignModelOutputField);
-              modelOutputPropName = assignModelOutputField
-                ? assignModelOutputField.target
-                : null;
+              modelOutputPropName = assignModelOutputField ? assignModelOutputField.target : null;
               // Console.log('modelOutputPropName=>', modelOutputPropName);
             }
             // 可能要再加上一對多判斷
@@ -261,21 +248,21 @@ module.exports = async function getDetail(
             field.required = true;
             field.values = values
               ? values
-                .concat([
-                  {
-                    id: null,
-                  },
-                ])
-                .map((v) => {
-                  let name = v[modelOutputPropName] || v.name || v.key || v.id;
-                  if (_.isFunction(modelOutputPropName)) {
-                    name = modelOutputPropName(v);
-                  }
-                  return {
-                    value: v.id,
-                    name,
-                  };
-                })
+                  .concat([
+                    {
+                      id: null,
+                    },
+                  ])
+                  .map((v) => {
+                    let name = v[modelOutputPropName] || v.name || v.key || v.id;
+                    if (_.isFunction(modelOutputPropName)) {
+                      name = modelOutputPropName(v);
+                    }
+                    return {
+                      value: v.id,
+                      name,
+                    };
+                  })
               : [];
           }
           return field;
@@ -296,4 +283,4 @@ module.exports = async function getDetail(
     sails.log.error(e);
     throw e;
   }
-}
+};

@@ -23,7 +23,8 @@ try {
 
 module.exports = {
   datastores: {
-    mysql: (_.has(local, 'datastores["mysql-test"]') && _.get(local, 'datastores["mysql-test"]')) || {
+    mysql: (_.has(local, 'datastores["mysql-test"]') &&
+      _.get(local, 'datastores["mysql-test"]')) || {
       user: 'root',
       password: '',
       database: 'database',

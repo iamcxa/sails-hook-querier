@@ -3,15 +3,15 @@
  *
  * 依據給予的資料建立
  * @version 1.0
- * @param Required {Object} {
+ * @param Required {object} {
  *     langCode{String} = 'zh-TW',   要新增的資料語系。
  *     modelName{String} = null,     要新增的目標 Sequelize Model 名稱。
  *     include{Object|Array} = null, 額外給予的 Sequelize include Query。
- *     input{Object} = null,         要新增的原始資料。
+ *     input{object} = null,         要新增的原始資料。
  *   }
- * @param Optional {Object} {
- *     format{Object} = null,        原始資料的格式化樣板。
- *     formatCb{Object} = null,      原始資料的格式化 callback。
+ * @param Optional {object} {
+ *     format{object} = null,        原始資料的格式化樣板。
+ *     formatCb{object} = null,      原始資料的格式化 callback。
  *   }
  * @example 依據 input 建立一筆 User 的新資料，並且包含建立 Parent 與 Passport，同時附有建立資料前的 formatCb。
  * QueryHelper.create({
@@ -25,16 +25,11 @@
  *     username: rawData.Parent.idNumber,
  *    }),
  * });
- * @returns {Object} created item
+ * @returns {object} created item
  */
 
 module.exports = async function create(
-  {
-    langCode = this.langCode,
-    modelName = undefined,
-    include = undefined,
-    input = undefined,
-  } = {},
+  { langCode = this.langCode, modelName = undefined, include = undefined, input = undefined } = {},
   { toJSON = undefined, format = undefined, formatCb = undefined } = {},
 ) {
   try {
@@ -85,9 +80,10 @@ module.exports = async function create(
         modelPrefix: false,
         include: include
           ? this.getIncludeModelColumns({
-            modelName,
-            include,
-          }) : null,
+              modelName,
+              include,
+            })
+          : null,
       });
       Console.log('format==============>');
       Console.dir(format);
@@ -121,11 +117,11 @@ module.exports = async function create(
     }
     return toJSON
       ? createdItem.get({
-        plain: true,
-      })
+          plain: true,
+        })
       : createdItem;
   } catch (e) {
     sails.log.error(e);
     throw e;
   }
-}
+};

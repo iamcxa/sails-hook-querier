@@ -29,13 +29,9 @@ const isDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/g;
 
 global.Console = log ? console : fakeConsole;
 
-export {
-  langCode, log, commonFields, TAG, isNumeric, isDate,
-};
+export { langCode, log, commonFields, TAG, isNumeric, isDate };
 
-export function validate({
-  value, schema, options, callback,
-}) {
+export function validate({ value, schema, options, callback }) {
   return Joi.validate(
     value,
     _.isFunction(schema) ? Joi.object().keys(schema(Joi)) : schema,
@@ -46,6 +42,7 @@ export function validate({
 
 /**
  * 定義共通資料欄位，用來將 Model Name 去除，以便使用同一組 i18n。
+ *
  * @example model.User.createdAt ==> model.createdAt
  * @param {*} name
  */
@@ -137,8 +134,9 @@ export function getIncludeModelByObject(includeModelObject) {
 
 /**
  * 取出目標 Model 全部是文字類型的欄位名稱
+ *
  * @version 1.0
- * @param {String} modelName = null 要查詢的目標 Sequelize Model 名稱。
+ * @param {string} modelName = null 要查詢的目標 Sequelize Model 名稱。
  * @example 取出 Parent 中，全部屬性為文字類型的欄位名稱。
  * QueryHelper.getModelSearchableColumns('Parent');
  * // *  [{ key: 'Parent.education', type: 'String' }
@@ -156,11 +154,11 @@ export function getModelSearchableColumns(
     // eslint-disable-next-line
     for (const key in model.rawAttributes) {
       if (
-        model.rawAttributes[key].type.key === 'STRING'
-        || model.rawAttributes[key].type.key === 'TEXT'
-        || model.rawAttributes[key].type.key === 'JSON'
-        || model.rawAttributes[key].type.key === 'UUID'
-        || model.rawAttributes[key].type.key === 'ENUM'
+        model.rawAttributes[key].type.key === 'STRING' ||
+        model.rawAttributes[key].type.key === 'TEXT' ||
+        model.rawAttributes[key].type.key === 'JSON' ||
+        model.rawAttributes[key].type.key === 'UUID' ||
+        model.rawAttributes[key].type.key === 'ENUM'
       ) {
         targets.push({
           key: `${modelName}.${key}`,
@@ -168,9 +166,9 @@ export function getModelSearchableColumns(
         });
       }
       if (
-        date
-        && (model.rawAttributes[key].type.key === 'DATE'
-          || model.rawAttributes[key].type.key === 'DATEONLY')
+        date &&
+        (model.rawAttributes[key].type.key === 'DATE' ||
+          model.rawAttributes[key].type.key === 'DATEONLY')
       ) {
         targets.push({
           key: `${modelName}.${key}`,
@@ -195,9 +193,10 @@ export function getModelSearchableColumns(
 
 /**
  * 取得傳入的 model column ENUM 的值
+ *
  * @version 1.0
- * @param {String} [modelName=null]
- * @param {String} [columnName=null]
+ * @param {string} [modelName=null]
+ * @param {string} [columnName=null]
  * @example 取出 Parent 中 ENUM 欄位 union 的全部值。
  * QueryHelper.getEnumValues('Parent', 'union');
  * // * [ '非會員', '個人會員', '學生會員', '相關會員', '理事', '監事', '理事長', '常務理事', '常務監事' ]
@@ -219,6 +218,7 @@ export function getEnumValues(modelName = null, columnName = null) {
 
 /**
  * 產生 VUE form 需要的欄位名稱與類型
+ *
  * @param {any} {
  *     modelName = null,
  * }
@@ -284,9 +284,7 @@ export function getModelOutputColumns({
       }
       fields.push(field);
     }
-    const autoReadonly = ['createdAt', 'updatedAt', 'deletedAt', 'id'].concat(
-      readonly || [],
-    );
+    const autoReadonly = ['createdAt', 'updatedAt', 'deletedAt', 'id'].concat(readonly || []);
     const autoRequired = this.getModelColumns({
       modelName,
       exclude: autoReadonly,
@@ -301,10 +299,8 @@ export function getModelOutputColumns({
     };
     return fields
       .filter((e) => !this.commonFields.some((ex) => e.name === ex))
-      .filter((e) =>
-        (!_.isEmpty(include) ? include.some((inc) => e.name === inc) : e))
-      .filter((e) =>
-        (!_.isEmpty(exclude) ? !exclude.some((ex) => e.name === ex) : e))
+      .filter((e) => (!_.isEmpty(include) ? include.some((inc) => e.name === inc) : e))
+      .filter((e) => (!_.isEmpty(exclude) ? !exclude.some((ex) => e.name === ex) : e))
       .map((field) => ({
         ...field,
         label: sails.__(getPhrase(field.name)),
@@ -323,8 +319,9 @@ export function getModelOutputColumns({
 
 /**
  * 依據給予的 Sequelize Model 名稱，產生空白的欄位格式 JSON，並以 null 填充。
+ *
  * @version 20180310
- * @param {Object} {
+ * @param {object} {
  *     modelName{String} = null, 目標 Model 名稱。
  *     exclude{Array} = [], 要排除的欄位名稱。
  *     include{Array} = [], 要額外加入的欄位名稱。
@@ -351,13 +348,9 @@ export function getModelOutputColumns({
  * //  updatedAt: null,
  * //  deletedAt: null,
  * // }
- * @returns {Object} 空的 model 欄位格式 JSON。
+ * @returns {object} 空的 model 欄位格式 JSON。
  */
-export function buildEmptyModel({
-  modelName = null,
-  exclude = [],
-  include = [],
-} = {}) {
+export function buildEmptyModel({ modelName = null, exclude = [], include = [] } = {}) {
   try {
     const model = {};
     this.getModelColumns({
@@ -376,8 +369,9 @@ export function buildEmptyModel({
 
 /**
  * 取得某個 Sequelize Model 的所有欄位名稱。
+ *
  * @version 20180310
- * @param {Object} {
+ * @param {object} {
  *     modelPrefix = false,
  *     modelName = null,
  *     exclude = [],
@@ -424,9 +418,7 @@ export function getModelColumns({
     // 取得 model
     const model = this.getModelByName(modelName);
     // 取得單複數 model name
-    const outputModelName = isPrefixPlural
-      ? inflection.pluralize(model.name)
-      : model.name;
+    const outputModelName = isPrefixPlural ? inflection.pluralize(model.name) : model.name;
     // 組合
     let prefix = '';
     if (_.isBoolean(modelPrefix)) {
@@ -457,8 +449,9 @@ export function getModelColumns({
 
 /**
  * 取得特定 model 內 column 的類型，回傳值為 Sequelize 的 type 字串。
+ *
  * @version 20180331
- * @param {Object} {
+ * @param {object} {
  *     modelName{String} = null,
  *     columnName{String} = null,
  *  }
@@ -468,7 +461,7 @@ export function getModelColumns({
  *    columnName = 'email',
  * });
  * // 'String'
- * @returns {String|Null} column type
+ * @returns {string | null} column type
  * @see {@link http://docs.sequelizejs.com/manual/tutorial/models-definition.html}
  */
 export function getModelColumnType({ modelName = null, columnName = null }) {
@@ -488,19 +481,14 @@ export function getModelColumnType({ modelName = null, columnName = null }) {
 
 /**
  * 取得給予 ModelName 之關聯 ModelName，可透過參數指定取得單數或複數名稱。
+ *
  * @param {*} modelName
  * @param {*} { singular = false, plural = false }
  * @returns [String...]
  */
 export function getAssociations(
   modelName,
-  {
-    singular = false,
-    plural = false,
-    one2One = false,
-    one2Many = false,
-    raw = false,
-  } = {},
+  { singular = false, plural = false, one2One = false, one2Many = false, raw = false } = {},
 ) {
   const model = this.getModelByName(modelName);
   const { associations } = model;
@@ -545,16 +533,13 @@ export function getAssociations(
 
 /**
  * 取得給予 ModelName 之關聯 ModelName 的欄位名稱，可透過 include 參數指定複數關聯 Model 的欄位名稱。
+ *
  * @param {*} modelName
  * @param {*} include
  * @param {*} prefix
  * @returns [String...]
  */
-export function getIncludeModelColumns({
-  modelName,
-  include,
-  prefix,
-}) {
+export function getIncludeModelColumns({ modelName, include, prefix }) {
   const modelAssociations = this.getAssociations(modelName, {
     raw: true,
   });
@@ -576,11 +561,13 @@ export function getIncludeModelColumns({
       result = result.concat(columns);
 
       if (model.include && Array.isArray(model.include)) {
-        result = result.concat(this.getIncludeModelColumns({
-          modelName: modelItem.name,
-          include: model.include,
-          prefix: modelPrefix,
-        }));
+        result = result.concat(
+          this.getIncludeModelColumns({
+            modelName: modelItem.name,
+            include: model.include,
+            prefix: modelPrefix,
+          }),
+        );
       }
     }
   }

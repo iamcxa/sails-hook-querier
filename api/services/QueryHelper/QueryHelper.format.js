@@ -2,6 +2,7 @@ const _ = require('lodash');
 
 /**
  * 依據輸入的 format 物件來格式化輸出，將 data 與 format 合併並保留 format 作為預設值。
+ *
  * @version 20180310
  * @example
  * QueryHelper.matchFormat({
@@ -57,13 +58,14 @@ export function matchFormat({ format = null, data = null }) {
 
 /**
  * 依據定義好的欄位比對並同步輸入與目標物件。
+ *
  * @version 1.0
- * @param Required {Object} {
+ * @param Required {object} {
  *     modelName{String} = null,  目標 Sequelize Model 名稱。
- *     format{Object} = null,     預先定義的資料格式。
+ *     format{object} = null,     預先定義的資料格式。
  *     formatCb{Function} = null, 最後輸出前再次格式化資料的 callback。
- *     rawData{Object} = null,    尚未處理過的輸入資料。
- *     source{Object} = null,     要被填入的空白資料欄位。
+ *     rawData{object} = null,    尚未處理過的輸入資料。
+ *     source{object} = null,     要被填入的空白資料欄位。
  *   }
  * @example
  * QueryHelper.formatInput({
@@ -75,7 +77,7 @@ export function matchFormat({ format = null, data = null }) {
  *    }),
  *    rawData: input,
  * });
- * @returns {Object} 格式化過的輸入資料。
+ * @returns {object} 格式化過的輸入資料。
  * @see {@link https://lodash.com/docs/4.17.5#hasIn}
  * @see {@link https://lodash.com/docs/4.17.5#has}
  * @see {@link https://lodash.com/docs/4.17.5#set}
@@ -97,11 +99,11 @@ export function formatInput({
           // Console.log('_.get(rawData, path)=>', _.get(rawData, path));
           const value = _.get(rawData, path);
           if (
-            _.isNil(value)
-            || (!this.isNumeric(value)
-              && _.isEmpty(value)
-              && !_.isBoolean(value)
-              && !_.isFunction(value))
+            _.isNil(value) ||
+            (!this.isNumeric(value) &&
+              _.isEmpty(value) &&
+              !_.isBoolean(value) &&
+              !_.isFunction(value))
           ) {
             _.set(source, path, null);
           } else if (_.isString(value) && value.match(this.isDate) !== null) {
@@ -134,12 +136,13 @@ export function formatInput({
 /**
  * 格式化來自 Sequelize Query 的輸出物件，並視輸入來輸出該 Model 的欄位定義給前端。
  * 如果有給予 fields，可以依據 required 與 readonly 參數，給予前端可以自動產生表格的資料。
+ *
  * @version 1.0
- * @param Required {Object} {
- *     format{Object} = null,     預先定義的資料格式。
+ * @param Required {object} {
+ *     format{object} = null,     預先定義的資料格式。
  *     formatCb{Function} = null, 最後輸出前再次格式化資料的 callback。
- *     data{Object} = null,       來自 Sequelize Query 後的原始的輸出資料。
- *     fields{Object} = null,     預先定義的 Sequelize Model 欄位定義。
+ *     data{object} = null,       來自 Sequelize Query 後的原始的輸出資料。
+ *     fields{object} = null,     預先定義的 Sequelize Model 欄位定義。
  *     required{Array} = [],     要被設定為 required 的欄位名稱。
  *     readonly{Array} = [],     要被設定為 readonly 的欄位名稱。
  *  }
@@ -152,7 +155,7 @@ export function formatInput({
  *    readonly,
  *    data: data.toJSON(),
  *  });
- * @returns {Object} 格式化過的輸出資料與 Sequelize Model 欄位定義。
+ * @returns {object} 格式化過的輸出資料與 Sequelize Model 欄位定義。
  */
 export function formatOutput({
   format = null,
@@ -205,9 +208,7 @@ export function formatOutput({
         ...extra,
       };
     }
-    return !_.isNil(formatCb) && _.isFunction(formatCb)
-      ? formatCb(result)
-      : result;
+    return !_.isNil(formatCb) && _.isFunction(formatCb) ? formatCb(result) : result;
   } catch (e) {
     sails.log.error(e);
     throw e;
@@ -216,6 +217,7 @@ export function formatOutput({
 
 /**
  * 替 fields 加入 or 條件
+ *
  * @param {*} fields
  * @returns
  */

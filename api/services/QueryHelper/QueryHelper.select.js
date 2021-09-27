@@ -100,12 +100,14 @@ function formatQuery({
       order: mOrder,
       collate,
       duplicating,
-      ...paging ? {
-        limit: limit && limit > perPage ? limit : perPage,
-        offset: (curPage - 1) * perPage,
-      } : {
-        ...limit ? { limit } : {},
-      },
+      ...(paging
+        ? {
+            limit: limit && limit > perPage ? limit : perPage,
+            offset: (curPage - 1) * perPage,
+          }
+        : {
+            ...(limit ? { limit } : {}),
+          }),
     };
 
     if (include && _.isArray(include)) {
@@ -178,11 +180,7 @@ function formatQuery({
               },
             });
           } else if (_.isObject(value)) {
-            const {
-              operator,
-              condition,
-              defaultValue,
-            } = value;
+            const { operator, condition, defaultValue } = value;
 
             const op = formatOperator(operator);
             const cond = formatCondition(condition);
@@ -222,7 +220,9 @@ function formatQuery({
       }
 
       columns.forEach((column) => {
-        query.where[defaultCondition].push(Sequelize.where(Sequelize.col(column), 'like', `%${fmtKeyword}%`));
+        query.where[defaultCondition].push(
+          Sequelize.where(Sequelize.col(column), 'like', `%${fmtKeyword}%`),
+        );
       });
     }
 
@@ -244,10 +244,7 @@ function formatQuery({
   }
 }
 
-async function formatOutput({
-  presenter = null,
-  data = null,
-}) {
+async function formatOutput({ presenter = null, data = null }) {
   try {
     let result;
     if (!_.isNil(presenter) && _.isFunction(presenter)) {
@@ -278,27 +275,29 @@ async function cached(cache, cb, argv) {
 
     if (cache) {
       const cachedAt = Date.now();
-      cache.adapter.set(`${cache.key}::${cachedAt}`, JSON.stringify({
-        ...result,
-        cachedAt,
-      }), {
-        lifetime: cache.lifetime,
-      });
+      cache.adapter.set(
+        `${cache.key}::${cachedAt}`,
+        JSON.stringify({
+          ...result,
+          cachedAt,
+        }),
+        {
+          lifetime: cache.lifetime,
+        },
+      );
     }
   }
   return result;
 }
 
-async function create(
-  {
-    model = undefined,
-    scope = [],
-    include = [],
-    data = {},
-    // presenter = undefined,
-    // log = false,
-  } = {},
-) {
+async function create({
+  model = undefined,
+  scope = [],
+  include = [],
+  data = {},
+  // presenter = undefined,
+  // log = false,
+} = {}) {
   let result;
 
   if (scope) {
@@ -312,27 +311,25 @@ async function create(
   }
 
   // if (!_.isNil(presenter) && _.isFunction(presenter)) {
-    // if (presenter.constructor.name === 'AsyncFunction') {
-      // result = await presenter(data);
-    // } else {
-      // result = presenter(data);
-    // }
+  // if (presenter.constructor.name === 'AsyncFunction') {
+  // result = await presenter(data);
+  // } else {
+  // result = presenter(data);
+  // }
   // }
 
   return result;
 }
 
-async function update(
-  {
-    model = undefined,
-    scope = [],
-    include = [],
-    where = {},
-    data = {},
-    presenter = undefined,
-    // log = false,
-  } = {},
-) {
+async function update({
+  model = undefined,
+  scope = [],
+  include = [],
+  where = {},
+  data = {},
+  presenter = undefined,
+  // log = false,
+} = {}) {
   let result;
 
   if (scope) {
@@ -346,24 +343,22 @@ async function update(
   }
 
   // if (!_.isNil(presenter) && _.isFunction(presenter)) {
-    // if (presenter.constructor.name === 'AsyncFunction') {
-      // result = await presenter(data);
-    // } else {
-      // result = presenter(data);
-    // }
+  // if (presenter.constructor.name === 'AsyncFunction') {
+  // result = await presenter(data);
+  // } else {
+  // result = presenter(data);
+  // }
   // }
 
   return result;
 }
 
-async function destroy(
-  {
-    model = undefined,
-    scope = [],
-    include = [],
-    // log = false,
-  } = {},
-) {
+async function destroy({
+  model = undefined,
+  scope = [],
+  include = [],
+  // log = false,
+} = {}) {
   let result;
 
   if (scope) {
@@ -379,32 +374,30 @@ async function destroy(
   return result;
 }
 
-async function find(
-  {
-    model = undefined,
-    scope = [],
-    include = [],
-    attributes = [],
-    searchable = undefined,
-    presenter = undefined,
-    filter = {
-      where: {},
-    },
-    sort = 'DESC',
-    sortBy = undefined,
-    order = undefined,
-    collate = undefined,
-    group = undefined,
-    limit = undefined,
-    paging = true,
-    curPage = 1,
-    perPage = 30,
-    keyword = undefined,
-    rawWhere = false,
-    toJSON = false,
-    log = false,
-  } = {},
-) {
+async function find({
+  model = undefined,
+  scope = [],
+  include = [],
+  attributes = [],
+  searchable = undefined,
+  presenter = undefined,
+  filter = {
+    where: {},
+  },
+  sort = 'DESC',
+  sortBy = undefined,
+  order = undefined,
+  collate = undefined,
+  group = undefined,
+  limit = undefined,
+  paging = true,
+  curPage = 1,
+  perPage = 30,
+  keyword = undefined,
+  rawWhere = false,
+  toJSON = false,
+  log = false,
+} = {}) {
   try {
     if (!model || !model.name) {
       throw Error('model missing.');
@@ -444,10 +437,12 @@ async function find(
 
     const items = [];
     for (const row of data.rows) {
-      items.push(await formatOutput({
-        presenter,
-        data: toJSON ? row.toJSON() : row,
-      }));
+      items.push(
+        await formatOutput({
+          presenter,
+          data: toJSON ? row.toJSON() : row,
+        }),
+      );
     }
 
     const total = typeof data.count === 'number' ? data.count : data.count.length;
@@ -530,7 +525,7 @@ class Query {
    */
   useSearchable(searchable) {
     this.data.searchable = {
-      ...this.data.searchable ? this.data.searchable : {},
+      ...(this.data.searchable ? this.data.searchable : {}),
       ...searchable,
     };
     return this;
@@ -665,7 +660,7 @@ class Query {
    * @param {Array} query.group - 分組
    * @param {string} query.collate - 語系
    * @param {number} query.limit - 搜尋數量上限
-   * @return {object} result - 回傳結果
+   * @returns {object} result - 回傳結果
    * @property {Array} result.items - 搜尋結果
    * @property {object} result.paging - 分頁設定
    * @property {number} result.paging.lastPage - 最後一頁位置
@@ -727,7 +722,7 @@ class Query {
    * @param {Array} query.group - 分組
    * @param {string} query.collate - 語系
    * @param {number} query.limit - 搜尋數量上限
-   * @return {object} result - 回傳結果
+   * @returns {object} result - 回傳結果
    * @property {Array} result.items - 搜尋結果
    * @property {object} result.paging - 分頁設定
    * @property {number} result.paging.lastPage - 最後一頁位置
@@ -739,16 +734,7 @@ class Query {
    * @property {number} result.paging.limit - 搜尋數量上限
    * @property {number} result.paging.total - 總搜尋數量
    */
-  async findAll({
-    sort = 'DESC',
-    sortBy,
-    order,
-    group,
-    collate,
-    limit,
-    toJSON,
-    log,
-  }) {
+  async findAll({ sort = 'DESC', sortBy, order, group, collate, limit, toJSON, log }) {
     this.queryInit();
 
     const result = cached(this.data.cache, find, {
@@ -778,10 +764,7 @@ class Query {
     return result;
   }
 
-  async create({
-    data,
-    log,
-  }) {
+  async create({ data, log }) {
     this.queryInit();
 
     const result = cached(this.data.cache, create, {
@@ -795,10 +778,7 @@ class Query {
     return result;
   }
 
-  async update({
-    data,
-    log,
-  }) {
+  async update({ data, log }) {
     this.queryInit();
 
     const result = cached(this.data.cache, update, {
@@ -812,10 +792,7 @@ class Query {
     return result;
   }
 
-  async destroy({
-    data,
-    log,
-  }) {
+  async destroy({ data, log }) {
     this.queryInit();
 
     const result = cached(this.data.cache, destroy, {
@@ -832,8 +809,9 @@ class Query {
 
 /**
  * 將回傳 class Query 並呼叫 Query.select(model)
+ *
  * @param {model} model - 要進行查詢的 Sequelize models
  */
 module.exports = function select(model) {
   return new Query().select(model);
-}
+};

@@ -2,8 +2,9 @@ const _ = require('lodash');
 
 /**
  * 依據輸入資料格式化查詢 query
+ *
  * @version 1.0
- * @param {Object} {
+ * @param {object} {
  *     langCode{String} = 'zh-TW',      要查詢的資料語系。
  *     modelName{String} = null,        要查詢的目標 Sequelize Model 名稱。
  *     filter = null,
@@ -14,7 +15,7 @@ const _ = require('lodash');
  *     order = null,
  *   }
  * @example
- * @returns {Object}
+ * @returns {object}
  */
 export function formatQuery({
   attributes = undefined,
@@ -193,16 +194,10 @@ export function formatQuery({
           let value = isNumber ? parseInt(field.value, 10) : field.value;
           value = _.isDate(value) ? new Date(value) : value;
           if (isNumber) {
-            query.where.$and.push(
-              Sequelize.where(Sequelize.col(`${field.key}`), 'eq', value),
-            );
+            query.where.$and.push(Sequelize.where(Sequelize.col(`${field.key}`), 'eq', value));
           } else {
             query.where.$and.push(
-              Sequelize.where(
-                Sequelize.col(`${field.key}`),
-                'like',
-                `%${value}%`,
-              ),
+              Sequelize.where(Sequelize.col(`${field.key}`), 'like', `%${value}%`),
             );
           }
         }
@@ -236,15 +231,12 @@ export function formatQuery({
       }
 
       // 推入搜尋目標
-      query.where.$or = targets.map((e) =>
-        Sequelize.where(Sequelize.col(e), 'like', `%${kw}%`));
+      query.where.$or = targets.map((e) => Sequelize.where(Sequelize.col(e), 'like', `%${kw}%`));
 
       // 額外目標欄位
       if (filter.search.extra) {
         filter.search.extra.forEach((e) => {
-          query.where.$or.push(
-            Sequelize.where(Sequelize.col(e), 'like', `%${kw}%`),
-          );
+          query.where.$or.push(Sequelize.where(Sequelize.col(e), 'like', `%${kw}%`));
         });
       }
     }
@@ -278,12 +270,13 @@ export function formatQuery({
 
 /**
  * 依據輸入資料回傳分頁資料
+ *
  * @version 1.0
- * @param {Object} {
+ * @param {object} {
  *     modelName = null,
  *     include = null,
  *   }
- * @param {Object} {
+ * @param {object} {
  *     langCode = 'zh-TW',
  *     filter = null,
  *     curPage = 1,
@@ -291,7 +284,7 @@ export function formatQuery({
  *     sort = 'DESC',
  *     log = false,
  *   }
- * @param {Object} {
+ * @param {object} {
  *     format = null,
  *     formatCb = null,
  *   }
@@ -334,7 +327,7 @@ export function formatQuery({
  *       studentNames: e.data.Parent.studentNames,
  *     }),
  *   });
- * @returns {Object}
+ * @returns {object}
  */
 export async function findBy(
   {
@@ -432,7 +425,8 @@ export async function findBy(
         formatCb,
         data: e ? e.toJSON() : null,
         view,
-      }));
+      }),
+    );
     const total = typeof data.count === 'number' ? data.count : data.count.length;
     if (view) {
       extra = {
@@ -480,30 +474,30 @@ export function getIndexPageTableAndFilters({
     const autoIncludeColumns = _.isEmpty(include)
       ? []
       : _.flattenDeep(
-        include.map((e) => {
-          // Console.log('autoIncludeColumns e=>', e);
-          if (!_.isObject(e)) {
-            throw Error('include model must be an object.');
-          }
-          return (
-            QueryHelper.getModelColumns({
-              modelName: e.model ? e.model.name : e.modelName,
-              modelPrefix: true,
-            }) || []
-          );
-        }),
-      );
+          include.map((e) => {
+            // Console.log('autoIncludeColumns e=>', e);
+            if (!_.isObject(e)) {
+              throw Error('include model must be an object.');
+            }
+            return (
+              QueryHelper.getModelColumns({
+                modelName: e.model ? e.model.name : e.modelName,
+                modelPrefix: true,
+              }) || []
+            );
+          }),
+        );
     // console.log('autoIncludeColumns=>', autoIncludeColumns)
     // Console.log('includeColumns=>', includeColumns);
 
     // 取出表格欄位
     let columns = _.isEmpty(includeColumns)
       ? this.getModelColumns({
-        modelName,
-        modelPrefix: false,
-        exclude: excludeColumns,
-        include: autoIncludeColumns,
-      })
+          modelName,
+          modelPrefix: false,
+          exclude: excludeColumns,
+          include: autoIncludeColumns,
+        })
       : includeColumns;
     // console.log('columns=>', columns)
     if (excludeColumns) {
@@ -512,14 +506,12 @@ export function getIndexPageTableAndFilters({
 
     // 取出表頭
     const isAutoIncludeField = (name) =>
-      (autoIncludeColumns.some((col) => col === name)
+      autoIncludeColumns.some((col) => col === name)
         ? `model.${_.upperFirst(name)}`
-        : `model.${_.upperFirst(modelName)}.${name}`);
+        : `model.${_.upperFirst(modelName)}.${name}`;
 
     const headers = columns.map((col) => ({
-      label: sails.__(
-        this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),
-      ),
+      label: sails.__(this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col)),
       // label: sails.__({
       //   phrase:
       //     this.isCommonField(col) ? `model.${col}` : isAutoIncludeField(col),
@@ -533,9 +525,7 @@ export function getIndexPageTableAndFilters({
       integer: true,
     }).map((e) => ({
       label: sails.__(
-        this.isCommonField(e.key)
-          ? `model${e.key.replace(modelName, '')}`
-          : `model.${e.key}`,
+        this.isCommonField(e.key) ? `model${e.key.replace(modelName, '')}` : `model.${e.key}`,
       ),
       // label: sails.__({
       //   phrase: this.isCommonField(e.key)
@@ -572,9 +562,7 @@ export async function getDetailPageFieldWithAssociations({
   required = [],
   // readonly = [],
 }) {
-  sails.log(
-    `=== getPageFields modelName: "${modelName}", langCode: "${langCode}" ===`,
-  );
+  sails.log(`=== getPageFields modelName: "${modelName}", langCode: "${langCode}" ===`);
   try {
     // 建立全部欄位名稱
     const fieldNames = QueryHelper.getModelOutputColumns({
@@ -601,9 +589,7 @@ export async function getDetailPageFieldWithAssociations({
         associatedData[target] = modelData;
       }
       fieldNames.map((field) => {
-        const isThisFieldAssociated = associatedModels.some(
-          (ass) => field.name === `${ass}Id`,
-        );
+        const isThisFieldAssociated = associatedModels.some((ass) => field.name === `${ass}Id`);
         // Console.log('isThisFieldAssociated=>', isThisFieldAssociated);
         if (isThisFieldAssociated) {
           const associatedModelName = field.name.replace('Id', '');
@@ -614,14 +600,10 @@ export async function getDetailPageFieldWithAssociations({
             // Console.log('associatedModelName=>', associatedModelName);
             // 如果有指定哪個 model 使用哪個 prop 輸出
             const assignModelOutputField = outputFieldNamePairs
-              ? outputFieldNamePairs.filter(
-                (pair) => pair.modelName === associatedModelName,
-              )[0]
+              ? outputFieldNamePairs.filter((pair) => pair.modelName === associatedModelName)[0]
               : null;
             // Console.log('assignModelOutputField=>', assignModelOutputField);
-            modelOutputPropName = assignModelOutputField
-              ? assignModelOutputField.target
-              : null;
+            modelOutputPropName = assignModelOutputField ? assignModelOutputField.target : null;
             // Console.log('modelOutputPropName=>', modelOutputPropName);
           }
           // 可能要再加上一對多判斷
@@ -629,21 +611,21 @@ export async function getDetailPageFieldWithAssociations({
           field.required = true;
           field.values = values
             ? values
-              .concat([
-                {
-                  id: null,
-                },
-              ])
-              .map((v) => {
-                let name = v[modelOutputPropName] || v.name || v.key || v.id;
-                if (_.isFunction(modelOutputPropName)) {
-                  name = modelOutputPropName(v);
-                }
-                return {
-                  value: v.id,
-                  name,
-                };
-              })
+                .concat([
+                  {
+                    id: null,
+                  },
+                ])
+                .map((v) => {
+                  let name = v[modelOutputPropName] || v.name || v.key || v.id;
+                  if (_.isFunction(modelOutputPropName)) {
+                    name = modelOutputPropName(v);
+                  }
+                  return {
+                    value: v.id,
+                    name,
+                  };
+                })
             : [];
         }
         return field;

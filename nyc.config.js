@@ -6,10 +6,5 @@ module.exports = {
     // 'html'
   ],
   'skip-full': true,
-  exclude: [
-    '.**.{js,json}',
-    'coverage/**',
-    'config/**/*.{js,json}',
-    'test/**/*.{js,json}',
-  ]
+  exclude: ['.**.{js,json}', 'coverage/**', 'config/**/*.{js,json}', 'test/**/*.{js,json}'],
 };
