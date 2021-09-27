@@ -31,9 +31,9 @@
  *  });
  * @returns {Object} updated item
  */
-import _ from 'lodash';
+const _ = require('lodash');
 
-export default async function update(
+module.exports = async function update(
   {
     langCode = this.langCode,
     modelName = null,

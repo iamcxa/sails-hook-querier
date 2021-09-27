@@ -1,4 +1,4 @@
-import samples from '../samples';
+const samples = require('../samples');
 
 describe('about QueryHelper.create operation.', function () {
   it('create should be success', async function () {

@@ -69,9 +69,9 @@
  *  });
  * @returns {Object} 屬於某個 ID 的資料。
  */
-import _ from 'lodash';
+const _ = require('lodash');
 
-export default async function getDetail(
+module.exports = async function getDetail(
   {
     langCode = 'zh-TW',
     modelName = null,

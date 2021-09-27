@@ -1,4 +1,4 @@
-import _ from 'lodash';
+const _ = require('lodash');
 
 /**
  * 依據輸入的 format 物件來格式化輸出，將 data 與 format 合併並保留 format 作為預設值。

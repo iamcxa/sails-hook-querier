@@ -14,9 +14,9 @@
  * @returns {Array} 包含是否完成的陣列
  */
 
-import _ from 'lodash';
+const _ = require('lodash');
 
-export default async function destroy({
+module.exports = async function destroy({
   modelName = null,
   include = null,
   force = false,

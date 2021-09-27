@@ -28,7 +28,7 @@
  * @returns {Object} created item
  */
 
-export default async function create(
+module.exports = async function create(
   {
     langCode = this.langCode,
     modelName = undefined,

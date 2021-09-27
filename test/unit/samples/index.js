@@ -1,6 +1,6 @@
-import instances from './instances.json';
+const instances = require('./instances.json');
 
-export default {
+module.exports = {
   user: instances.User,
   group: instances.Group,
   image: instances.Image,

@@ -834,10 +834,6 @@ class Query {
  * 將回傳 class Query 並呼叫 Query.select(model)
  * @param {model} model - 要進行查詢的 Sequelize models
  */
-export default function select(model) {
+module.exports = function select(model) {
   return new Query().select(model);
 }
-
-export {
-  Query,
-};

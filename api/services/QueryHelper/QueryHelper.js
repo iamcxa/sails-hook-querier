@@ -3,10 +3,9 @@
  * @author Kent Chen<iamcxa@gmail.com>
  */
 /* eslint no-underscore-dangle: 0 */
-// import moment from 'moment';
-import _ from 'lodash';
-import inflection from 'inflection';
-import Joi from 'joi';
+const _ = require('lodash');
+const inflection = require('inflection');
+const Joi = require('joi');
 
 export { default as getDetail } from './QueryHelper.getDetail';
 export { default as create } from './QueryHelper.create';
@@ -607,4 +606,4 @@ export function modelAssociationsToArray(model) {
   return result;
 }
 
-export default {};
+module.exports = {};
