@@ -20,7 +20,7 @@ describe('about QueryHelper select operation.', function () {
       model: Group,
       include: [User],
       data: (i) => {
-        if (i < 2) {
+        if (i < 1) {
           return {
             ...input,
             name: 'targetItem',
@@ -97,7 +97,7 @@ describe('about QueryHelper select operation.', function () {
       .findAll({});
 
     result1.items.length.should.equal(perPage);
-    result2.items.length.should.equal(baseSize * 2 - 2);
+    result2.items.length.should.equal(baseSize * 2 - 1);
     result1.items[0].formatted.should.equal(true);
     result2.items[0].formatted.should.equal(true);
   });
@@ -305,61 +305,161 @@ describe('about QueryHelper select operation.', function () {
     );
   });
 
-  it.skip('cache data should be success', async function () {
+  it('cache data performance', async function () {
     let start = process.hrtime();
-    const timer = function (note) {
+    const timer = function (note, display) {
       const precision = 3; // 3 decimal places
       const elapsed = process.hrtime(start)[1] / 1000000;
-      sails.log(`${process.hrtime(start)[0]} s, ${elapsed.toFixed(precision)} ms - ${note}`);
+      if (display) {
+        sails.log(`${process.hrtime(start)[0]} s, ${elapsed.toFixed(precision)} ms - ${note}`);
+      } else {
+        sails.log(`- ${note}`);
+      }
       start = process.hrtime();
     };
 
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const max = 1000;
 
-    timer('query1 start');
-    const result1 = await QueryHelper.select(Group)
-      .useInclude([
-        {
-          model: User,
-        },
-      ])
-      .useRequest({
-        name: 'get',
-      })
-      .useWhere((request) => ({
-        name: `%${request.name}%`,
-      }))
-      .useCache({
-        adapter: 'redis',
-        lifetime: 10,
-      })
-      .findAll({
-        toJSON: true,
-      });
-    timer('query1 done');
-    sails.log(result1);
+    timer('no cache query start');
+    for (let i = 0; i < max; i++) {
+      await QueryHelper.select(Group)
+        .useRequest({
+          name: 'get',
+        })
+        .useWhere((request) => ({
+          name: `%${request.name}%`,
+        }))
+        .findAll({
+          toJSON: true,
+        });
+    }
+    await sleep(300);
+    timer('no cache query done', true);
     await sleep(2000);
-    timer('query2 start');
-    const result2 = await QueryHelper.select(Group)
-      .useInclude([
-        {
-          model: User,
-        },
-      ])
-      .useRequest({
-        name: 'get',
-      })
-      .useWhere((request) => ({
-        name: `%${request.name}%`,
-      }))
-      .useCache({
-        adapter: 'redis',
-        lifetime: 10,
-      })
-      .findAll({
-        toJSON: true,
+    timer('cached query start');
+    for (let i = 0; i < max; i++) {
+      const result = await QueryHelper.select(Group)
+        .useRequest({
+          name: 'get',
+        })
+        .useWhere((request) => ({
+          name: `%${request.name}%`,
+        }))
+        .useCache({
+          adapter: 'redis',
+          lifetime: 10,
+        })
+        .findAll({
+          toJSON: true,
+        });
+      sails.log(result);
+    }
+    timer('cached query done', true);
+  });
+
+  it('cache create data performance', async function () {
+    let start = process.hrtime();
+    const timer = function (note, display) {
+      const precision = 3; // 3 decimal places
+      const elapsed = process.hrtime(start)[1] / 1000000;
+      if (display) {
+        sails.log(`${process.hrtime(start)[0]} s, ${elapsed.toFixed(precision)} ms - ${note}`);
+      } else {
+        sails.log(`- ${note}`);
+      }
+      start = process.hrtime();
+    };
+
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const name = 'cachetest';
+    const max = 10;
+
+    timer('no cache create query start');
+    for (let i = 0; i < max; i++) {
+      await Group.create({
+        ...input,
+        name: `no${name}`,
       });
-    timer('query2 done');
-    sails.log(result2);
+
+      const result = await QueryHelper.select(Group)
+        .useRequest({
+          name: `no${name}`,
+        })
+        .useWhere((request) => ({
+          name: `%${request.name}%`,
+        }))
+        .findAll({
+          toJSON: true,
+        });
+      // sails.log(result);
+    }
+    timer('no cache create query done', true);
+    await sleep(2000);
+    timer('cached create query start');
+    for (let i = 0; i < max; i++) {
+      await QueryHelper.select(Group)
+        .useCache({
+          adapter: 'redis',
+          lifetime: 100,
+          key: name,
+        })
+        .create({
+          name: `${name}`,
+        });
+
+      const result = await QueryHelper.select(Group)
+        .useCache({
+          adapter: 'redis',
+          lifetime: 100,
+          key: name,
+        })
+        .getCache();
+      sails.log(result);
+    }
+    timer('cached create query done', true);
+  });
+
+  it('clean cache should be success', async function () {
+    const name = 'cacheclean';
+    const max = 10;
+    for (let i = 0; i < max; i++) {
+      await QueryHelper.select(Group)
+        .useCache({
+          adapter: 'redis',
+          lifetime: 10,
+          key: name,
+        })
+        .create({
+          name: `${name}`,
+        });
+
+      await QueryHelper.select(Group)
+        .useCache({
+          adapter: 'redis',
+          lifetime: 10,
+          ey: name,
+        })
+        .useRawWhere({
+          name: `${name}`,
+        })
+        .destroy();
+
+      const result = await QueryHelper.select(Group)
+        .useRequest({
+          name: 'get',
+        })
+        .useRawWhere({
+          name: `${name}`,
+        })
+        .useCache({
+          adapter: 'redis',
+          lifetime: 10,
+        })
+        .findAll({
+          toJSON: true,
+        });
+      should.not.exist(result.cached);
+    }
   });
 });
