@@ -22,6 +22,7 @@ jobs:
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
           MYSQL_ROOT_PASSWORD: ''
+      - image: redis
 
     steps:
       - checkout
