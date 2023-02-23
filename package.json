@@ -56,7 +56,7 @@
     "sails-hook-blocks": "github:iamcxa/sails-hook-blocks",
     "sails-hook-sequelize": "github:udea-io/sails-hook-sequelize",
     "sails-util-micro-apps": "github:udea-io/sails-util-micro-apps",
-    "sequelize": "^5.22.4",
+    "sequelize": "^6.28.2",
     "sqlite3": "^5.0.2",
     "tracer": "^1.1.5"
   },
